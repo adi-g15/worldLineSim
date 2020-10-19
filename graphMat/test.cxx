@@ -7,8 +7,8 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    graph_Matrix<int> mat(6,6);
-    // graph_Matrix<int> mat;
+    Graph_Matrix<int> mat(6,6);
+    // Graph_Matrix<int> mat;
 
     mat.displayMat();    
 

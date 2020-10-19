@@ -2,21 +2,27 @@
 
 #include <utility>
 #include <cstdint>
+#include <list>
 
+#include "entity.hpp"
+
+template<typename udimen_t = uint32_t>
 struct _coord{
-    private: static constexpr uint32_t _NULL_COORDINATE_ = static_cast<uint32_t>(-1);
-    public:
-    uint32_t mX, mY;
+    udimen_t mX, mY;
 
-    inline bool operator==(const _coord& c) const{ return this->mX == c.mX && this->mY == c.mY; }
-    inline void reset(){ this->mX = _NULL_COORDINATE_; this->mY = _NULL_COORDINATE_; }
-    inline bool isNull(){ return this->mX == _NULL_COORDINATE_ && this->mY == _NULL_COORDINATE_; }
+    _coord(udimen_t x, udimen_t y): mX(x), mY(y){}
 };
 
 typedef uint64_t _timePoint;
 
-struct _box{
-    bool isEmpty = true;
+struct _box{    //Just as extension, to add more variables to the graph_box
+    // since this will be the `data` content of the graph_box, so, it will be accessed by, this->data->varNameHere
+        // only for INTERNAL USE, for path finding
+    Direction __dir_came_from;  //stores the direction from which this node was reached
+
+    std::list<Entity*> entities;
+
+    // bool isEmpty = true;    //maybe removed
 };
 
 namespace statics

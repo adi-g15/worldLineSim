@@ -1,25 +1,26 @@
 #pragma once
 
 #include <ostream>
+#include <vector>
+#include <utility>
 
-// #include "graph_mat_decl.hpp"
+#include "direction.hpp"
+#include "includes/declarations.hpp"
 
-enum Direction: uint8_t{ // intentionally not enum class now
-    UP,
-    DOWN,
-    RIGHT,
-    LEFT
-};
+// equivalent to {x,y} in a matrix, this typedef defines the position of a box/point, in an intuitive way (to me atleast :D), and feels more closer to the implementation than to give indices, since here we have directions mostly
+typedef std::vector<std::pair< Direction, uint16_t >> graph_position;
 
 template< typename node_type >
-struct graph_box    //make it non-copyable
+struct Graph_Box    //make it non-copyable
 {
+    typedef uint32_t udimen_t;
+
     public:
         const std::remove_reference_t<node_type>& getData() const{ return this->data; }
 
-        graph_box* get_box(){ return this; }
-        const graph_box* get_box() const{ return this; }
-        graph_box* get_adj_box( Direction dir ) const{
+        Graph_Box* get_box(){ return this; }
+        const Graph_Box* get_box() const{ return this; }
+        Graph_Box* get_adj_box( Direction dir ) const{
             switch (dir)
             {
                 case Direction::UP: return this->up;
@@ -30,31 +31,36 @@ struct graph_box    //make it non-copyable
             }
         }
 
-        graph_box(){
+        Graph_Box(udimen_t x, udimen_t y): Graph_Box(node_type{}, x, y){}
+
+        Graph_Box(node_type data, udimen_t x, udimen_t y): data(data), coords(x,y){
             this->up = nullptr;
             this->down = nullptr;
             this->left = nullptr;
             this->right = nullptr;
         }
 
-        graph_box(const graph_box<node_type>&) = delete;
-        graph_box(const graph_box<node_type>&&) = delete;
+        Graph_Box(const Graph_Box<node_type>&) = delete;
+        Graph_Box(const Graph_Box<node_type>&&) = delete;
 
-        friend std::ostream& operator<<( std::ostream& os, const graph_box& box){
+        friend std::ostream& operator<<( std::ostream& os, const Graph_Box& box){
             os << box.getData();
             return os;
         }
-        // friend class graph_Matrix<node_type>;
+        // friend class Graph_Matrix<node_type>;
 
-    private:
-        node_type data;
+    protected:
+        node_type data;    /*This has been given as an extension, so that you can add more variables to the graph_box
+                            though, note that, you will be able to access using this->data->your_var_name */
+        _coord<udimen_t> coords;  // @NOTE - not actually needed, though this maybe used in my implementation of snake
 
-        graph_box* right;
-        graph_box* left;
-        graph_box* up;
-        graph_box* down;
-        // friend class graph_Matrix<node_type>;
+        Graph_Box* right;
+        Graph_Box* left;
+        Graph_Box* up;
+        Graph_Box* down;
+        // friend class Graph_Matrix<node_type>;
 
-        template<typename,typename> friend class graph_Matrix;    //will make all graph_Matrix friend to this
+        // LEARNT - friending a templated class (down below is the `syntax` found, to friend `all` templated versions of Graph_Matrix)
+        template<typename,typename> friend class Graph_Matrix;    //will make all Graph_Matrix friend to this
 
 };

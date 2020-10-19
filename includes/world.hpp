@@ -8,6 +8,7 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 
 #include "log.hpp"
 #include "snake.hpp"
+#include "world_plot.hpp"
 
 #include <vector>
 #include <utility>
@@ -52,7 +53,7 @@ private:
     std::pair<uint16_t, uint16_t> _WorldDimens; //current dimensions of this world
     std::pair<uint16_t, uint16_t> _curr_BOUNDS; //current `reserved` dimensions of this world
 
-    std::vector< std::vector<_box> > world_plot;    // @todo - Will be 3D in future
+    WorldPlot world_plot;    // @todo - Will be 3D in future
 
     std::vector< Snake > snakes;
 
