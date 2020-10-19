@@ -2,36 +2,14 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "tsc: build - tsconfig.json"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "tsc: watch - tsconfig.json"
-		},
-		{
 			"type": "shell",
 			"label": "C/C++: g++ build active file",
 			"command": "/usr/bin/g++",
 			"args": [
 				"-g",
-				"${workspaceFolder}/*cpp",
-				"${workspaceFolder}/src/*cpp",
-				"-I",
-				"${workspaceFolder}/includes",
+				"${workspaceFolder}/test.cxx",
 				"-o",
-				"${workspaceFolder}/world"
+				"test"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -48,10 +26,9 @@
 			"args": [
 				"/Zi",
 				"/EHsc",
-				"/std:c++latest",
 				"/Fe:",
 				"${workspaceFolder}\\test.exe",
-				"${file}"
+				"${workspaceFolder}\\test.cxx"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

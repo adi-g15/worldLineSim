@@ -1,3 +1,15 @@
+/*
+    Get w = getWorld( t - t` )
+
+    if( is_descendence(w, curr) ){
+        par = w;
+    }else {
+        par = curr;
+    }
+
+    addNewWorld( par );
+*/
+
 #include "world.hpp"
 #include "random.hpp"
 #include "exceptions.hpp"

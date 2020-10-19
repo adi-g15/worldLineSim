@@ -1,3 +1,9 @@
+/*
+FOR THE WORLD TO BE DYNAMICALLY GROWING ->
+    We need the logica; matrix like structure but list like additions too...  if that's possible
+
+*/
+
 #pragma once
 
 #include "log.hpp"

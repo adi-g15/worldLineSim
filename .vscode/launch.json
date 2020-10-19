@@ -1,20 +1,15 @@
 {
     "configurations": [
     {
-        "type": "firefox",
+        "name": "(Windows) Launch",
+        "type": "cppvsdbg",
         "request": "launch",
-        "reAttach": true,
-        "name": "Launch index.html",
-        "file": "${workspaceFolder}/index.html"
-    },
-    {
-        "name": "Launch Program",
-        "program": "${fileDirname}/${fileBasenameNoExtension}.ts",
-        "request": "launch",
-        "skipFiles": [
-            "<node_internals>/**"
-        ],
-        "type": "pwa-node"
+        "program": "${workspaceFolder}/test.exe",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false
     }
     ]
 }

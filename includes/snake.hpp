@@ -17,9 +17,10 @@ public:
     std::vector< _coord > curr_path;
     uint32_t length;   //starts with _world.init_length
 
+    void _Action1() override;   //calls moveForward()
+    void _Action2() override;   //calls eatFood()
+
     bool isPathClean() const;
-    bool eatFood(); //returns true if it can eat, else false and no change
-    bool moveForward();
     const _coord& getHead() const;
 
     Snake(const World_Ptr);
@@ -27,4 +28,6 @@ public:
 private:
     std::vector< _coord > body;
     _coord head;
+    bool eatFood(); //returns true if it can eat, else false and no change
+    bool moveForward();
 };

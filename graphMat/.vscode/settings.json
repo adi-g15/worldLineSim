@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "*.tcc": "cpp",
+        "memory": "cpp",
+        "new": "cpp",
+        "numeric": "cpp",
+        "system_error": "cpp",
+        "ostream": "cpp"
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#551B00",
+        "titleBar.activeBackground": "#772600",
+        "titleBar.activeForeground": "#FFFBFA"
+    }
+}
