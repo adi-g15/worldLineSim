@@ -13,7 +13,7 @@ typedef std::vector<std::pair< Direction, uint16_t >> graph_position;
 template< typename node_type >
 struct Graph_Box    //make it non-copyable
 {
-    typedef uint32_t udimen_t;
+    typedef int32_t dimen_t;
 
     public:
         const std::remove_reference_t<node_type>& getData() const{ return this->data; }
@@ -31,9 +31,10 @@ struct Graph_Box    //make it non-copyable
             }
         }
 
-        Graph_Box(udimen_t x, udimen_t y): Graph_Box(node_type{}, x, y){}
+        Graph_Box(dimen_t x, dimen_t y): Graph_Box(node_type{}, x, y){}
+        Graph_Box(const _coord<dimen_t>& coord): Graph_Box(node_type{}, coord.mX, coord.mY){}
 
-        Graph_Box(node_type data, udimen_t x, udimen_t y): data(data), coords(x,y){
+        Graph_Box(node_type data, dimen_t x, dimen_t y): data(data), coords(x,y){
             this->up = nullptr;
             this->down = nullptr;
             this->left = nullptr;
@@ -52,7 +53,7 @@ struct Graph_Box    //make it non-copyable
     protected:
         node_type data;    /*This has been given as an extension, so that you can add more variables to the graph_box
                             though, note that, you will be able to access using this->data->your_var_name */
-        _coord<udimen_t> coords;  // @NOTE - not actually needed, though this maybe used in my implementation of snake
+        _coord<dimen_t> coords;  // @NOTE - not actually needed, though this maybe used in my implementation of snake
 
         Graph_Box* right;
         Graph_Box* left;

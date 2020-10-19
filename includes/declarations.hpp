@@ -6,11 +6,11 @@
 
 #include "entity.hpp"
 
-template<typename udimen_t = uint32_t>
+template<typename dimen_t = int32_t>
 struct _coord{
-    udimen_t mX, mY;
+    dimen_t mX, mY;
 
-    _coord(udimen_t x, udimen_t y): mX(x), mY(y){}
+    _coord(dimen_t x, dimen_t y): mX(x), mY(y){}
 };
 
 typedef uint64_t _timePoint;

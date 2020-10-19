@@ -4,13 +4,13 @@
 
 #include "graph_mat_decl.hpp"
 
-template< typename node_type, typename udimen_t = uint32_t >
-class Square_Matrix: public Graph_Matrix<node_type, udimen_t>{
+template< typename node_type, typename dimen_t = int32_t >
+class Square_Matrix: public Graph_Matrix<node_type, dimen_t>{
     public:
-        udimen_t getOrder() const{  //order of the matrix
-            return this->_N_Rows;
+        dimen_t getOrder() const{  //order of the matrix
+            return this->_total_y_abs;
         }
-        void resize(udimen_t new_order) override{
+        void resize(dimen_t new_order) override{
             this->resize(new_order, new_order);
         }
 

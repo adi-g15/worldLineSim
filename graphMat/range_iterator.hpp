@@ -2,12 +2,12 @@
 
 #include "graph_mat_decl.hpp"
 
-template<typename udimen_t = uint32_t>
+template<typename dimen_t = int32_t>
 class range_iterator{   //only for graph_matrix
     private:
         //temporary variables for for range loops
-        udimen_t __tmp_forRange_x;
-        udimen_t __tmp_forRange_y;
+        dimen_t __tmp_forRange_x;
+        dimen_t __tmp_forRange_y;
 
     public:
         range_iterator(){
