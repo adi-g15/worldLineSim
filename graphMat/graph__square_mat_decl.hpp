@@ -10,8 +10,13 @@ class Square_Matrix: public Graph_Matrix<node_type, dimen_t>{
         dimen_t getOrder() const{  //order of the matrix
             return this->_total_y_abs;
         }
-        void resize(dimen_t new_order) override{
-            this->resize(new_order, new_order);
+        void resize(dimen_t new_order){
+            Graph_Matrix::resize(new_order, new_order);
         }
+
+    Square_Matrix(): Square_Matrix(1){}
+    Square_Matrix(dimen_t order): Graph_Matrix(order, order){
+
+    }
 
 };

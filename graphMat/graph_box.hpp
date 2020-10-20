@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "direction.hpp"
-#include "includes/declarations.hpp"
+#include "../includes/declarations.hpp"
 
 // equivalent to {x,y} in a matrix, this typedef defines the position of a box/point, in an intuitive way (to me atleast :D), and feels more closer to the implementation than to give indices, since here we have directions mostly
 typedef std::vector<std::pair< Direction, uint16_t >> graph_position;

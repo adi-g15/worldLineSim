@@ -6,8 +6,17 @@
         "new": "cpp",
         "numeric": "cpp",
         "system_error": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "xlocnum": "cpp",
+        "xstring": "cpp",
+        "iosfwd": "cpp"
     },
+    "C_Cpp.default.includePath": [
+        "${default}",
+        "${workspaceFolder}/.."
+    ],
     "workbench.colorCustomizations": {
         "activityBar.background": "#551B00",
         "titleBar.activeBackground": "#772600",

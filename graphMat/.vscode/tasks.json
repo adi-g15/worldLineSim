@@ -26,6 +26,8 @@
 			"args": [
 				"/Zi",
 				"/EHsc",
+				"/std:c++latest",
+				"/I..",
 				"/Fe:",
 				"${workspaceFolder}\\test.exe",
 				"${workspaceFolder}\\test.cxx"
