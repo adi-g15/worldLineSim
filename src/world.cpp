@@ -119,3 +119,16 @@ void World::runNextUnitTime(){
 
     ++this->currentTime;
 }
+
+bool World::isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const{
+    return this->world_plot.isPathClear( std::forward(origin), std::forward(path) );
+}
+
+directionalPath World::getShortestPathToFood( const Graph_Box<_box>* origin ) const{
+      // @question -> Will std::forward with pointers work as well, (seems so, since it's just taking the value stored, which is the address in the pointer)
+    return this->world_plot.getShortestPathToFood( std::forward(origin) );
+}
+
+void World::getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& path ) const{
+    return this->world_plot.getShortestPathToFood( std::forward(origin), path );
+}

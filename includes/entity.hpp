@@ -7,7 +7,8 @@
 
 typedef void (*Action_Ptr)(void);
 
-class Entity: _ID{   // Entity class for now won't hold any connection with a particular world
+// Meant to be inherited from; Also since two member functions are pure virtuals, so you can't have an object of Entity either
+class Entity: _ID{
 private:
     std::string type;
     std::vector<Action_Ptr> supported_Operations;
@@ -25,6 +26,6 @@ public:
     }
     auto getEntityId(){ return this->_id; }
 
-    virtual void _Action1();    //only 2 actions supported as of now
-    virtual void _Action2();
+    virtual void _Action1() = 0;    //only 2 actions supported as of now
+    virtual void _Action2() = 0;
 };

@@ -45,6 +45,13 @@ public:
     const std::pair<uint16_t, uint16_t>& get_curr_bounds() const;
     bool isCellEmpty( const coord_type& ) const;
 
+    // --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
+    bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
+    directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;
+    void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
+    // x-Just abstracted access to private worldPlot member function, no logic in these of their own-x //
+
+
     World( const World_Ptr, _timePoint );  //can later be made private
 
 private:

@@ -12,6 +12,7 @@ class WorldPlot: public Square_Matrix<_box>{
     public:
         bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
         directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;    // @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
+        void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
 
         void expand();   //expands this->__temp.expansion_speed unit on each side
         void __expand_n_units();    //to be used when there's rate

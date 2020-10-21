@@ -14,10 +14,9 @@ template< typename node_type >
 struct Graph_Box    //make it non-copyable
 {
     typedef int32_t dimen_t;
+    typedef _coord<dimen_t> coord_type;
 
     public:
-        const std::remove_reference_t<node_type>& getData() const{ return this->data; }
-
         Graph_Box* get_box(){ return this; }
         const Graph_Box* get_box() const{ return this; }
         Graph_Box* get_adj_box( Direction dir ) const{
@@ -50,10 +49,13 @@ struct Graph_Box    //make it non-copyable
         }
         // friend class Graph_Matrix<node_type>;
 
+        const coord_type& getCoords(){ return this->coords; }
+        const std::remove_reference<node_type>* getData() const{ return this->data; }
+
     protected:
         node_type data;    /*This has been given as an extension, so that you can add more variables to the graph_box
                             though, note that, you will be able to access using this->data->your_var_name */
-        _coord<dimen_t> coords;  // @NOTE - not actually needed, though this maybe used in my implementation of snake
+        coord_type coords;  // @NOTE - not actually needed, though this maybe used in my implementation of snake
 
         Graph_Box* right;
         Graph_Box* left;

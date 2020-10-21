@@ -19,7 +19,7 @@ class Snake: public Entity{
     typedef int32_t dimen_t;
     typedef std::make_unsigned_t<dimen_t> udimen_t;
 
-    typedef directionalPath SnakeBody;
+    typedef std::list<Direction> SnakeBody; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
 public:
     const World_Ptr parent_world;
 

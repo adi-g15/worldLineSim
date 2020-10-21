@@ -4,11 +4,21 @@
 #include "declarations.hpp"
 #include "random.hpp"
 
+void Snake::_Action1(){
+    this->eatFood();    // @note - Ignoring returned boolean from eatFood(), if that's required use eatFood() directly, this method is just for the sake for generalisation using Entity
+}
+
+void Snake::_Action2(){
+    this->moveForward();
+}
+
 bool Snake::eatFood(){  //can only eat, if AT the position
-    if( head == this->parent_world->food ){    //ERROR - Invalid Use of Incomplete type
+    if( this->head->getCoords() == this->parent_world->food ){
         this->parent_world->ateFood(this);
         ++ this->length;
+        return true;
     }
+    return false;
 }
 
 //Returns if `this` snake has ate the food or not
@@ -17,10 +27,10 @@ bool Snake::moveForward(){
         if( this->eatFood() ){
             return true;
         }
-        this->curr_path = PathFinder::getPath(this, this->parent_world->food);
+        this->parent_world->getShortestPathToFood( this->head, curr_Path );
     } else{
-        if( !PathFinder::pathIsClear(this->parent_world, this->curr_path) ) //if path is not clear, search for a new path
-            this->curr_path = PathFinder::getPath(this, this->parent_world->food);
+        if( !this->parent_world->isPathClear( head, curr_Path ) ) //if path is not clear, search for a new path
+            this->parent_world->getShortestPathToFood( head, curr_Path );
     }
 
     // move with path.back()
@@ -28,7 +38,15 @@ bool Snake::moveForward(){
 
 }
 
-const _coord& Snake::getHead() const{
+const coord_type Snake::getHeadCoord() const{
+    return this->head->getCoords();
+}
+
+const Graph_Box<_box>* Snake::getHead() const{
+    return this->head;
+}
+
+Graph_Box<_box>* Snake::getHead() {
     return this->head;
 }
 
