@@ -1,4 +1,5 @@
 #include "verse.hpp"
+#include "display.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -11,6 +12,8 @@ void Verse::big_bang(){
 }
 
 void Verse::runSimulation(){
+    this->
+
     while (true)
     {
         this->currWorld->runNextUnitTime();

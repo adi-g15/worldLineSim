@@ -2,6 +2,7 @@
 FOR THE WORLD TO BE DYNAMICALLY GROWING ->
     We need the logica; matrix like structure but list like additions too...  if that's possible
 
+    ACCOMPLISHED -> That is what i wrote the Graph_Mat for !!
 */
 
 #pragma once
@@ -27,8 +28,9 @@ enum class Events{  //for logging puposes
 
 typedef std::shared_ptr<World> World_Ptr;
 class World{
+    typedef _coord<int32_t> coord_type;
 public:
-    _coord food;    //food can have different points/nutitional values too in 'future'
+    coord_type food;    //food can have different points/nutitional values too in 'future'
     _timePoint currentTime;
 
     void resumeWorld();
@@ -41,7 +43,7 @@ public:
     //------                ------//
 
     const std::pair<uint16_t, uint16_t>& get_curr_bounds() const;
-    bool isCellEmpty( const _coord& ) const;
+    bool isCellEmpty( const coord_type& ) const;
 
     World( const World_Ptr, _timePoint );  //can later be made private
 
@@ -60,7 +62,7 @@ private:
     bool _CheckBounds();    //for checking `need` to increase size
     void _Expand(uint16_t);
 
-    bool _RangeCheck(const _coord&) const;    //for checking if a coordinate is valid
+    bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
     void createFood();
     void runNextUnitTime();   //resumes the world, the nextTime period happens in this time

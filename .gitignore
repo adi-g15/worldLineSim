@@ -1,11 +1,5 @@
-js/
-*.js
-*.map
-node_modules
-
 experiment*
 delete*
-*sh
 
 # C++
 #CMake

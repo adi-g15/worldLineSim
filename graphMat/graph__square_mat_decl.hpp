@@ -11,11 +11,11 @@ class Square_Matrix: public Graph_Matrix<node_type, dimen_t>{
             return this->_total_y_abs;
         }
         void resize(dimen_t new_order){
-            Graph_Matrix::resize(new_order, new_order);
+            Graph_Matrix<node_type, dimen_t>::resize(new_order, new_order);
         }
 
     Square_Matrix(): Square_Matrix(1){}
-    Square_Matrix(dimen_t order): Graph_Matrix(order, order){
+    Square_Matrix(dimen_t order): Graph_Matrix<node_type, dimen_t>(order, order){
 
     }
 

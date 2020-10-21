@@ -66,6 +66,6 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity("Snake"), parent
     this->length = init_len;
 }
 
-Snake::Snake(){
+// Snake::Snake(){
 
-}
+// }

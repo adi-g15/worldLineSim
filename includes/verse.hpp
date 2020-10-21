@@ -3,6 +3,9 @@
 #include "world.hpp"
 #include "util/tree.hpp"
 #include "declarations.hpp"
+
+#include "display.hpp"
+
 #include <memory>
 
     // The world tree will mostly work almost same as array
@@ -11,6 +14,8 @@ class Verse{
 public:
     void big_bang();
 
+    Display display_Screen; // this class will manage the rendering
+
     Verse();
 private:
         //whenever a new world is to be created, this will be used
@@ -18,8 +23,11 @@ private:
     Tree< World_Ptr > worldTree;    //the tree will also hold number of nodes, and other properties
     World_Ptr currWorld;
 
+    void renderScreen();
     void runSimulation();
     bool createWorld(_timePoint);   //forks the new world from current World
     bool createWorld(World_Ptr, _timePoint);
+
+    friend class Display;
 
 };

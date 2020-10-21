@@ -10,29 +10,38 @@
 #include <memory>
 #include <cstdint>
 
+
 //Later instead of a path being a vector of coords, have it as a vector of directioins, and also store the direction of this snake
 class Snake: public Entity{
-    typedef std::shared_ptr<World> World_Ptr;
-    typedef std::vector< Direction > SnakeBody;
+    // typedef std::shared_ptr<World> World_Ptr;
+    typedef World* World_Ptr;
+    typedef _coord<int32_t> coord_type;
+    typedef int32_t dimen_t;
+    typedef std::make_unsigned_t<dimen_t> udimen_t;
+
+    typedef directionalPath SnakeBody;
 public:
     const World_Ptr parent_world;
 
-    std::vector< _coord > curr_path;
-    uint32_t length;   //starts with _world.init_length
+    // std::vector< coord_type > curr_path;
+    directionalPath curr_Path;
+    udimen_t length;   //starts with _world.init_length
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
 
-    bool isPathClean() const;
-    const _coord& getHead() const;
+    const coord_type& getHeadCoord() const;
+
+    Graph_Box<_box>* getHead();
+    const Graph_Box<_box>* getHead() const;
 
     Snake(const World_Ptr);
-    Snake(const World_Ptr, uint16_t init_len);
+    Snake(const World_Ptr, int init_len);
 private:
-    // std::vector< _coord > body;
+    // std::vector< coord_type > body;
     std::vector< SnakeBody > body;
     Graph_Box<_box>* head;
 
     bool eatFood(); //returns true if it can eat, else false and no change
-    bool moveForward();
+    bool moveForward(); // continue on the acquired path, or if it's not available, find a new one
 };

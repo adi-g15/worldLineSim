@@ -1,0 +1,23 @@
+body{
+    height: 100vh;
+    background: linear-gradient(to bottom, white, limegreen);
+
+}
+
+main{
+    height: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div{
+    height: 10%;
+    text-align: center;
+}
+
+canvas{
+    /* height: 50%; */
+    /* width: 80vw; */
+    background: grey;
+}
