@@ -7,9 +7,11 @@ it enjoys this condition ->
 _Think about a world, in which 4 snakes keep moving automatically to get food_
 
 And, here's what this project adds ->
-_And... you can go to a particular time in **past**, and change the position of one of the snakes... Baammm, a new world line is created in which this event happened, and the older world had the even no taken place... so there is a high chance, current state(lengths of the snakes) of the world will be different than what had been in the previous world line_
+_And... you can go to a particular time in **past**, and change the position of one of the snakes... Baammm, a new world line is created in which this event happened, and the older world had the event not taken place... so there is a high chance, current state(lengths of the snakes) of the world will be different than what had been in the previous world line_
 
-That's it, this project does this much mainly (though no limitations).
+That's it, this project does this much mainly (though no limitations on what it may add later).
+
+It also features a constantly growing matrix (the world_plot).
 
 ### Compiling
 NA - Not complete for a successful compile yet
