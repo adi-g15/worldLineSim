@@ -14,23 +14,14 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 #include <vector>
 #include <utility>
 #include <unordered_map>
-
-enum class Events{  //for logging puposes
-    ENTITY_BIRTH,
-    ENTITY_DEATH,
-    ENTITY_MOVE,
-    ENTITY_GROW,
-    NEW_WORLD,
-    WORLD_PAUSE,
-    // WORLD_RESUME,   //won't be used now
-        //BIG_BANG happens only once, so not must to include
-};
+#include <thread>
 
 typedef std::shared_ptr<World> World_Ptr;
 class World{
-    typedef _coord<int32_t> coord_type;
+    typedef int32_t dimen_t;
+    typedef std::make_unsigned_t<int32_t> udimen_t;
+    typedef _coord<dimen_t> coord_type;
 public:
-    coord_type food;    //food can have different points/nutitional values too in 'future'
     _timePoint currentTime;
 
     void resumeWorld();
@@ -42,7 +33,8 @@ public:
     int _init_SnakeLength = 2;
     //------                ------//
 
-    const std::pair<uint16_t, uint16_t>& get_curr_bounds() const;
+    const dimen_t& get_curr_bound() const;
+    dimen_t getFreeSpace() const; //returns num of boxes empty
     bool isCellEmpty( const coord_type& ) const;
 
     // --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
@@ -50,6 +42,12 @@ public:
     directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;
     void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
     // x-Just abstracted access to private worldPlot member function, no logic in these of their own-x //
+
+    struct {
+            bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
+            auto is_world_running(){ return _world_runnning; }
+            auto get_world_thread_id(){ return std::this_thread::get_id(); }
+    } _shared_concurrent_data;  // @caution - Can be concurrently accessed, be sure to 
 
 
     World( const World_Ptr, _timePoint );  //can later be made private
@@ -59,19 +57,19 @@ private:
     State currentState;
     bool simulationRunning;
 
-    std::pair<uint16_t, uint16_t> _WorldDimens; //current dimensions of this world
-    std::pair<uint16_t, uint16_t> _curr_BOUNDS; //current `reserved` dimensions of this world
+    // std::pair<uint16_t, uint16_t> _WorldDimens; //current dimensions of this world
+    // std::pair<uint16_t, uint16_t> _curr_BOUNDS; //current `reserved` dimensions of this world
+    udimen_t _WorldDimen; //current `order` of this world
+    udimen_t _curr_BOUND; //current `reserved` `order` of this world
 
     WorldPlot world_plot;    // @todo - Will be 3D in future
 
     std::vector< Snake > snakes;
 
-    bool _CheckBounds();    //for checking `need` to increase size
-    void _Expand(uint16_t);
+    // bool _CheckBounds();    //for checking `need` to increase size
 
     bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
-    void createFood();
     void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
     // void resumeSimulation();
     void stopSimulation();

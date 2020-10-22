@@ -10,8 +10,6 @@
 #include <memory>
 #include <cstdint>
 
-
-//Later instead of a path being a vector of coords, have it as a vector of directioins, and also store the direction of this snake
 class Snake: public Entity{
     // typedef std::shared_ptr<World> World_Ptr;
     typedef World* World_Ptr;
@@ -29,6 +27,8 @@ public:
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
+
+    void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
     const coord_type& getHeadCoord() const;
 

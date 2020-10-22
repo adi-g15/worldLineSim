@@ -15,6 +15,7 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
     protected:
     std::string title;
     std::string description;
+    SCREEN* term_screen;
 
     std::vector< WINDOW* > _Windows;
 
@@ -54,7 +55,9 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
     ~single_term();
 };
 
-    single_term::single_term(std::string_view title, std::string_view desc) : title(title), description(desc){
+    single_term::single_term(std::string_view title, std::string_view desc) : title(title), description(desc)
+        // ,term_screen(stdscr)  // @future -> logger will need this
+    {
         initscr();
 
         noecho();

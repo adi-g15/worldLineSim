@@ -1,8 +1,10 @@
 #include "snake.hpp"
-#include "path_finder.hpp"
 #include "world.hpp"
 #include "declarations.hpp"
 #include "random.hpp"
+
+#include <thread>
+#include <chrono>
 
 void Snake::_Action1(){
     this->eatFood();    // @note - Ignoring returned boolean from eatFood(), if that's required use eatFood() directly, this method is just for the sake for generalisation using Entity
@@ -10,6 +12,26 @@ void Snake::_Action1(){
 
 void Snake::_Action2(){
     this->moveForward();
+}
+
+void Snake::simulateExistence(){
+    // @future -> Can add more logic here, when more interaction options between entities are added
+
+    if( std::this_thread::get_id() == this->parent_world.__world_thread_id ){
+        #ifdef NO_THREAD_ENTITY
+            continue;
+        #endif
+        throw std::exception( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
+    }
+    while ( this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
+        this->moveForward();
+
+        #ifdef NO_THREAD_ENTITY
+            continue;   // don't pause the current thread, if it's the main thread itself
+        #endif
+        std::this_thread::sleep_for(std::chrono::milliseconds( statics::UNIT_TIME * 1000 ));
+
+    }
 }
 
 bool Snake::eatFood(){  //can only eat, if AT the position
@@ -34,7 +56,7 @@ bool Snake::moveForward(){
     }
 
     // move with path.back()
-    //@todo
+    // @todo
 
 }
 

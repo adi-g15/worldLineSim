@@ -17,7 +17,10 @@ It also features a constantly growing matrix (the world_plot).
 NA - Not complete for a successful compile yet
 
 ### NOTE - 
-Initially the focus is that _internally_ the simulation happens, but you can't see it (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
+1. 
+
+2. Initially the focus is that _internally_ the simulation happens, but maybe the display won't be very great now (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
+
 
 ## Source of Idea -> Steins Gate (Anime)
 

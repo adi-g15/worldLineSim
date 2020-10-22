@@ -9,7 +9,7 @@ typedef void (*Action_Ptr)(void);
 
 // Meant to be inherited from; Also since two member functions are pure virtuals, so you can't have an object of Entity either
 class Entity: _ID{
-private:
+protected:
     std::string type;
     std::vector<Action_Ptr> supported_Operations;
     // std::vector<void (*)()> supported_Operations;
@@ -28,4 +28,5 @@ public:
 
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
+    virtual void simulateExistence() = 0;   // simulate the work when on a single thread
 };

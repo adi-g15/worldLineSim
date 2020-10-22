@@ -11,6 +11,9 @@ class Display : public single_term{
 
     public:
     void init() override;
+    const SCREEN* getScreen(){
+        return this->term_screen;
+    }
 
     Display() = delete;
     Display(Verse&);

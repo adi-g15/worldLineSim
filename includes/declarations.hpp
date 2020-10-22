@@ -44,6 +44,17 @@ struct _box{    //Just as extension, to add more variables to the graph_box
     // bool isEmpty = true;    //maybe removed
 };
 
+enum class Event{  //for logging puposes
+    ENTITY_BIRTH,
+    ENTITY_DEATH,
+    ENTITY_MOVE,
+    ENTITY_GROW,
+    NEW_WORLD,
+    WORLD_PAUSE,
+    // WORLD_RESUME,   //won't be used now
+        //BIG_BANG happens only once, so not must to include
+};
+
 namespace statics
 {
     // static constexpr std::pair< uint16_t, uint16_t > MAX_BOUNDS{ 1000, 1000 };    //applicable to ALL WORLDS CREATED
