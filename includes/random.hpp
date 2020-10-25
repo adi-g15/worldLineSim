@@ -28,12 +28,13 @@ private:
     //static mt1667
 };
 
+typedef uint16_t id_type;
     // @todo - Ensure this is thread_safe, to concurrently create multiple entities in different worlds IN DIFFERENT VERSES
 class _ID{  // no reuse of IDs, since it's enough
     public:
-        const uint16_t _id;
+        const id_type _id;
         _ID(): _id(++(_ID::_curr_ID)){}
     private:
-        static uint32_t _curr_ID;
+        static id_type _curr_ID;
         static std::mutex _id_mutex;    // to prevent data races with _ID::_curr_ID
 };

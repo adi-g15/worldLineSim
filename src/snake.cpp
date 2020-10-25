@@ -14,6 +14,11 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
+_coord<int32_t> Snake::getPos() const{
+    return this->getHeadCoord();
+}
+
+
 void Snake::simulateExistence(){
     // @future -> Can add more logic here, when more interaction options between entities are added
 
@@ -63,7 +68,7 @@ bool Snake::moveForward(){  // this will also be on the snake's thread, and not 
 
 }
 
-const coord_type Snake::getHeadCoord() const{
+const auto& Snake::getHeadCoord() const{
     return this->head->getCoords();
 }
 

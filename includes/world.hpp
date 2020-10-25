@@ -18,16 +18,12 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 #include <mutex>
 
 typedef World* World_Ptr;
-class World{
+class World: public _ID{
     typedef int32_t dimen_t;
     typedef std::make_unsigned_t<int32_t> udimen_t;
     typedef _coord<dimen_t> coord_type;
 public:
     _timePoint currentTime;
-
-    // void resumeSimulation();
-    void start_WorldSimulation();
-    void stop_WorldSimulation();
 
     void ateFood(const Snake*); //which snake ate it, log it, then randomize the food again
 
@@ -83,7 +79,7 @@ private:
     void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
     World();
 
-    friend class Verse;
-    friend class PathFinder;
+    // friend class Verse;  // doesn't need to be a friend, since World_Node is the one that needs that private constructor
+    friend class World_Node;
 
 };

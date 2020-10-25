@@ -16,9 +16,12 @@ struct State    // @idea Can later have food location in state too... not doind 
     _timePoint state_time;
 
     private:
-    State(const std::vector < coord_type >& pos, _timePoint t) : curr_pos(pos), state_time(t){}
+    State(
+        // const std::vector < coord_type >& pos,
+        _timePoint t
+    ): state_time(t){}
 
-    friend class World;
+    friend struct World_Node;
     friend struct Log;
 
 };

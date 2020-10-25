@@ -17,6 +17,7 @@ public:
     void big_bang();
 
     Display display_Screen; // this class will manage the rendering
+    std::map< id_type, World_Node* > mapping_of_world_id_to_world_node_ptr; // to call pause on a particular world `through` the node
 
     Verse();
 private:
