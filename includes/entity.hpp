@@ -7,6 +7,8 @@
 
 typedef void (*Action_Ptr)(void);
 
+// In our case, each entity will have atleast one id, and can have 2 ids, if their simulatoon is running (the second ID being the thread::id they are running on)
+
 // Meant to be inherited from; Also since two member functions are pure virtuals, so you can't have an object of Entity either
 class Entity: _ID{
 protected:

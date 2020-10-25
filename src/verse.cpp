@@ -12,7 +12,6 @@ void Verse::big_bang(){
 
 void Verse::runSimulation(){
     // @todo
-    // this->
 
     while( true ){
         this->currWorld->runNextUnitTime();

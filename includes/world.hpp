@@ -15,6 +15,7 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 #include <utility>
 #include <unordered_map>
 #include <thread>
+#include <mutex>
 
 typedef std::shared_ptr<World> World_Ptr;
 class World{
@@ -23,9 +24,11 @@ class World{
     typedef _coord<dimen_t> coord_type;
 public:
     _timePoint currentTime;
+    
+    // void resumeSimulation();
+    void start_WorldSimulation();
+    void stop_WorldSimulation();
 
-    void resumeWorld();
-    void pauseWorld();
     void ateFood(const Snake*); //which snake ate it, log it, then randomize the food again
 
     //------constants for this world------//
@@ -44,11 +47,13 @@ public:
     // x-Just abstracted access to private worldPlot member function, no logic in these of their own-x //
 
     struct {
+        // @CAUTION - Ensure this access is thread safe
             bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
             auto is_world_running(){ return _world_runnning; }
             auto get_world_thread_id(){ return std::this_thread::get_id(); }
-    } _shared_concurrent_data;  // @caution - Can be concurrently accessed, be sure to 
 
+        std::vector< std::thread > entity_threads;  //wil be required to join these threads, in stopSimulation();
+    } _shared_concurrent_data;  // @caution - Can be concurrently accessed, be sure to 
 
     World( const World_Ptr, _timePoint );  //can later be made private
 
@@ -56,6 +61,8 @@ private:
     std::vector<Log> logs;
     State currentState;
     bool simulationRunning;
+
+    std::mutex __world_mutex;
 
     // std::pair<uint16_t, uint16_t> _WorldDimens; //current dimensions of this world
     // std::pair<uint16_t, uint16_t> _curr_BOUNDS; //current `reserved` dimensions of this world
@@ -71,8 +78,6 @@ private:
     bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
     void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
-    // void resumeSimulation();
-    void stopSimulation();
     World();
 
     friend class Verse;

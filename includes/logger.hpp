@@ -29,7 +29,7 @@ class LOGGER{  //actual logger class that logs the data to a file, or some strea
             // @note - Will likely create a new window and store
             // _logger_screen = newterm();
             _verse_screen = verse_screen;
-            logger_screen_mutex
+            // logger_screen_mutex
             // @todo
 
         }

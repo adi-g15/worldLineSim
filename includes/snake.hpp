@@ -10,14 +10,16 @@
 #include <memory>
 #include <cstdint>
 
+// @note - `directionalPath` is alias for a `std::vector`, while `SnakeBody` is an alias for a `std::list`
+
 class Snake: public Entity{
     // typedef std::shared_ptr<World> World_Ptr;
     typedef World* World_Ptr;
-    typedef _coord<int32_t> coord_type;
     typedef int32_t dimen_t;
     typedef std::make_unsigned_t<dimen_t> udimen_t;
 
     typedef std::list<Direction> SnakeBody; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
+
 public:
     const World_Ptr parent_world;
 
@@ -30,7 +32,7 @@ public:
 
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
-    const coord_type& getHeadCoord() const;
+    const _coord<dimen_t>& getHeadCoord() const;
 
     Graph_Box<_box>* getHead();
     const Graph_Box<_box>* getHead() const;
@@ -39,7 +41,7 @@ public:
     Snake(const World_Ptr, int init_len);
 private:
     // std::vector< coord_type > body;
-    std::vector< SnakeBody > body;
+    SnakeBody body;
     Graph_Box<_box>* head;
 
     bool eatFood(); //returns true if it can eat, else false and no change

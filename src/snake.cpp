@@ -17,19 +17,21 @@ void Snake::_Action2(){
 void Snake::simulateExistence(){
     // @future -> Can add more logic here, when more interaction options between entities are added
 
-    if( std::this_thread::get_id() == this->parent_world.__world_thread_id ){
+    // a one time check, before an entity starts existing
+    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
         #ifdef NO_THREAD_ENTITY
             continue;
         #endif
         throw std::exception( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
     }
+
     while ( this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
         this->moveForward();
 
         #ifdef NO_THREAD_ENTITY
             continue;   // don't pause the current thread, if it's the main thread itself
         #endif
-        std::this_thread::sleep_for(std::chrono::milliseconds( statics::UNIT_TIME * 1000 ));
+        std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
 
     }
 }
@@ -44,8 +46,9 @@ bool Snake::eatFood(){  //can only eat, if AT the position
 }
 
 //Returns if `this` snake has ate the food or not
-bool Snake::moveForward(){
-    if( this->curr_path.empty() ){
+bool Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
+
+    if( this->curr_Path.empty() ){
         if( this->eatFood() ){
             return true;
         }

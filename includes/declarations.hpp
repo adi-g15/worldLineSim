@@ -39,7 +39,7 @@ struct _box{    //Just as extension, to add more variables to the graph_box
         // only for INTERNAL USE, for path finding
     Direction __dir_came_from;  //stores the direction from which this node was reached
 
-    std::list<Entity*> entities;
+    std::list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
 
     // bool isEmpty = true;    //maybe removed
 };

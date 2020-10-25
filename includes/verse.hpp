@@ -1,12 +1,14 @@
 #pragma once
 
 #include "world.hpp"
-#include "util/tree.hpp"
+#include "world_tree.hpp"
 #include "declarations.hpp"
 
 #include "display.hpp"
 
 #include <memory>
+#include <thread>
+#include <utility>
 
     // The world tree will mostly work almost same as array
 class Verse{
@@ -20,7 +22,7 @@ public:
 private:
         //whenever a new world is to be created, this will be used
     // std::unordered_map< State, World* > stateMap;   //If a particular state is already on the tree, resume that world instead of creating a totally new node, which will effectively just be an array
-    Tree< World_Ptr > worldTree;    //the tree will also hold number of nodes, and other properties
+    WorldTree< std::pair<World_Ptr, std::thread> > worldTree;    //the tree will also hold number of nodes, and other properties
     World_Ptr currWorld;
 
     void renderScreen();
