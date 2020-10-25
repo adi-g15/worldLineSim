@@ -17,14 +17,14 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 #include <thread>
 #include <mutex>
 
-typedef std::shared_ptr<World> World_Ptr;
+typedef World* World_Ptr;
 class World{
     typedef int32_t dimen_t;
     typedef std::make_unsigned_t<int32_t> udimen_t;
     typedef _coord<dimen_t> coord_type;
 public:
     _timePoint currentTime;
-    
+
     // void resumeSimulation();
     void start_WorldSimulation();
     void stop_WorldSimulation();
@@ -48,12 +48,15 @@ public:
 
     struct {
         // @CAUTION - Ensure this access is thread safe
+        // this will only be SET IN CONSTRUCTOR AND STOP_SIMULATION, for GET, use the method
             bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
-            auto is_world_running(){ return _world_runnning; }
-            auto get_world_thread_id(){ return std::this_thread::get_id(); }
+        public:
+            auto is_world_running() const{ return _world_runnning; }
+            auto get_world_thread_id() const{ return std::this_thread::get_id(); }
+    } _shared_concurrent_data;
 
-        std::vector< std::thread > entity_threads;  //wil be required to join these threads, in stopSimulation();
-    } _shared_concurrent_data;  // @caution - Can be concurrently accessed, be sure to 
+    //wil be required to join these threads, in stopSimulation();
+    std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
 
     World( const World_Ptr, _timePoint );  //can later be made private
 

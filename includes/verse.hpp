@@ -22,8 +22,13 @@ public:
 private:
         //whenever a new world is to be created, this will be used
     // std::unordered_map< State, World* > stateMap;   //If a particular state is already on the tree, resume that world instead of creating a totally new node, which will effectively just be an array
-    WorldTree< std::pair<World_Ptr, std::thread> > worldTree;    //the tree will also hold number of nodes, and other properties
-    World_Ptr currWorld;
+    World_Tree worldTree;    //the tree will also hold number of nodes, and other properties
+
+    // World_Ptr currWorld; // this to be handled by the world tree itself
+    const World_Ptr get_current_world(){
+        return this->worldTree.
+    }
+
 
     void renderScreen();
     void runSimulation();

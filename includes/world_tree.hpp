@@ -15,11 +15,20 @@ struct World_Node{
     World data;
     _timePoint latest_time;  //time at which it has been paused
 
-    std::list<World_Node_Ptr> nodes;
+    World_Node_Ptr left_node, right_node;   // each node will have at max two childs
+    std::mutex node_mutex;  // @note - Try to have this need removed, by managing edge cases where itis need buyt may not be actually needed
 
 public:
-    World_Node(World& world) : data(world){
-        this->latest_time = world.currentTime;  //initially
+    const World_Ptr get_world() const{
+        std::scoped_lock s(node_mutex);
+        return &(this->data);
+    }
+    World_Node() = delete;
+    World_Node(World&) = delete;
+
+    // @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
+    World_Node( World_Ptr old_world , _timePoint t ): data(old_world, t){
+        this->latest_time = data.currentTime;  //initially
     }
 };
 
@@ -35,10 +44,18 @@ private:
     int16_t num_nodes;
 
     struct {
-        World_Node_Ptr __latest_world;  //pointer to the latest world currently running
-        void update_node_time(){    // @note - Call this when a world is going to be stopped
-            __latest_world->latest_time = __latest_world->data.currentTime;
-        }
+        private:
+            World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
+
+        public:
+            std::mutex tree_mutex;
+            const World_Ptr get_latest_world(){
+                std::scoped_lock s(tree_mutex);
+                return __latest_world_node->get_world();
+            }
+            void update_node_time(){    // @note - Call this when a world is going to be stopped
+                __latest_world_node->latest_time = __latest_world_node->get_world()->currentTime;
+            }
     } _fast_access_data;    // temporary data for fast access, to currently running world
 
 public:

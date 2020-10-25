@@ -28,7 +28,16 @@ WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound),
 
 }
 
-void WorldPlot::expand(){   //expands one unit on each side
+void WorldPlot::start_auto_expansion(){
+    // @assert - Making sure the world_plot expands on a different thread, so that it doesn't hinder the world thread (it may well be changed later, read the note in world.cpp where this function is called)
+    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_thread_id() ){
+        throw std::exception("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
+    }
+    this->auto_expand();
+}
+
+
+void WorldPlot::auto_expand(){   //expands one unit on each side
     this->__temp.free_space_ratio = this->parent_world->getFreeSpace()/this->getOrder();
     if( __temp.time_since_speed_updated >= 10 ){
         --__temp.expansion_speed;
@@ -39,7 +48,7 @@ void WorldPlot::expand(){   //expands one unit on each side
     }
 
     if ( this->__temp.free_space_ratio > statics::max_free_space ){
-        // @log - world doesn't need to expand since reached max_free_space
+        // @log - world doesn't need to auto_expand since reached max_free_space
         return;
     }else if ( this->__temp.free_space_ratio < statics::min_free_space )
     {
@@ -48,7 +57,6 @@ void WorldPlot::expand(){   //expands one unit on each side
     }
 
     this->__expand_n_units(__temp.expansion_speed);
-
 }
 
 void WorldPlot::__expand_n_units(int8_t n){    //to be used when there's rate

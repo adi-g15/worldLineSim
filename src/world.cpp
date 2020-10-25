@@ -81,10 +81,12 @@ World::World() : currentTime(statics::BIG_BANG_TIME), currentState({}, this->cur
 void World::start_WorldSimulation(){
 
     for( auto&& snake : this->snakes ){
-        this->_shared_concurrent_data.entity_threads.push_back(
+        this->entity_threads.push_back(
             std::thread(&Snake::simulateExistence, snake)
         );
     }
+
+    std::thread( &WorldPlot::start_auto_expansion(), this->world_plot );    // @future - Explore the possibilities of doing the world_plot expansion in this_thread, ie. the world's thread itself (that will likely have modifying the next while loop)
 
     // this loop `just waits AND ensures the world_plot has food avaialable`, (since the entities are on there own threads)
     while( this->_shared_concurrent_data.is_world_running() ){
@@ -98,6 +100,18 @@ void World::start_WorldSimulation(){
 
     ++this->currentTime;
 
+}
+
+void World::stop_WorldSimulation(){
+    this->_shared_concurrent_data._world_runnning = false;
+
+    for (auto &&thread : this->entity_threads)
+    {
+        if( thread.joinable() )
+            thread.join();
+    }
+
+    // @todo - Do whatever needs to be done, after all entities have been stopped
 }
 
 const World::dimen_t& World::get_curr_bound() const{
