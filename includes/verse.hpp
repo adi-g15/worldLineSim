@@ -15,6 +15,7 @@ class Verse{
     typedef std::shared_ptr<World> World_Ptr;
 public:
     void big_bang();
+    void kaal_day(std::string_view origin); // @don't try to destruct the origin, since that will just be kind of a deadlock like situation, both trying to stop the other
 
     Display display_Screen; // this class will manage the rendering
     std::map< id_type, World_Node* > mapping_of_world_id_to_world_node_ptr; // to call pause on a particular world `through` the node

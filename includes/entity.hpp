@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include "random.hpp"
+#include "declarations.hpp"
 
 typedef void (*Action_Ptr)(void);
 

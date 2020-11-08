@@ -1,5 +1,6 @@
 experiment*
 delete*
+.vs
 
 # i am not commiting this directory to git, it contains the pdcurses.lib and includes for pdcurses
 curses/

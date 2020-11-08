@@ -8,24 +8,33 @@
 /*
 NOTE - This time, i will first complete World_Tree class from start, and then what seems to be common to other trees, i will slowly shift it to the tree class, and then all those properties are to inhgherited in the Wrd_tree class from Tree class
 */
+typedef int32_t dimen_t;
+struct StatePlusPlus{
+    const State& state;
+    const id_type node_id;
+    const dimen_t x_dimen;
+    const dimen_t y_dimen_t;  // the dimensions of the world
+};
 
-struct World_Node{
+struct World_Node: _ID{
     typedef World* World_Ptr;
     typedef World_Node* World_Node_Ptr;
 
+    bool continued_world{false};    // stores whether this node just inherited the world pointer from parrent instead of a new world being formed. @note - This is to not delete the same emmory location multiple times, so when the switch is made to smat pointers, do remove it and use the smart pointers that automatically handle the memory for you
     World_Ptr world;
-    id_type world_id;
+    id_type world_id;   /* @note - this->_id and this->world_id    are not the same for world_node, since world_id can be same, also prefer world_node's _id*/
+    Display* disp_class;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
     std::vector<State> states;    // holds all states from it's formation to vbeing pauseed
-    _timePoint pause_time{ 0 };  //time at which it has been paused, will be 0 otherwise (ie. it is currently running)
-    // @note - pause_time = 0 & pause_time = statics::BIG_BANG_TIME is different, 0 just means that the world_node is active, and not yet paused
+    _timePoint paused_time{ 0 };  //time at which it has been paused, will be 0 otherwise (ie. it is currently running)
+    // @note - paused_time = 0 & paused_time = statics::BIG_BANG_TIME is different, 0 just means that the world_node is active, and not yet paused
 
     World_Node_Ptr parent_node; // this being nullptr, means that `this` node is the root itself
     World_Node_Ptr left_node, right_node;   // each node will have at max two childs
     std::mutex node_mutex;  // @note - Try to have this need removed, by managing edge cases where itis need buyt may not be actually needed
 
     void captureState(){
-        this->pause_time = this->world->currentTime;
-        State latest_state(this->pause_time);
+        this->paused_time = this->world->currentTime;
+        State latest_state(this->paused_time);
 
         for( Entity& entity : world->snakes ){
             latest_state.curr_pos.push_back(entity.getPos());
@@ -34,15 +43,24 @@ struct World_Node{
         this->states.push_back(latest_state);
     }
 
+    const StatePlusPlus return_data(){
+        return {
+            states.back(),
+            this->_id,
+            this->world->_WorldDimen,   /*x and y dimensions are same for now*/
+            this->world->_WorldDimen
+        };
+    }
+
     // this is to be provided to the user to edit how the `current` state should be, this option creates a new worldLine for future
     // this returns `current state`
-    State return_state(){
+    const State& return_state(){
         return states[states.size() - 1];   // or simply states.back(), but leave so as to have better understanding of the two overloads
     }
 
     // this is to be provided to the user to edit how the `current` state should be, this option creates a new worldLine for future
     // this returns `past state` time t_back back into the past
-    State return_state(_timePoint t_back){   // this only `returns` the current state of 
+    const State& return_state(_timePoint t_back){   // this only `returns` the current state of 
         if(t_back < states.size()){ // @caution - Can be concurrently accessing the size and in other thread pushing back state to it
             if( !parent_node ){
                 return parent_node->return_state( t_back - states.size() );
@@ -61,10 +79,10 @@ struct World_Node{
     // actual on screen handling of pause to be done by verse, as well as the display, and then calling return_state(), then asking user to modify it, and then that modified state should be passed to this handle_pause()
     void handle_pause(State that_state){    // the time of pause to be deduced from the time of current world
         // @note - stop_simulation should be called before this handle_pause, likely by the Verse itself, because this function will actually just do the work while the actual world has been `kind of` paused (but at same time it should keep running, or pause and resume when created the new node that continues with this world itself)
-        this->pause_time = world->currentTime;
+        this->paused_time = world->currentTime;
 
         // @todo - Cr5eating a new world here too, and also a node with this same world
-        this->left_node = ; //this will be almost the copy of this node, with the same nodes, just starting with an empty states vector, and that it's pause_time will also not be there (ie. by default 0, meaning the world_node has an active world currently running)
+        this->left_node = new World_Node(this->world, this->paused_time, true); //this will be almost the copy of this node, with the same world pointer, just starting with an empty states vector, and that it's paused_time will also not be there (ie. by default 0, meaning the world_node has an active world currently running)
 
     }
 
@@ -109,7 +127,6 @@ struct World_Node{
         // @todo
     }
 
-
     public:
     const World_Ptr get_world() const{
         std::scoped_lock s(node_mutex);
@@ -118,13 +135,20 @@ struct World_Node{
     World_Node(World&) = delete;
 
     // @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
-    World_Node(World_Ptr old_world, _timePoint t) : data(old_world, t){
+    World_Node(World_Ptr old_world, _timePoint t, bool is_continued = false) : world(old_world, t), continued_world(is_continued){
+        this->world_id = old_world->_id;
 
-        this->pause_time = data.currentTime;  //initially
+
+        this->paused_time = world->currentTime;  //initially
+    }
+
+    ~World_Node(){
+        if( ! this->continued_world )
+            delete this->world;
     }
 
     private:
-    World_Node() : pause_time(0), {
+    World_Node() : paused_time(0), {
         this->world = new World();
     // create a new world here
     }
@@ -155,7 +179,7 @@ class World_Tree : public Tree<World>{
             return __latest_world_node->get_world();
         }
         void update_node_time(){    // @note - Call this when a world is going to be stopped
-            __latest_world_node->pause_time = __latest_world_node->get_world()->currentTime;
+            __latest_world_node->paused_time = __latest_world_node->get_world()->currentTime;
         }
     } _fast_access_data;    // temporary data for fast access, to currently running world
 
