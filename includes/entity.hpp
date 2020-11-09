@@ -3,9 +3,19 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <any>
+
 #include "declarations.hpp"
 
 typedef void (*Action_Ptr)(void);
+
+struct Prop{    // @future - See the @future comment on the Entity::getUniqProp() function
+    std::any data;
+};
+
+struct SnakeProp: Prop{
+    // int data;   // for snake, the unique property (ie. this `data`) will be an int, ie. length
+};
 
 enum class entity_Types: uint8_t {
     SNAKE,
@@ -32,9 +42,15 @@ public:
         // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
         // supported_Operations = {&Entity::_Action1, &Entity::_Action2};
     }
+
     auto getEntityId(){ return this->_id; }
     virtual _coord<dimen_t> getPos() const = 0;
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
+
+    // @future -> Since the return type of this is fixed to int, it is restricted currently, but to allow more flexibility, the method return type can be changed to return an object of 'Prop', which is just a wrapper over the data that will be returned (or simply change return type to std::any)
+    virtual int getUniqProp() const = 0;  // each entity will have a unique property, for eg. snake's unique property is its length
+
     virtual void simulateExistence() = 0;   // simulate the work when on a single thread
+
 };

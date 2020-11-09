@@ -68,7 +68,7 @@ bool Snake::moveForward(){  // this will also be on the snake's thread, and not 
 
 }
 
-const auto& Snake::getHeadCoord() const{
+const _coord<Snake::dimen_t>& Snake::getHeadCoord() const{
     return this->head->getCoords();
 }
 
@@ -78,6 +78,10 @@ const Graph_Box<_box>* Snake::getHead() const{
 
 Graph_Box<_box>* Snake::getHead() {
     return this->head;
+}
+
+int Snake::getUniqProp() const{
+    return this->length;
 }
 
 Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}

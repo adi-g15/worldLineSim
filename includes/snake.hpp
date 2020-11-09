@@ -33,7 +33,8 @@ public:
 
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
-    const auto& getHeadCoord() const;
+    const _coord<dimen_t>& getHeadCoord() const;
+    int getUniqProp() const override;
 
     Graph_Box<_box>* getHead();
     const Graph_Box<_box>* getHead() const;
@@ -41,6 +42,7 @@ public:
     Snake(const World_Ptr);
     Snake(const World_Ptr, int init_len);
 private:
+    
     // std::vector< coord_type > body;
     SnakeBody body;
     Graph_Box<_box>* head;

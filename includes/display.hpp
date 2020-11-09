@@ -5,6 +5,7 @@
 #include <future>
 
 // #include "verse.hpp" // 
+#include "verse.hpp"
 #include "forward_decl.hpp"
 #include "multiTerm/single_term.hpp"
 
@@ -51,22 +52,22 @@ class Display : public single_term{
 
     public:
     void add_node(World_Node* node){
-        node->disp_class = this;
+        node->dispManager = this;
 
         this->nodes.push(node);
     }
-    void init() override;
+    void runInitTasks() override;
+    void showExit();
+    void runPreEndTasks();
 
     Display() = delete;
     Display(Verse&);
 
     friend class Verse;
-
 };
 
 
-
-void Display::init(){
+void Display::runInitTasks(){
     using namespace std::chrono_literals;
 
     // if( std::this_thread::get_id() == this->parent_verse->thread_id ){
