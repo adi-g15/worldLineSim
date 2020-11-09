@@ -1,12 +1,11 @@
 # World Line Simulator
-=======================
 
 Wait... if you are thinking it's some big rendering project, sorry but it's not,
 it enjoys this condition ->
 
 _Think about a world, in which 4 snakes keep moving automatically to get food_
 
-And, here's what this project adds ->
+And, this project generalises this idea to entities and actions, in different worlds and worldlines, as well theoretically different verses too, other than this ->
 _And... you can go to a particular time in **past**, and change the position of one of the snakes... Baammm, a new world line is created in which this event happened, and the older world had the event not taken place... so there is a high chance, current state(lengths of the snakes) of the world will be different than what had been in the previous world line_
 
 That's it, this project does this much mainly (though no limitations on what it may add later).
@@ -17,8 +16,8 @@ It also features a constantly growing matrix (the world_plot).
 NA - Not complete for a successful compile yet
 
 ### NOTE - 
-1. 
-
+1. Currently all commits are on the master branch itself, and not on a separate dev branch, since i prefer to keep track of all my 'initial
+ work on master itself (this thing will change once the initial idea is done)
 2. Initially the focus is that _internally_ the simulation happens, but maybe the display won't be very great now (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
 
 ## Flags used in code
