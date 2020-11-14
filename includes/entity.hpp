@@ -5,7 +5,8 @@
 #include <vector>
 #include <any>
 
-#include "declarations.hpp"
+// #include "declarations.hpp"
+#include "id_creator.hpp"
 
 typedef void (*Action_Ptr)(void);
 
@@ -17,6 +18,9 @@ struct SnakeProp: Prop{
     // int data;   // for snake, the unique property (ie. this `data`) will be an int, ie. length
 };
 
+template<typename dimen_t> // @assert - dimen_t must be integral type
+struct _coord;  // forward declaration
+
 enum class entity_Types: uint8_t {
     SNAKE,
     // more can be added later, it's made to be expandible, though do see the member declarations as for what ANY entity must have
@@ -25,7 +29,7 @@ enum class entity_Types: uint8_t {
 // In our case, each entity will have atleast one id, and can have 2 ids, if their simulatoon is running (the second ID being the thread::id they are running on)
 
 // Meant to be inherited from; Also since some member functions are pure virtuals, so you can't have an object of Entity either
-class Entity: _ID{
+class Entity: public _ID{
     typedef int32_t dimen_t;
 protected:
     entity_Types type;
@@ -33,18 +37,10 @@ protected:
     // std::vector<void (*)()> supported_Operations;
     // std::vector<void()> supported_Operations;   //same as above
 public:
-    Entity(entity_Types type):
-        _ID(), 
-        type(type)
-    {
-        // supported_Operations.push_back( &foo );  //works, void(void) in global scope
-        // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
-        // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
-        // supported_Operations = {&Entity::_Action1, &Entity::_Action2};
+    id_type getEntityId() const{
+        return this->_id;
     }
-
-    auto getEntityId(){ return this->_id; }
-    virtual _coord<dimen_t> getPos() const = 0;
+    virtual const _coord<dimen_t>& getPos() = 0;
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 
@@ -52,5 +48,15 @@ public:
     virtual int getUniqProp() const = 0;  // each entity will have a unique property, for eg. snake's unique property is its length
 
     virtual void simulateExistence() = 0;   // simulate the work when on a single thread
+
+    Entity(entity_Types type):
+        _ID(),
+        type(type)
+    {
+        // supported_Operations.push_back( &foo );  //works, void(void) in global scope
+        // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
+        // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
+        // supported_Operations = {&Entity::_Action1, &Entity::_Action2};
+    }
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "curses.h"
+#include "log.hpp"
 #include "declarations.hpp"
 
 #include <mutex>

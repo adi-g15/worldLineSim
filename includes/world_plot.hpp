@@ -15,8 +15,16 @@ class WorldPlot: public Square_Matrix<_box>{
 
     void auto_expand();   //expands this->__temp.expansion_speed unit on each side
     void __expand_n_units(int8_t n);    //to be used when there's rate
+    const Graph_Box<_box>* get_box(const _coord<dimen_t>& position) const{
+        // @todo - Return the graph_box with that coordinate
+
+        return &(this->origin);    // @debug - just for now
+    }
 
     public:
+        const Graph_Box<_box>* get_food() const{
+            return this->food;
+        }
         void createFood();
         dimen_t getCurrentOrder() const;
         bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
@@ -34,8 +42,6 @@ class WorldPlot: public Square_Matrix<_box>{
 
 
     WorldPlot(const World_Ptr);
-    WorldPlot(const WorldPlot&) = delete;
-    WorldPlot(const WorldPlot&&) = delete;
 
     friend class World;
 

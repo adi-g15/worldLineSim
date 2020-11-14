@@ -5,8 +5,8 @@ void WorldPlot::createFood(){
     // Resets the current food; This function should only be called after World::eatFood()
 
     struct { dimen_t mX, mY; } randomCoords;
-    randomCoords.mX = Random::random(this->getOrder());
-    randomCoords.mY = Random::random(this->getOrder());
+    randomCoords.mX = util::Random::random(this->getOrder());
+    randomCoords.mY = util::Random::random(this->getOrder());
 
     // @todo
 
@@ -17,7 +17,7 @@ bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPat
 
     for ( uint32_t i = 0; i<path.size(); ++i ){
         temp = temp->get_adj_box(path[i]);
-        if( ! temp->getData().entities.empty() )    return false;
+        if( ! temp->getData()->entities.empty() )    return false;
     }
 
     return true;
@@ -56,7 +56,7 @@ void WorldPlot::auto_expand(){   //expands one unit on each side
         ++__temp.expansion_speed;   // @log increasing the expansion speed
     }
 
-    this->__expand_n_units(__temp.expansion_speed);
+    this->__expand_n_units(static_cast<int>(__temp.expansion_speed));
 }
 
 void WorldPlot::__expand_n_units(int8_t n){    //to be used when there's rate

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "multiTerm/single_term.hpp"
-
 class World;
 class Verse;
 class Display;
+class World_Node;
+class World_Tree;

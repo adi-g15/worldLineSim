@@ -1,18 +1,17 @@
 #pragma once
 
-#include "world.hpp"
-#include "world_tree.hpp"
-#include "declarations.hpp"
+#include "forward_decl.hpp"	// for World_Tree
+#include "id_creator.hpp"
 
-#include "display.hpp"
-
+#include <map>
 #include <memory>
 #include <thread>
 #include <utility>
+#include <future>
 
 	// The world tree will mostly work almost same as array
 class Verse{
-	typedef std::shared_ptr<World> World_Ptr;
+	typedef World* World_Ptr;
 public:
 	std::promise<bool> big_bang();    // brambha, the creator
 	void render_screen();    // vishnu, the carer

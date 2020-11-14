@@ -29,23 +29,22 @@ public:
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
-    _coord<dimen_t> getPos() const override;
+    const _coord<dimen_t>& getPos() override;
 
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
     const _coord<dimen_t>& getHeadCoord() const;
     int getUniqProp() const override;
 
-    Graph_Box<_box>* getHead();
     const Graph_Box<_box>* getHead() const;
 
     Snake(const World_Ptr);
-    Snake(const World_Ptr, int init_len);
+    Snake(const World_Ptr, uint16_t);
 private:
-    
+
     // std::vector< coord_type > body;
     SnakeBody body;
-    Graph_Box<_box>* head;
+    const Graph_Box<_box>* head;    // just a constant pointer to the actual box in graph
 
     bool eatFood(); //returns true if it can eat, else false and no change
     bool moveForward(); // continue on the acquired path, or if it's not available, find a new one

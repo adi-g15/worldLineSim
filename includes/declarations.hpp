@@ -3,16 +3,18 @@
 #include <utility>
 #include <cstdint>
 #include <list>
-#include <random>   // for std::random_device
 
 #include "graphMat/direction.hpp"
-#include "util/math.hpp"
 
 #include "entity.hpp"
 
 template<typename dimen_t = int32_t> // @assert - dimen_t must be integral type
 struct _coord{
     dimen_t mX, mY;
+
+    bool operator==(const _coord<dimen_t>& second) const{
+        return this->mX == second.mX && this->mY == second.mY;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const _coord<dimen_t>& coord){
         if(coord.mX >= 0){
@@ -43,6 +45,9 @@ struct _box{    //Just as extension, to add more variables to the graph_box
     Direction __dir_came_from;  //stores the direction from which this node was reached
 
     std::list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
+
+    public:
+        bool hasEntities() const{    return  ! this->entities.empty(); }
 
     // bool isEmpty = true;    //maybe removed
 };
@@ -76,15 +81,3 @@ namespace statics
     static constexpr uint8_t init_expansion_speed{ 1 };
 
 } // namespace statics
-
-typedef uint16_t id_type;
-    // @todo - Ensure this is thread_safe, to concurrently create multiple entities in different worlds IN DIFFERENT VERSES
-class _ID{  // no reuse of IDs, since it's enough
-    public:
-        const id_type _id;
-        _ID(): _id(++(_ID::_curr_ID)){}
-    private:
-        static id_type _curr_ID;
-        static std::mutex _id_mutex;    // to prevent data races with _ID::_curr_ID
-};
-id_type _ID::_curr_ID = util::abs(std::random_device{}())%100000;

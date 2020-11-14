@@ -75,7 +75,8 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "future": "cpp",
-        "resumable": "cpp"
+        "resumable": "cpp",
+        "any": "cpp"
     },
     "workbench.colorCustomizations": {
         "activityBar.background": "#13332D",

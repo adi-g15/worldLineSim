@@ -8,15 +8,15 @@
 
 	// @note - it should be more like, returning a promise, rather than a future... only logically it should hold that the receiver can poll this object, to know whether the task is completed
 std::promise<bool> Verse::big_bang(){
-	World_Node* the_first_node{this->displayManager}; // creation of the first world, to ever exist in the particular verse
-
    // init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
 	std::promise<bool> creation_promise;
-	this->worldTree.initTree(the_first_node, &creation_promise);
+
+		 // creation of the first world, to ever exist in the particular verse
+	this->worldTree.initTree(creation_promise);	// WorldTree::init() will create the first node
 
 	this->render_screen();
 
-	creation_promise.set_value(true);   // @DEBUG
+	creation_promise.set_value(true);   // @DEBUG @note - LET IT REMAIN FOR NOW, until WorldTree::init_tree, has the capability of handling this promise implemented
 	return creation_promise; // @future use a std::condition_variable to return in initTree
 }
 
@@ -30,7 +30,7 @@ std::promise<bool> Verse::kaal_day(std::string_view origin){
 }
 
 void Verse::render_screen(){
-	this->displayManager.runInitTasks();
+	return this->displayManager.runInitTasks();
 }
 
 Verse::~Verse(){

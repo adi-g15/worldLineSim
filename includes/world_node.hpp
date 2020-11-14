@@ -1,7 +1,10 @@
-#include "declarations.hpp"
+#pragma once
+
+#include <thread>
+
+#include "id_creator.hpp"
 #include "state.hpp"
 #include "world.hpp"
-#include "world_plot.hpp"
 #include "display.hpp"
 
 typedef int32_t dimen_t;
@@ -12,15 +15,13 @@ struct StatePlusPlus{
 	const dimen_t y_dimen_t;  // the dimensions of the world
 };
 
-struct World_Node : _ID{
+class World_Node : public _ID{
 	typedef World* World_Ptr;
 	typedef World_Node* World_Node_Ptr;
 
 	bool continued_world{ false };    // stores whether this node just inherited the world pointer from parrent instead of a new world being formed. @note - This is to not delete the same emmory location multiple times, so when the switch is made to smat pointers, do remove it and use the smart pointers that automatically handle the memory for you
 	World_Ptr world;
 	id_type world_id;   /* @note - this->_id and this->world_id    are not the same for world_node, since world_id can be same, also prefer world_node's _id*/
-
-	Display* dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
 
 	struct{
 		WINDOW* node_window{ nullptr };   // @note - Invalidate this when this node is removed from the view
@@ -86,7 +87,7 @@ struct World_Node : _ID{
 		this->paused_time = world->currentTime;
 
 		// @todo - Cr5eating a new world here too, and also a node with this same world
-		this->left_node = new World_Node(this->world, this->paused_time, true); //this will be almost the copy of this node, with the same world pointer, just starting with an empty states vector, and that it's paused_time will also not be there (ie. by default 0, meaning the world_node has an active world currently running)
+		this->left_node = new World_Node(this->world, this->paused_time, this->dispManager, true); //this will be almost the copy of this node, with the same world pointer, just starting with an empty states vector, and that it's paused_time will also not be there (ie. by default 0, meaning the world_node has an active world currently running)
 
 	}
 
@@ -98,15 +99,16 @@ struct World_Node : _ID{
 			);
 		}
 
-		std::thread(&WorldPlot::start_auto_expansion(), this->world_plot);    // @future - Explore the possibilities of doing the world_plot expansion in this_thread, ie. the world's thread itself (that will likely have modifying the next while loop)
+		// @debug - Uncomment next line, just commented it for successful build
+		// std::thread(&WorldPlot::start_auto_expansion(), this->world_plot);    // @future - Explore the possibilities of doing the world_plot expansion in this_thread, ie. the world's thread itself (that will likely have modifying the next while loop)
 
 		// this loop `just waits AND ensures the world_plot has food avaialable`, (since the entities are on there own threads)
 		while( this->world->_shared_concurrent_data.is_world_running() ){
-			if( this->world->world_plot.food == nullptr ) this->world_plot.createFood(); //though this if block should NEVER be reached, since ateFood() also creates new Food
+			if( this->world->world_plot.get_food() == nullptr ) this->world->world_plot.createFood(); //though this if block should NEVER be reached, since ateFood() also creates new Food
 			this->captureState();   // can PAUSE then capture, for i am preferring some wrong coords in state, rather than stopping and starting threads again and again
 
 			//pause for a unit time
-			std::this_thread::sleep_for(std::chrono::milliseconds(statics::UNIT_TIME * 1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
 		}
 
 		this->stop_WorldSimulation(); //it will stop all the threads
@@ -136,6 +138,7 @@ struct World_Node : _ID{
 	}
 
 public:
+	Display* dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
 
 	void update_node_disp(){
 		if( !this->_window_data.node_window )   return; //  node is not on the screen (ie. node_window is null)
@@ -156,12 +159,13 @@ public:
 
 	const World_Ptr get_world() const{
 		std::scoped_lock s(node_mutex);
-		return &(this->world);
+
+		return this->world;	// @risky
 	}
 	World_Node(World&) = delete;
 
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
-	World_Node(World_Ptr old_world, _timePoint t, Display* dispMngr,bool is_continued = false) : world(old_world, t), continued_world(is_continued){
+	World_Node(World_Ptr old_world, _timePoint t, Display* dispMngr, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued){
 		this->world_id = old_world->_id;
 
 		this->dispManager = dispMngr;
@@ -178,7 +182,7 @@ public:
 
 private:
 	World_Node() = delete;
-	World_Node(Display* dispMngr) : paused_time(0), {
+	World_Node(Display* dispMngr) : paused_time(0) {
 		this->world = new World();
 
 		this->dispManager = dispMngr;
@@ -186,7 +190,7 @@ private:
 	}
 
 	friend class Display;
-	friend class Verse;	// creates the root node, passes to World_Node
+	friend class World_Tree;
 	// @change - Now, World_Tree won't be constructing the root node, rather, the Verse will create it in big_bang(), and then passes it to World_Tree to work further
-
+	// @reverting_change - World_Tree:init() will create the root node now
 };

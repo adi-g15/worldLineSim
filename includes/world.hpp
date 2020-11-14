@@ -20,11 +20,15 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 typedef World* World_Ptr;
 class World: public _ID{
 	typedef int32_t dimen_t;
-	typedef std::make_unsigned_t<int32_t> udimen_t;
 	typedef _coord<dimen_t> coord_type;
+
+	typedef std::make_unsigned_t<int32_t> udimen_t;
 public:
 	_timePoint currentTime;
 
+	const coord_type& get_food_coords() const{
+		return this->world_plot.food->getCoords();
+	}
 	void ateFood(const Snake*); //which snake ate it, log it, then randomize the food again
 
 	//------constants for this world------//
@@ -58,7 +62,7 @@ public:
 
 private:
 	// std::vector<Log> logs;   // these logs may no longer be required and managed by world_node
-	State currentState;
+	// State currentState;	// @deprecated - No more will the world be the one to store state, now it will be managed by World_Node
 	bool simulationRunning;
 
 	std::mutex __world_mutex;
@@ -72,12 +76,18 @@ private:
 
 	std::vector< Snake > snakes;
 
+	auto get_box(const _coord<dimen_t>& pos) const{
+		return this->world_plot.get_box(pos);
+	}
+
 	// bool _CheckBounds();    //for checking `need` to increase size
 
 	bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
 	void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
-	World() = default;
+	World(): world_plot(this){
+		// @todo - This is the constructor that creates the new world just after big bang
+	}
 
 	// friend class Verse;  // doesn't need to be a friend, since World_Node is the one that needs that private constructor
 	friend class World_Node;

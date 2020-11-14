@@ -11,7 +11,7 @@
 typedef std::vector<std::pair< Direction, uint16_t >> graph_position;
 
 template< typename node_type >
-struct Graph_Box    //make it non-copyable
+struct Graph_Box    // @node - it should be non-copyable
 {
     typedef int32_t dimen_t;
     typedef _coord<dimen_t> coord_type;
@@ -49,8 +49,8 @@ struct Graph_Box    //make it non-copyable
         }
         // friend class Graph_Matrix<node_type>;
 
-        const coord_type& getCoords(){ return this->coords; }
-        const std::remove_reference<node_type>* getData() const{ return this->data; }
+        const coord_type& getCoords() const{ return this->coords; }
+        const std::remove_reference_t<node_type>* getData() const{ return this->data; }
 
     protected:
         node_type data;    /*This has been given as an extension, so that you can add more variables to the graph_box

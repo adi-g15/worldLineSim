@@ -1,9 +1,12 @@
 #pragma once
 
-#include "util/tree.hpp"
 #include <vector>
-#include <queue>
+// #include <queue>
 #include <thread>
+#include <stack>
+
+#include "util/tree.hpp"
+#include "world_node.hpp"
 
 /*
 NOTE - This time, i will first complete World_Tree class from start, and then what seems to be common to other trees, i will slowly shift it to the tree class, and then all those properties are to inhgherited in the Wrd_tree class from Tree class
@@ -36,9 +39,14 @@ private:
 	} _fast_access_data;    // temporary data for fast access, to currently running world
 
 public:
-	bool initTree(World_Node_Ptr root_node){    //should be called after Verse::big_bang(), to initiate a world, and set it as the root node
+	bool initTree(std::promise<bool>& creation_promise){    //should be called after Verse::big_bang(), to initiate a world, and set it as the root node
+		// @todo - Create a new world_node (root) here, and initialise the tree
 
+		// @future @todo - Set value for the creation_promise, after the world has been `asynchronously created`
 
+		#ifdef __DEBUG
+			return true;
+		#endif
 	}
 
 	World_Tree(Display* displayManager) : root(nullptr), num_nodes(0){
@@ -49,32 +57,26 @@ public:
 		this->displayManager = displayManager;
 	}
 	// @tip - Use delegation to have a `master` constructor that all other will call, or if not a single master, then decrease the duplicacy in the constructor body
-	World_Tree(World& root_data, Display* displayManager) : root(new World_Node(root_data)), num_nodes(1){
+	World_Tree(World* root, Display* displayManager) : root(root), num_nodes(1){
 		if( !displayManager ){
 			throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
 		}
 
 		this->displayManager = displayManager;
 	}
-	World_Tree(World&& root_data, Display* displayManager) : root(new World_Node(root_data)), num_nodes(1){}
 	~World_Tree(){
-		if( !displayManager ){
-			throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
-		}
-
-		this->displayManager = displayManager;
-		std::queue<World_Node_Ptr> qn;
-		qn.push(root);
+		std::stack<World_Node_Ptr> st;
+		st.push(root);
 		World_Node_Ptr temp;
 
-		while( !qn.empty() ){
-			temp = qn.front();
+		while( !st.empty() ){
+			temp = st.top();
 
-			for( _tree_node<World>* i : temp->nodes ){
-				qn.push(i);
-			}
-			delete qn.front();;
-			qn.pop();
+			if( temp->left_node )	st.push( temp->left_node );
+			if( temp->right_node )	st.push( temp->right_node );
+
+			delete st.top();
+			st.pop();
 		}
 	}
 };

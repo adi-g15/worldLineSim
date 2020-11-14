@@ -14,14 +14,14 @@ namespace util
 
     template<typename T>
     bool abs(T a){
-        static_assert( std::is_integral_v<T1> == true && std::is_integral_v<T> == true );
+        static_assert( std::is_integral_v<T> == true );
 
         return a > 0 ? a : -a;
     }
 
 	template<typename T>
 	int num_digits(T number){
-		static_assert( std::is_integral<T>::value == true );
+		static_assert( std::is_integral_v<T> == true );
 
 		int count = 0;
 		number = number > 0 ? number : -number;

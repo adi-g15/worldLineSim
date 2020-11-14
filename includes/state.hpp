@@ -21,7 +21,7 @@ struct State    // @idea Can later have food location in state too... not doind 
         _timePoint t
     ): state_time(t){}
 
-    friend struct World_Node;
+    friend class World_Node;
     friend struct Log;
 
 };

@@ -11,7 +11,7 @@
 */
 
 #include "world.hpp"
-#include "random.hpp"
+#include "util/random.hpp"
 #include "exceptions.hpp"
 #include "util/math.hpp"
 
@@ -23,7 +23,7 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
 
     // @todo
 
-    // this->food.reset();
+    // this->world_plot.reset_food();
     // this->createFood();
 }
 
@@ -38,7 +38,7 @@ bool World::_RangeCheck(const coord_type& c) const{
     return this->world_plot.getCurrentOrder() > c.mX || this->world_plot.getCurrentOrder() > c.mY;
 }
 
-World::World(const World_Ptr world, _timePoint t) : currentTime(t), currentState({}, this->currentTime), world_plot(this){
+World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this){
     // @todo
 
     for( auto i = 0; i < this->_MAX_NumSnakes; i++ ){
@@ -52,7 +52,7 @@ World::World(const World_Ptr world, _timePoint t) : currentTime(t), currentState
 
 }
 
-World::World() : currentTime(statics::BIG_BANG_TIME), currentState({}, this->currentTime), world_plot(this){
+World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this){
     // @todo
 
     // @todo - Initialise the world_plot here, or get it on another thread (not really required, can be on the same thread as of the world)
@@ -60,10 +60,8 @@ World::World() : currentTime(statics::BIG_BANG_TIME), currentState({}, this->cur
 
     this->snakes.reserve(this->_MAX_NumSnakes);
     this->snakes.push_back( //later when simulated, let all snakes run on a different thread
-        Snake(this, Random::random(2, 5))
+        Snake{this, util::Random::random(2, 5)}
     );
-
-    this->currentState = State({}, this->currentTime);
 
 }
 

@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB SOURCES "src/*.cpp")
 add_executable(simulator main.cpp ${SOURCES})
-add_executable(test graphMat/test.cxx)
 
 # Edit the 3 lines, according to your build of curses (ncurse or pdcurses)
 set(CURSES_INCLUDE_PATH ./curses/includes)
@@ -21,4 +20,5 @@ target_link_libraries(simulator PRIVATE Threads::Threads)
 
 target_include_directories(simulator PRIVATE includes)
 target_include_directories(simulator PRIVATE .)
-target_include_directories(test PRIVATE .)
+
+# define a macro here "__DEBUG"

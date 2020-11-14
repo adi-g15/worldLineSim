@@ -1,7 +1,7 @@
 #include "snake.hpp"
 #include "world.hpp"
 #include "declarations.hpp"
-#include "random.hpp"
+#include "util/random.hpp"
 
 #include <thread>
 #include <chrono>
@@ -14,7 +14,7 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-_coord<int32_t> Snake::getPos() const{
+const _coord<int32_t>& Snake::getPos() const{
     return this->getHeadCoord();
 }
 
@@ -42,7 +42,7 @@ void Snake::simulateExistence(){
 }
 
 bool Snake::eatFood(){  //can only eat, if AT the position
-    if( this->head->getCoords() == this->parent_world->food ){
+    if( this->head->getCoords() == this->parent_world->get_food_coords()){
         this->parent_world->ateFood(this);
         ++ this->length;
         return true;
@@ -76,10 +76,6 @@ const Graph_Box<_box>* Snake::getHead() const{
     return this->head;
 }
 
-Graph_Box<_box>* Snake::getHead() {
-    return this->head;
-}
-
 int Snake::getUniqProp() const{
     return this->length;
 }
@@ -96,22 +92,32 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
     "The next move this new snake moves, will cause the new snake to `collide` with the older one, thereby ending its life in starting itself"
 */
 
-Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity("Snake"), parent_world(world){
-    this->head.mX = Random::random(parent_world->get_curr_bounds().first);
-    this->head.mY = Random::random(parent_world->get_curr_bounds().first);
+Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SNAKE), parent_world(world){
+    _coord<dimen_t> head_pos = {
+        util::Random::random<dimen_t>(parent_world->get_curr_bound()),
+        util::Random::random<dimen_t>(parent_world->get_curr_bound()),
+    };
+
+    this->head = parent_world->get_box(head_pos);
 
     while( !this->parent_world->isCellEmpty(this->head) ){
-        this->head.mX = Random::random(parent_world->get_curr_bounds().first);
-        this->head.mY = Random::random(parent_world->get_curr_bounds().first);
+        this->head.mX = util::Random::random<dimen_t>(parent_world->get_curr_bounds().first);
+        this->head.mY = util::Random::random<dimen_t>(parent_world->get_curr_bounds().first);
     }
 
-    this->body.push_back(this->head);
+    // this->body.push_back(this->head);    // since it's a list of directions, we don't require the head, its not direction, and also it is the starting point
     for( uint16_t i = 0; i < init_len - 1; i++ ){
-        auto tmp = Random::rand_neighbour(this->body.back());
-        while( !this->parent_world->isCellEmpty(tmp) ){
-            tmp = Random::rand_neighbour(this->body.back());
+        // @todo - Randomly chose a direction out of 4 directions currently
+        auto* prev_box = this->head;
+
+        // util::Random::rand_neighbour(this->body.back())
+        auto rand_direction = statics::directions[ util::Random::random(4) ];
+
+        while( ! prev_box->getData()->hasEntities() ){
+            prev_box = prev_box->get_adj_box(Direction::UP);
+            rand_direction = statics::directions[ util::Random::random(4) ];
         }
-        this->body.push_back(tmp);
+        this->body.push_back(rand_direction);
     }
 
 
