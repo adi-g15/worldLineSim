@@ -5,7 +5,6 @@
 #include <vector>
 #include <any>
 
-// #include "declarations.hpp"
 #include "id_creator.hpp"
 
 typedef void (*Action_Ptr)(void);
@@ -40,7 +39,7 @@ public:
     id_type getEntityId() const{
         return this->_id;
     }
-    virtual const _coord<dimen_t>& getPos() = 0;
+    virtual const _coord<dimen_t>& getPos() const = 0;
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 
@@ -59,4 +58,5 @@ public:
         // supported_Operations = {&Entity::_Action1, &Entity::_Action2};
     }
 
+    friend class World;
 };

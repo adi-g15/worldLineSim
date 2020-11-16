@@ -1,5 +1,7 @@
 #include "verse.hpp"
+#include "world_tree.hpp"
 #include "display.hpp"
+#include "graphMat/graph__square_mat.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -12,7 +14,7 @@ std::promise<bool> Verse::big_bang(){
 	std::promise<bool> creation_promise;
 
 		 // creation of the first world, to ever exist in the particular verse
-	this->worldTree.initTree(creation_promise);	// WorldTree::init() will create the first node
+	this->worldTree->initTree(creation_promise);	// WorldTree::init() will create the first node
 
 	this->render_screen();
 
@@ -30,11 +32,15 @@ std::promise<bool> Verse::kaal_day(std::string_view origin){
 }
 
 void Verse::render_screen(){
-	return this->displayManager.runInitTasks();
+	return this->displayManager->runInitTasks();
+}
+
+Verse::Verse(): displayManager(new Display(this)), worldTree(new World_Tree(this->displayManager)){
+
 }
 
 Verse::~Verse(){
-	this->displayManager.showExit();	// show Exit message on the screen, till the displayManger is automatically gets destructed after its destrcutor is called, and that is when everything is removed
+	this->displayManager->showExit();	// show Exit message on the screen, till the displayManger is automatically gets destructed after its destrcutor is called, and that is when everything is removed
 
 	this->kaal_day("Shiv").get_future().wait();	// source = "Shiv" means the destructor is the 'origin' (see the declaration of kaal_day)
 

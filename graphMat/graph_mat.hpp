@@ -9,8 +9,8 @@
 #endif
 
 //iterates over all the boxes
-template< typename node_type, typename dimen_t>
-bool Graph_Matrix<node_type, dimen_t>::forRange(graph_box_type* iteratee){ //returns false when iterated all of that of that row
+template< typename node_dtype, typename dimen_t>
+bool Graph_Matrix<node_dtype, dimen_t>::forRange(graph_box_type* iteratee){ //returns false when iterated all of that of that row
 	// @warning "This overload will iterate through ALL BOXES, which may be very large, be sure, if you wanted this"
 
 	//moved to util::range_iterator
@@ -19,8 +19,8 @@ bool Graph_Matrix<node_type, dimen_t>::forRange(graph_box_type* iteratee){ //ret
 	return true;
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::pushCol(){ // add a column at end
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::pushCol(){ // add a column at end
 	this->tr_box->right = new graph_box_type(this->_x_max+1, this->_y_max);
 	this->tr_box->right->left = this->tr_box;
 
@@ -59,8 +59,8 @@ void Graph_Matrix<node_type, dimen_t>::pushCol(){ // add a column at end
 	++(this->_total_x_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::pushRow(){ // add a row at downward end
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::pushRow(){ // add a row at downward end
 	this->bl_box->down = new graph_box_type(this->_x_min, this->_y_min-1);
 	this->bl_box->down->up = this->bl_box;
 
@@ -100,8 +100,8 @@ void Graph_Matrix<node_type, dimen_t>::pushRow(){ // add a row at downward end
 	++(this->_total_y_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::injectCol(){ // add a column at leftmost
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::injectCol(){ // add a column at leftmost
 	this->tl_box->left = new graph_box_type(this->_x_min-1, this->_y_max);
 	this->tl_box->left->right = this->tl_box;
 
@@ -148,8 +148,8 @@ void Graph_Matrix<node_type, dimen_t>::injectCol(){ // add a column at leftmost
 	++(this->_total_x_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::injectRow(){ // add a row at begin
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::injectRow(){ // add a row at begin
 	this->tl_box->up = new graph_box_type(this->_x_min, this->_y_max+1);
 	this->tl_box->up->down = this->tl_box;
 
@@ -188,8 +188,8 @@ void Graph_Matrix<node_type, dimen_t>::injectRow(){ // add a row at begin
 	++(this->_total_y_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::popRow_upper(){   //remove the uppermost row ( = y_max)
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::popRow_upper(){   //remove the uppermost row ( = y_max)
 	if( this->tl_box == this->bl_box )   return; //don't pop out the origin row (y=0)
 
 	graph_box_type* temp = this->tl_box;
@@ -211,8 +211,8 @@ void Graph_Matrix<node_type, dimen_t>::popRow_upper(){   //remove the uppermost 
 	--(this->_total_y_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::popCol_left(){   //remove the leftmost column; INTERNAL but can be used
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::popCol_left(){   //remove the leftmost column; INTERNAL but can be used
 	if( this->tl_box == this->tr_box )   return; //don't pop out the origin column (x=0)
 
 	graph_box_type* temp = this->tl_box;
@@ -234,8 +234,8 @@ void Graph_Matrix<node_type, dimen_t>::popCol_left(){   //remove the leftmost co
 	--(this->_total_x_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::popCol(){   //by default, removes the rightmost column ( = x_max ), if not available calls popCol_front() to try to remove the leftmost column, so it's safe to just use this function only
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::popCol(){   //by default, removes the rightmost column ( = x_max ), if not available calls popCol_front() to try to remove the leftmost column, so it's safe to just use this function only
 	if( this->tr_box == this->tl_box )   return; //don't pop out the origin column (x=0)
 
 	if( this->_x_max == 0 ) return this->popCol_left();
@@ -259,8 +259,8 @@ void Graph_Matrix<node_type, dimen_t>::popCol(){   //by default, removes the rig
 	--(this->_total_x_abs);
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::popRow(){   //remove the last row ( = n_row-1)
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::popRow(){   //remove the last row ( = n_row-1)
 	if( this->tl_box == this->bl_box )   return; //don't pop out the origin row (y=0)
 
 	if( this->_y_min == 0 )	return this->popRow_upper();
@@ -285,23 +285,23 @@ void Graph_Matrix<node_type, dimen_t>::popRow(){   //remove the last row ( = n_r
 	--(this->_total_y_abs);
 }
 
-template< typename node_type, typename dimen_t>
-std::pair< std::make_unsigned_t<dimen_t>, std::make_unsigned_t<dimen_t> > Graph_Matrix<node_type, dimen_t>::getDimensions() const{
+template< typename node_dtype, typename dimen_t>
+std::pair< std::make_unsigned_t<dimen_t>, std::make_unsigned_t<dimen_t> > Graph_Matrix<node_dtype, dimen_t>::getDimensions() const{
 	return { this->_total_y_abs, this->_total_x_abs };    //return in form of rows, cols
 }
 
-template< typename node_type, typename dimen_t>
-auto Graph_Matrix<node_type, dimen_t>::getNumRows() const{
+template< typename node_dtype, typename dimen_t>
+auto Graph_Matrix<node_dtype, dimen_t>::getNumRows() const{
 	return this->_total_y_abs;
 }
 
-template< typename node_type, typename dimen_t>
-auto Graph_Matrix<node_type, dimen_t>::getNumCols() const{
+template< typename node_dtype, typename dimen_t>
+auto Graph_Matrix<node_dtype, dimen_t>::getNumCols() const{
 	return this->_total_x_abs;
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::displayMat(std::ostream& os) const{
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::displayMat(std::ostream& os) const{
 	// @todo - Use util::range_iterator here to iterate through all boxes
 
 	// temporary code
@@ -319,8 +319,8 @@ void Graph_Matrix<node_type, dimen_t>::displayMat(std::ostream& os) const{
 	}
 }
 
-template< typename node_type, typename dimen_t>
-void Graph_Matrix<node_type, dimen_t>::resize(dimen_t _num_rows, dimen_t _num_cols){
+template< typename node_dtype, typename dimen_t>
+void Graph_Matrix<node_dtype, dimen_t>::resize(dimen_t _num_rows, dimen_t _num_cols){
 	// @future - Use this->__capacity to, use the nodes, previously allocated only, instead of allocating again
 	if( _num_rows < 0 || _num_cols < 0 ){
 		throw std::length_error("Cannot have a graph with negative dimensions");
@@ -426,26 +426,26 @@ void Graph_Matrix<node_type, dimen_t>::resize(dimen_t _num_rows, dimen_t _num_co
 
 
 // ACCESSOR FUNCTIONS //
-template< typename node_type, typename dimen_t>
-Graph_Box<node_type>* Graph_Matrix<node_type, dimen_t>::operator[](const _coord<dimen_t>& pos){
+template< typename node_dtype, typename dimen_t>
+Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const _coord<dimen_t>& pos){
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 	// @todo - call overloaded operator taking graph_position
 }
 
-template< typename node_type, typename dimen_t>
-const Graph_Box<node_type>* Graph_Matrix<node_type, dimen_t>::operator[](const _coord<dimen_t>& pos) const{
+template< typename node_dtype, typename dimen_t>
+const Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const _coord<dimen_t>& pos) const{
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 	// @todo - call overloaded operator taking graph_position
 }
 
-template< typename node_type, typename dimen_t>
-Graph_Box<node_type>* Graph_Matrix<node_type, dimen_t>::operator[](const graph_position& pos){
+template< typename node_dtype, typename dimen_t>
+Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const graph_position& pos){
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 
 }
 
-template< typename node_type, typename dimen_t>
-const Graph_Box<node_type>* Graph_Matrix<node_type, dimen_t>::operator[](const graph_position& pos) const{
+template< typename node_dtype, typename dimen_t>
+const Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const graph_position& pos) const{
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 
 }
@@ -454,8 +454,8 @@ const Graph_Box<node_type>* Graph_Matrix<node_type, dimen_t>::operator[](const g
 
 // CONSTRUCTORS AND DESTRUCTORS	//
 
-template< typename node_type, typename dimen_t>
-Graph_Matrix<node_type, dimen_t>::Graph_Matrix() : Graph_Matrix(1, 1){}
+template< typename node_dtype, typename dimen_t>
+Graph_Matrix<node_dtype, dimen_t>::Graph_Matrix() : Graph_Matrix(1, 1){}
 
 /*
 	The origin -> as per the current initialisation of _x_min, _x_max and y_min y_max,
@@ -467,14 +467,14 @@ Graph_Matrix<node_type, dimen_t>::Graph_Matrix() : Graph_Matrix(1, 1){}
 					So, each box is not actually a square with four corners, instead it will simple have just one coordinate (similar to a point)
 */
 
-template< typename node_type, typename dimen_t>
+template< typename node_dtype, typename dimen_t>
 																								// @look_later - Here, for now i have initialised _x_min and _x_max as given below, but shouldn't they both be 0,0 ? Same for _y_min and _y_max ?
-Graph_Matrix<node_type, dimen_t>::Graph_Matrix(dimen_t _num_rows, dimen_t _num_cols) : _total_x_abs(0), _total_y_abs(0), _x_min(0), _x_max(0), _y_min(0), _y_max(0), origin(0,0){
+Graph_Matrix<node_dtype, dimen_t>::Graph_Matrix(dimen_t _num_rows, dimen_t _num_cols) : _total_x_abs(0), _total_y_abs(0), _x_min(0), _x_max(0), _y_min(0), _y_max(0), origin(0,0){
 	if( _num_rows < 0 || _num_cols < 0 ){
 		throw std::length_error("Cannot have a graph with negative dimensions");
 	}
 
-	this->origin.data = decltype(this->origin.data){};	// @caution -> due to this , and maybe code at other places, the `node_type` has to copy-constructible
+	this->origin.data = decltype(this->origin.data){};	// @caution -> due to this , and maybe code at other places, the `node_dtype` has to copy-constructible
 
 	this->tl_box = &origin;
 	this->bl_box = &origin;
@@ -497,8 +497,8 @@ Graph_Matrix<node_type, dimen_t>::Graph_Matrix(dimen_t _num_rows, dimen_t _num_c
 
 }
 
-template< typename node_type, typename dimen_t>
-Graph_Matrix<node_type, dimen_t>::~Graph_Matrix(){
+template< typename node_dtype, typename dimen_t>
+Graph_Matrix<node_dtype, dimen_t>::~Graph_Matrix(){
 	while( this->_total_y_abs != 0 ){  //excluding the origin node, which will automatically get destructed, since it's not a pointer
 		popRow();   //remove the last row ( = n_row-1)     
 	}

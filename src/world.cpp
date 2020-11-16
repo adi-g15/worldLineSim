@@ -27,11 +27,12 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
     // this->createFood();
 }
 
-bool World::isCellEmpty(const coord_type& c) const{
-    if( !this->_RangeCheck(c) )   return false;
+bool World::isCellEmpty(const Graph_Box<_box>* c) const{
+    if( !this->_RangeCheck(c->getCoords()) )   return false;
 
     // @todo -> Don't need this, remove it later, since with current graph matrix
     // return this->world_plot.isEmpty(c);
+    return c->getData().entities.empty();
 }
 
 bool World::_RangeCheck(const coord_type& c) const{

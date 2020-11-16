@@ -37,8 +37,7 @@ public:
 	//------                ------//
 
 	const dimen_t& get_curr_bound() const;
-	dimen_t getFreeSpace() const; //returns num of boxes empty
-	bool isCellEmpty( const coord_type& ) const;
+	bool isCellEmpty( const Graph_Box<_box>* ) const;
 
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
 	bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
@@ -58,6 +57,10 @@ public:
 	//wil be required to join these threads, in stopSimulation();
 	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
 
+	const Graph_Box<_box>* get_box(const _coord<dimen_t>& pos) const{
+		return this->world_plot.get_box(pos);
+	}
+
 	World( const World_Ptr, _timePoint );  //can later be made private
 
 private:
@@ -76,18 +79,13 @@ private:
 
 	std::vector< Snake > snakes;
 
-	auto get_box(const _coord<dimen_t>& pos) const{
-		return this->world_plot.get_box(pos);
-	}
-
 	// bool _CheckBounds();    //for checking `need` to increase size
 
 	bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
 	void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
-	World(): world_plot(this){
 		// @todo - This is the constructor that creates the new world just after big bang
-	}
+	World();
 
 	// friend class Verse;  // doesn't need to be a friend, since World_Node is the one that needs that private constructor
 	friend class World_Node;

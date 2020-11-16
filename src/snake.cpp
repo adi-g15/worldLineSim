@@ -14,7 +14,7 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-const _coord<int32_t>& Snake::getPos() const{
+const _coord<Snake::dimen_t>& Snake::getPos() const{
     return this->getHeadCoord();
 }
 
@@ -27,7 +27,7 @@ void Snake::simulateExistence(){
         #ifdef NO_THREAD_ENTITY
             continue;
         #endif
-        throw std::exception( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
+        throw std::logic_error( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
     }
 
     while ( this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
@@ -100,9 +100,8 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
 
     this->head = parent_world->get_box(head_pos);
 
-    while( !this->parent_world->isCellEmpty(this->head) ){
-        this->head.mX = util::Random::random<dimen_t>(parent_world->get_curr_bounds().first);
-        this->head.mY = util::Random::random<dimen_t>(parent_world->get_curr_bounds().first);
+    while( !this->parent_world->isCellEmpty(this->head) ){  // loop until you chose an empty box as the head
+        this->head = this->head->get_adj_box( Direction(util::Random::random<dimen_t>(4)) );    // @warning- randomly assigning any number from 0 to 3
     }
 
     // this->body.push_back(this->head);    // since it's a list of directions, we don't require the head, its not direction, and also it is the starting point
@@ -113,7 +112,7 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
         // util::Random::rand_neighbour(this->body.back())
         auto rand_direction = statics::directions[ util::Random::random(4) ];
 
-        while( ! prev_box->getData()->hasEntities() ){
+        while( ! prev_box->getData().hasEntities() ){
             prev_box = prev_box->get_adj_box(Direction::UP);
             rand_direction = statics::directions[ util::Random::random(4) ];
         }

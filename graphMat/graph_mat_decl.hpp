@@ -12,6 +12,7 @@
  *          but the coordinates won't be like that, for example, going down, the x_coord as in matrix won't increase, the y will increase, same for y coordinates 
 */
 
+#include <iostream> // use at displaing matrix
 #include <cstdint>
 #include <utility>
 // #include <concepts>
@@ -21,10 +22,10 @@
     // @limitation (wrt vector<vector>) - Currently you can't get back the nth row, say mat[4], isn't valid, though can be implemented by simply returning, mat[4][0] which will logically be a linked list
 
 // dimen_t will be the unit of dimension
-template< typename node_type, typename dimen_t=int32_t> // @concepts -> make sure that std::is_signed<dimen_t> == true
+template< typename node_dtype, typename dimen_t=int32_t> // @concepts -> make sure that std::is_signed<dimen_t> == true
 class Graph_Matrix{
     static_assert(std::is_signed_v<dimen_t> == true);
-    typedef Graph_Box<node_type> graph_box_type;
+    typedef Graph_Box<node_dtype> graph_box_type;
     typedef std::make_unsigned_t<dimen_t> udimen_t;
     // typedef int32_t dimen_t;  //dimension unit
 
@@ -92,7 +93,7 @@ public:
 
     void displayMat(std::ostream& output_stream = std::cout) const;
 
-    // friend std::ostream& operator<<(std::ostream& os, const Graph_Matrix<node_type,dimen_t>&) const{
+    // friend std::ostream& operator<<(std::ostream& os, const Graph_Matrix<node_dtype,dimen_t>&) const{
     //     this->displayMat(os);
     // }
 

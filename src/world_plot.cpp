@@ -1,4 +1,5 @@
 #include "world_plot.hpp"
+#include "graphMat/graph_mat.hpp"   // for the definitions
 #include "world.hpp"
 
 void WorldPlot::createFood(){
@@ -17,7 +18,7 @@ bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPat
 
     for ( uint32_t i = 0; i<path.size(); ++i ){
         temp = temp->get_adj_box(path[i]);
-        if( ! temp->getData()->entities.empty() )    return false;
+        if( ! temp->getData().entities.empty() )    return false;
     }
 
     return true;
@@ -30,15 +31,21 @@ WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound),
 
 void WorldPlot::start_auto_expansion(){
     // @assert - Making sure the world_plot expands on a different thread, so that it doesn't hinder the world thread (it may well be changed later, read the note in world.cpp where this function is called)
-    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_thread_id() ){
-        throw std::exception("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
+    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
+        throw std::logic_error("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
     }
     this->auto_expand();
 }
 
+WorldPlot::dimen_t WorldPlot::getFreeSpace() const{ // returns num of boxes empty
+    // @todo - return num of boxes empty
+
+    return dimen_t{};
+}
+
 
 void WorldPlot::auto_expand(){   //expands one unit on each side
-    this->__temp.free_space_ratio = this->parent_world->getFreeSpace()/this->getOrder();
+    this->__temp.free_space_ratio = this->getFreeSpace()/this->getOrder();
     if( __temp.time_since_speed_updated >= 10 ){
         --__temp.expansion_speed;
         __temp.time_since_speed_updated = 0;

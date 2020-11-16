@@ -49,7 +49,6 @@ class Display : public single_term{
 	int main_y_corner, main_x_corner;
 	int main_dimen_y, main_dimen_x;
 
-	~Display(); //private destructor, only the Verse using it can destroy the Display
 
 	public:
 	void addNode(World_Node* node){
@@ -63,10 +62,10 @@ class Display : public single_term{
 
 	Display() = delete;
 	Display(Verse*);
+	~Display();
 
 	friend class Verse;
 };
-
 
 void Display::runInitTasks(){
 	using namespace std::chrono_literals;
@@ -164,6 +163,13 @@ void Display::runInitTasks(){
 		std::this_thread::sleep_for(200ms);
 	}
 
+}
+
+void Display::showExit(){
+	clear();
+	clearAll();
+
+	mvwaddstr(stdscr, this->_terminal_y/2, (this->_terminal_x - 15)/2, "About to Exit !");
 }
 
 Display::Display(Verse* parent) :

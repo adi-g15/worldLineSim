@@ -8,9 +8,9 @@ using std::clog, std::endl;
     // for logging mainly (not literally 'tests' though)
 namespace test{
     namespace logger{
-        template<typename node_type>
-        bool __IsConncted( const Graph_Box<node_type>* from, const Graph_Box<node_type>* to , Direction dir ){
-            const Graph_Box<node_type>* temp{ from };
+        template<typename node_dtype>
+        bool __IsConncted( const Graph_Box<node_dtype>* from, const Graph_Box<node_dtype>* to , Direction dir ){
+            const Graph_Box<node_dtype>* temp{ from };
 
             bool boolean{false}, b2{false};
             for (int i = 0; temp!=nullptr && i < 100; i++){

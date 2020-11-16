@@ -138,7 +138,7 @@ class World_Node : public _ID{
 	}
 
 public:
-	Display* dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
+	std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
 
 	void update_node_disp(){
 		if( !this->_window_data.node_window )   return; //  node is not on the screen (ie. node_window is null)
@@ -157,7 +157,7 @@ public:
 		}
 	}
 
-	const World_Ptr get_world() const{
+	const World_Ptr get_world(){	// can't be const qualified, since the mutex is being modified
 		std::scoped_lock s(node_mutex);
 
 		return this->world;	// @risky
@@ -165,7 +165,7 @@ public:
 	World_Node(World&) = delete;
 
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
-	World_Node(World_Ptr old_world, _timePoint t, Display* dispMngr, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued){
+	World_Node(World_Ptr old_world, _timePoint t, std::shared_ptr<Display> dispMngr, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued){
 		this->world_id = old_world->_id;
 
 		this->dispManager = dispMngr;
@@ -182,7 +182,7 @@ public:
 
 private:
 	World_Node() = delete;
-	World_Node(Display* dispMngr) : paused_time(0) {
+	World_Node(std::shared_ptr<Display> dispMngr) : paused_time(0) {
 		this->world = new World();
 
 		this->dispManager = dispMngr;

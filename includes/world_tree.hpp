@@ -18,7 +18,7 @@ class World_Tree : public Tree<World>{
 	typedef World_Node* World_Node_Ptr;
 	// typedef _tree_node<World>* World_Node_Ptr;
 private:
-	Display* displayManager;    // the displayManager for the verse
+	std::shared_ptr<Display> displayManager;    // the displayManager for the verse
 	World_Node_Ptr root;
 	// std::vector<Tree_Node_Ptr> all_nodes;    //vector of pointers to all nodes, this maybe additional storage, but gives ease destructing, and to know number of nodes
 	int16_t num_nodes;
@@ -49,7 +49,7 @@ public:
 		#endif
 	}
 
-	World_Tree(Display* displayManager) : root(nullptr), num_nodes(0){
+	World_Tree(std::shared_ptr<Display> displayManager) : root(nullptr), num_nodes(0){
 		if( !displayManager ){
 			throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
 		}
@@ -57,7 +57,7 @@ public:
 		this->displayManager = displayManager;
 	}
 	// @tip - Use delegation to have a `master` constructor that all other will call, or if not a single master, then decrease the duplicacy in the constructor body
-	World_Tree(World* root, Display* displayManager) : root(root), num_nodes(1){
+	World_Tree(World_Node_Ptr root, std::shared_ptr<Display> displayManager) : root(root), num_nodes(1){
 		if( !displayManager ){
 			throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
 		}
