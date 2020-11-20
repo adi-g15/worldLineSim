@@ -26,11 +26,11 @@ void sig_handler(int SIGNAL){   // @warning -> It doesn't close the program itse
 */
 class single_term{  //initially will have 3 windows, a square one at bottom left, rectangular at bottom right, and a rectangular intoduction at top
 	bool curses_initialized{ false };
+	std::vector< WINDOW* > _Windows;	// not in use currently, in Display class
 	protected:
 	std::string title;
 	std::string description;    // @note - Not now (not enough space)
 
-	std::vector< WINDOW* > _Windows;
 	std::vector<std::pair< int, int >> _win_Dimensions;  //windows dimensions
 
 	int _terminal_y;

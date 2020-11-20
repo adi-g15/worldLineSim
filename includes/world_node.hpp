@@ -5,14 +5,14 @@
 #include "id_creator.hpp"
 #include "state.hpp"
 #include "world.hpp"
-#include "display.hpp"
+#include "display/node_adapter.hpp"
 
 typedef int32_t dimen_t;
 struct StatePlusPlus{
 	const State& state;
 	const id_type node_id;
 	const dimen_t x_dimen;
-	const dimen_t y_dimen_t;  // the dimensions of the world
+	const dimen_t x_dimen;  // the dimensions of the world
 };
 
 class World_Node : public _ID{
@@ -20,6 +20,8 @@ class World_Node : public _ID{
 	typedef World_Node* World_Node_Ptr;
 
 	bool continued_world{ false };    // stores whether this node just inherited the world pointer from parrent instead of a new world being formed. @note - This is to not delete the same emmory location multiple times, so when the switch is made to smat pointers, do remove it and use the smart pointers that automatically handle the memory for you
+
+	World_Tree& world_tree;
 	World_Ptr world;
 	id_type world_id;   /* @note - this->_id and this->world_id    are not the same for world_node, since world_id can be same, also prefer world_node's _id*/
 
@@ -118,7 +120,7 @@ class World_Node : public _ID{
 	}
 
 	void stop_WorldSimulation(){
-		this->world->_shared_concurrent_data._world_runnning = false;
+		this->world->_shared_concurrent_data.is_world_running() = false;
 
 		for( auto&& thread : this->world->entity_threads ){
 			if( thread.joinable() )
@@ -138,7 +140,8 @@ class World_Node : public _ID{
 	}
 
 public:
-	std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
+	// std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
+	node_adapter adapter;	// the display controller
 
 	void update_node_disp(){
 		if( !this->_window_data.node_window )   return; //  node is not on the screen (ie. node_window is null)
@@ -162,13 +165,23 @@ public:
 
 		return this->world;	// @risky
 	}
-	World_Node(World&) = delete;
 
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
-	World_Node(World_Ptr old_world, _timePoint t, std::shared_ptr<Display> dispMngr, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued){
-		this->world_id = old_world->_id;
+	World_Node( World_Tree& tree ) : continued_world(false), adapter(tree.access_disp_manager()->newNodeAdapter(this)){
 
-		this->dispManager = dispMngr;
+	}
+
+	World_Node( World_Tree& tree, World_Node* parent_node/*World_Ptr old_world*/, _timePoint t, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued), adapter(tree.access_disp_manager()->newNodeAdapter(this)){
+		if( ! is_continued ){
+			this->world = new World( parent_node->world, t );	// starting from parent_node->world
+		}else
+		{
+			this->world = parent_node->world;
+		}
+
+		this->world_id = this->world->_id;
+
+		// this->dispManager = dispMngr;
 		// @warning @thread -> See all occurences of such cases where we are accessing data members/functions directly using the arrow notation, and ENSURE IT'S THREADSAFE (where they tend to be on different on different threads)
 		dispMngr->addNode(this);	// adds this node, as well as initialise this->_display_data
 
@@ -181,14 +194,6 @@ public:
 	}
 
 private:
-	World_Node() = delete;
-	World_Node(std::shared_ptr<Display> dispMngr) : paused_time(0) {
-		this->world = new World();
-
-		this->dispManager = dispMngr;
-	// create a new world here
-	}
-
 	friend class Display;
 	friend class World_Tree;
 	// @change - Now, World_Tree won't be constructing the root node, rather, the Verse will create it in big_bang(), and then passes it to World_Tree to work further

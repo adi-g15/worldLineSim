@@ -16,7 +16,7 @@ class WorldPlot: public Square_Matrix<_box>{
 
 	void auto_expand();   //expands this->__temp.expansion_speed unit on each side
 	void __expand_n_units(int8_t n);    //to be used when there's rate
-	const Graph_Box<_box>* get_box(const _coord<dimen_t>& position) const{
+	const Graph_Box<_box>* get_box(const coord& position) const{
 		// @todo - Return the graph_box with that coordinate
 
 		return &(this->origin);    // @debug - just for now

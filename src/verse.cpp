@@ -1,6 +1,6 @@
 #include "verse.hpp"
 #include "world_tree.hpp"
-#include "display.hpp"
+#include "display/display.hpp"
 #include "graphMat/graph__square_mat.hpp"
 
 #include <memory>

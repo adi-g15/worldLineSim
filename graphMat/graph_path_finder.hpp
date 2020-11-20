@@ -6,7 +6,7 @@
 
 #include <vector>
 
-typedef std::vector<_coord<>> Path;
+typedef std::vector<coord> Path;
 
 class PathFinder{
     /*
@@ -20,7 +20,7 @@ class PathFinder{
 
    typedef World* World_Ptr;
    public:
-    static Path getPath( const Snake*, _coord<>&);
+    static Path getPath( const Snake*, coord&);
 
     static bool pathIsClear( const World_Ptr, const Path&);
 

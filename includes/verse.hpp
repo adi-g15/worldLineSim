@@ -11,7 +11,6 @@
 
 	// The world tree will mostly work almost same as array
 class Verse{
-	typedef World* World_Ptr;
 public:
 	std::promise<bool> big_bang();    // brambha, the creator
 	void render_screen();    // vishnu, the carer
@@ -20,6 +19,10 @@ public:
 
 	std::shared_ptr<Display> displayManager; // this class will manage the rendering
 	std::map< id_type, World_Node* > mapping_of_world_id_to_world_node_ptr; // to call pause on a particular world `through` the node
+
+	const std::shared_ptr<Display> disp_manager() const{
+		return this->displayManager;
+	}
 
 	Verse();
 	~Verse();

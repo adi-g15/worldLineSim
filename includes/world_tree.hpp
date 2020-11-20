@@ -19,6 +19,7 @@ class World_Tree : public Tree<World>{
 	// typedef _tree_node<World>* World_Node_Ptr;
 private:
 	std::shared_ptr<Display> displayManager;    // the displayManager for the verse
+	const Verse* parent_verse;
 	World_Node_Ptr root;
 	// std::vector<Tree_Node_Ptr> all_nodes;    //vector of pointers to all nodes, this maybe additional storage, but gives ease destructing, and to know number of nodes
 	int16_t num_nodes;
@@ -39,6 +40,10 @@ private:
 	} _fast_access_data;    // temporary data for fast access, to currently running world
 
 public:
+	const std::shared_ptr<Display> access_disp_manager() const{
+		return this->parent_verse->disp_manager();
+	}
+
 	bool initTree(std::promise<bool>& creation_promise){    //should be called after Verse::big_bang(), to initiate a world, and set it as the root node
 		// @todo - Create a new world_node (root) here, and initialise the tree
 

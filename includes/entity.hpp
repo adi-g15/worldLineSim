@@ -6,7 +6,9 @@
 #include <any>
 
 #include "id_creator.hpp"
+#include "util/coord.hpp"
 
+typedef util::_coord<int32_t> coord;
 typedef void (*Action_Ptr)(void);
 
 struct Prop{    // @future - See the @future comment on the Entity::getUniqProp() function
@@ -16,9 +18,6 @@ struct Prop{    // @future - See the @future comment on the Entity::getUniqProp(
 struct SnakeProp: Prop{
     // int data;   // for snake, the unique property (ie. this `data`) will be an int, ie. length
 };
-
-template<typename dimen_t> // @assert - dimen_t must be integral type
-struct _coord;  // forward declaration
 
 enum class entity_Types: uint8_t {
     SNAKE,
@@ -39,7 +38,7 @@ public:
     id_type getEntityId() const{
         return this->_id;
     }
-    virtual const _coord<dimen_t>& getPos() const = 0;
+    virtual const coord& getPos() const = 0;
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 

@@ -10,14 +10,13 @@ The state should only be created when asked for, for on most cases, when world p
     // This is mainly for logging, hence not making it complex with Graph_Box* etc
 struct State    // @idea Can later have food location in state too... not doind it now, it's up to `future` decision
 {   
-    typedef _coord<int32_t> coord_type;
-    std::vector < coord_type > curr_pos; //current positions of snakes
+    std::vector < coord > curr_pos; //current positions of snakes
 
     _timePoint state_time;
 
     private:
     State(
-        // const std::vector < coord_type >& pos,
+        // const std::vector < coord >& pos,
         _timePoint t
     ): state_time(t){}
 

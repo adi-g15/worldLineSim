@@ -20,7 +20,7 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 typedef World* World_Ptr;
 class World: public _ID{
 	typedef int32_t dimen_t;
-	typedef _coord<dimen_t> coord_type;
+	typedef coord coord_type;
 
 	typedef std::make_unsigned_t<int32_t> udimen_t;
 public:
@@ -57,7 +57,7 @@ public:
 	//wil be required to join these threads, in stopSimulation();
 	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
 
-	const Graph_Box<_box>* get_box(const _coord<dimen_t>& pos) const{
+	const Graph_Box<_box>* get_box(const coord& pos) const{
 		return this->world_plot.get_box(pos);
 	}
 

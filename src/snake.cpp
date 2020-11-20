@@ -14,7 +14,7 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-const _coord<Snake::dimen_t>& Snake::getPos() const{
+const coord& Snake::getPos() const{
     return this->getHeadCoord();
 }
 
@@ -68,7 +68,7 @@ bool Snake::moveForward(){  // this will also be on the snake's thread, and not 
 
 }
 
-const _coord<Snake::dimen_t>& Snake::getHeadCoord() const{
+const coord& Snake::getHeadCoord() const{
     return this->head->getCoords();
 }
 
@@ -93,7 +93,7 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
 */
 
 Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SNAKE), parent_world(world){
-    _coord<dimen_t> head_pos = {
+    coord head_pos = {
         util::Random::random<dimen_t>(parent_world->get_curr_bound()),
         util::Random::random<dimen_t>(parent_world->get_curr_bound()),
     };

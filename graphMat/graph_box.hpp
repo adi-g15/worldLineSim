@@ -14,7 +14,7 @@ template< typename node_dtype >
 struct Graph_Box    // @node - it should be non-copyable
 {
     typedef int32_t dimen_t;
-    typedef _coord<dimen_t> coord_type;
+    typedef coord coord_type;
 
     public:
         Graph_Box* get_box(){ return this; }
@@ -31,7 +31,7 @@ struct Graph_Box    // @node - it should be non-copyable
         }
 
         Graph_Box(dimen_t x, dimen_t y): Graph_Box(node_dtype{}, x, y){}
-        Graph_Box(const _coord<dimen_t>& coord): Graph_Box(node_dtype{}, coord.mX, coord.mY){}
+        Graph_Box(const coord& coord): Graph_Box(node_dtype{}, coord.mX, coord.mY){}
 
         Graph_Box(node_dtype data, dimen_t x, dimen_t y): data(data), coords(x,y){
             this->up = nullptr;

@@ -76,11 +76,13 @@
         "xutility": "cpp",
         "future": "cpp",
         "resumable": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "valarray": "cpp"
     },
     "workbench.colorCustomizations": {
         "activityBar.background": "#13332D",
         "titleBar.activeBackground": "#1B473F",
         "titleBar.activeForeground": "#F6FBFA"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

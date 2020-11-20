@@ -61,7 +61,7 @@ World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this){
 
     this->snakes.reserve(this->_MAX_NumSnakes);
     this->snakes.push_back( //later when simulated, let all snakes run on a different thread
-        Snake{this, util::Random::random(2, 5)}
+        Snake{this, util::Random::random<uint16_t>(2, 5)}
     );
 
 }

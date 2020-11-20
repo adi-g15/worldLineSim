@@ -79,8 +79,8 @@ public:
     auto getNumCols() const;
 
         // @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
-    graph_box_type* operator[](const _coord<dimen_t>&);
-    const graph_box_type* operator[](const _coord<dimen_t>&) const;
+    graph_box_type* operator[](const coord&);
+    const graph_box_type* operator[](const coord&) const;
     graph_box_type* operator[](const graph_position& pos);
     const graph_box_type* operator[](const graph_position& pos) const;
 

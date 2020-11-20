@@ -427,13 +427,13 @@ void Graph_Matrix<node_dtype, dimen_t>::resize(dimen_t _num_rows, dimen_t _num_c
 
 // ACCESSOR FUNCTIONS //
 template< typename node_dtype, typename dimen_t>
-Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const _coord<dimen_t>& pos){
+Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const coord& pos){
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 	// @todo - call overloaded operator taking graph_position
 }
 
 template< typename node_dtype, typename dimen_t>
-const Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const _coord<dimen_t>& pos) const{
+const Graph_Box<node_dtype>* Graph_Matrix<node_dtype, dimen_t>::operator[](const coord& pos) const{
 	// @note to viewer -> You can express your view on whether we should prefer simple [x][y] for position or the graph_position typedefed in graph_box.hpp
 	// @todo - call overloaded operator taking graph_position
 }
