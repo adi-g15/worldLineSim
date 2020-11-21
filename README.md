@@ -49,6 +49,23 @@ Other than these, usual single line comments, are 'low-priority comments' more g
 
 And, multi line comments are generally for briefly telling about some struct or class
 
+## Future Ideas
+
+> There have been lots of ideas, all just in code, from now on, adding here, what i feel...
+
+* UI libraries ->
+  Consider using libraries that have been made for multi threaded applications, or better handle those cases. Some considerables are ->
+  1. https://github.com/wjakob/nanogui
+  2. https://github.com/dankamongmen/notcurses
+
+* I/O ->
+  Likely not required with the UI libraries, but likely for logging another stream maybe required. Some considerations are ->
+  1. https://github.com/expnkx/fast_io
+
+* Multi-Threading ->
+  Since this project HEAVILY depends on asynchronous and multithreading approach, so better use a thread pool too in later time, for removing some of the overhead of creating and destroying threads again and again
+  There are likely multiple thread pool implementations, use one of them.
+
 ## Source of Idea
 
   Steins Gate (Anime)
@@ -56,9 +73,6 @@ And, multi line comments are generally for briefly telling about some struct or 
   and...
 
   My Interest, and thinking 😎😎
-
-
-> `@future` - Since this project HEAVILY depends on asynchronous and multithreading approach, so better use a thread pool too in later time, for removing some of the overhead of creating and destroying threads again and again
 
 
 :copyright: Aditya Gupta 2020

@@ -5,11 +5,15 @@
 #include "display/node_adapter.hpp"
 
 void Display::pauseRendering(){
-	this->paused = true; 
+	this->paused = true;
+
+	this->clearAll();
 }
 
 void Display::resumeRendering(){
 	this->paused = false;
+
+	this->runInitTasks();
 }
 
 std::shared_ptr<node_adapter> Display::newNodeAdapter(World_Node* node){
@@ -43,6 +47,9 @@ std::shared_ptr<node_adapter> Display::newNodeAdapter(World_Node* node){
 	std::shared_ptr<node_adapter> adapter{ new node_adapter(this->shared_from_this(), node, this->adapters_height, this->adapters_width, y_corner, x_corner) };
 	queue.push(adapter->node);
 	queue.adapters.push_back(adapter);
+
+	adapter->update();	// get it on screen
+	this->main_area->refresh();
 
 	return std::move(adapter);
 }
