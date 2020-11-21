@@ -53,9 +53,6 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 	}
 
 	void refreshAll(){
-		// for( WINDOW* win : this->_Windows ){
-		//     wrefresh(win);
-		// }
 		wrefresh(stdscr);
 	}
 

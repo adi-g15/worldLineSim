@@ -4,7 +4,9 @@ project(World-Line-Simulator VERSION 0.271)
 set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB SOURCES "src/*.cpp")
-add_executable(simulator main.cpp ${SOURCES})
+# later distribute display into a library, and link to it
+file(GLOB DISP_SOURCES "display/src/*.cpp")
+add_executable(simulator main.cpp ${SOURCES} ${DISP_SOURCES})
 
 # Edit the 3 lines, according to your build of curses (ncurse or pdcurses)
 set(CURSES_INCLUDE_PATH ./curses/includes)

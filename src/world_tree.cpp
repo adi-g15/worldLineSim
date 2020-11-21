@@ -39,8 +39,9 @@ World_Tree::World_Tree(World_Node_Ptr root, std::shared_ptr<Display> displayMana
 
 World_Tree::~World_Tree(){
     std::stack<World_Node_Ptr> st;
-    st.push(root);
     World_Node_Ptr temp;
+
+    if(root) st.push(root);
 
     while( !st.empty() ){
         temp = st.top();

@@ -10,8 +10,9 @@
 #include "verse.hpp"
 #include "forward_decl.hpp"
 #include "multiTerm/single_term.hpp"
-#include "node_adapter.hpp"
 #include "curses_subwin.hpp"
+
+class node_adapter;	// forward-declaration
 
 	// @note - The queue member functions return World_Node* not the adapters (The adapters are meant to be modified by this class itself)
 struct _8_node_queue{   // @note - It has been separately defined as a wrapper class to std::queue, specially to be used by class Display, and to avoid all these if statements checking always in different functions that will be operating with the queue
@@ -36,7 +37,8 @@ struct _8_node_queue{   // @note - It has been separately defined as a wrapper c
 		}
 
 		void pop(){
-			this->data.erase(this->data.begin());
+			this->data.pop_front();
+			this->adapters.pop_front();
 		}
 
 		auto size(){    // sure to be <= 8
@@ -44,17 +46,12 @@ struct _8_node_queue{   // @note - It has been separately defined as a wrapper c
 		}
 	// END - Typical Queue Operations
 
-		auto add_adapter(node_adapter& adapter){
-			this->push(adapter.node);
-			this->adapters.push_back(adapter);
-		}
-
 		_8_node_queue(){}
 
 };
 
 /* This class will just `hold` everything, with all handling of `its members` being controlled by the parent verse object */
-class Display : public single_term{
+class Display : public single_term, public std::enable_shared_from_this<Display>{
 	typedef std::shared_ptr<SubWindow> SubWindow_Ptr;
 
 
@@ -62,29 +59,32 @@ class Display : public single_term{
 
 	static constexpr char QUIT_KEY{'q'};
 
+	int adapters_height{10};
+	int adapters_width{17};	// these should be same for all, as of the current situation
+		// @future - Try to make these adapt to, for eg. more snakes, so ONLY the next code for determining the position should need change, after the y_length, and x_length aren't same for all node_adapters anymore
+
 	_8_node_queue queue; // pointers to world_nodes
 
 	SubWindow_Ptr top_area, main_area, legend_area;
 
-	std::vector<std::vector<bool>> occupy_table;
+	std::vector<std::vector<bool>> occupy_table;	/* the occupy table keeps record of what regions are occupied (also called, occupancy_table) */
 
 	public:
-	node_adapter newNodeAdapter(World_Node* node){
-		// Initialisizes a node_adapter, and the SubWindow for that, then return BY VALUE
-		// node->dispManager = this;	// @caution - Assign this in world tree itself, where the node is created, since here, we are getting invalid use of incomplete types due to the order in which the headers have been included, can't do much, else just have two hpp files one with definitons, but i want it to be simpler
+	bool paused{ true };
 
-		// node_adapter n(this);	// give the current displayManager
-		// this->queue.add_adapter(n);	// @come_back - Complete it later
-	}
+	node_adapter newNodeAdapter(World_Node* node);
 	void runInitTasks() override;
 	void showExit();
 	void helpScreen();
+	void optionScreen();	// shows options -> 1. View verse state; 2. View help
 	void runPreEndTasks();
+	void resumeRendering();
 	void pauseRendering();
 
 	Display() = delete;
 	Display(Verse*);
 	~Display();
 
+	friend class node_adapter;
 	friend class Verse;
 };

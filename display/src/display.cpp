@@ -1,8 +1,49 @@
-#include "display/display.hpp"
+// @note @future -> Later try to get this into a single display.hpp for easier use with modifications later on
 
+#include "display/display.hpp"
+#include "display/node_adapter.hpp"
 
 void Display::pauseRendering(){
-	
+	this->paused = true; 
+}
+
+void Display::resumeRendering(){
+	this->paused = false;
+}
+
+node_adapter Display::newNodeAdapter(World_Node* node){
+	// @note - Not using the_occupy_currently
+	this->main_area->updateDimen();
+
+	int y_corner;
+	int x_corner;
+	int index_num = queue.size();
+	if(index_num == 8){
+		queue.pop();
+
+		index_num = 7;
+	}
+
+	int bigBox_coord_x;
+	int bigBox_coord_y;	// the big box's corner coord
+
+	bigBox_coord_y = ((main_area->getmax_y()+1)/2) * (index_num / 4);	// first row or second row
+	bigBox_coord_x = ((main_area->getmax_x()+1)/4) * (index_num % 4);
+
+	if( index_num %2 == 0 ){
+		y_corner = bigBox_coord_y;
+	}else{
+		y_corner = bigBox_coord_y + 2;	// 2 lines below
+	}
+
+		// here what we want is to `horizonatlly center` the node_adapter inside this big_box
+	x_corner = bigBox_coord_x + ( (main_area->getmax_x()+1)/4 - adapters_width ) / 2;
+
+	node_adapter adapter{this->shared_from_this(), node, this->adapters_height, this->adapters_width, y_corner, x_corner};
+	queue.push(adapter.node);
+	queue.adapters.push_back(adapter);
+
+	return adapter;
 }
 
 void Display::helpScreen(){
@@ -10,13 +51,86 @@ void Display::helpScreen(){
 
 	this->curses_init();	// @note - single_term itself manages if curses is already initialised
 
+	this->resumeRendering();
 	this->main_area->disable();
 	this->legend_area->disable();
 
 	SubWindow helpArea{ 0, 0, 3, 0 };	// don't make it a raw pointer, since for it's destructor to be called, it's scope should end, which won't happen if we use new SubWindow, with raw pointer
 
+	helpArea.box();
+	auto async_input = this->get_async_input();
 	
+	helpArea.addstr(1, 1, "Help Guide");
+	helpArea.nladdstr("====================");
 
+	helpArea.newline();
+	helpArea.nladdstr("*All worlds continue on diff. threads,w/o blocking the display, or the verse");
+
+	helpArea.newline();
+
+	helpArea.nladdstr("- Type the id to chose a particular world");
+
+	helpArea.nladdstr("- Commands");
+	helpArea.nladdstr("-   N - Namaste World(New)");
+	helpArea.nladdstr("-   P - Pause");
+	helpArea.nladdstr("-   R - Resume");
+	helpArea.nladdstr("-   T - Time Travel !!");
+	helpArea.nladdstr("-   L - Logs (of World)");
+	helpArea.nladdstr("-   V - Logs (of Verse)");
+
+	helpArea.addstr(-3, 1, "If you find a problem...");
+	helpArea.nladdstr("Please solve it yourselves");
+	helpArea.nladdstr(":copy: AdityaG15 :D");
+
+	top_area->addstr(title, position::MIDDLE);
+
+	int cur_dimen_y, cur_dimen_x;
+	getmaxyx(stdscr, this->_terminal_y, this->_terminal_x);
+	while( true ){
+		main_area->updateDimen();
+		legend_area->updateDimen();
+
+		getmaxyx(stdscr, cur_dimen_y, cur_dimen_x);
+		if( cur_dimen_y != _terminal_y || cur_dimen_x != _terminal_x ){
+			this->clearAll(); // to clean out the previous borders
+		}
+
+		top_area->box();
+		main_area->box();
+		legend_area->box();
+
+		this->refreshAll();
+
+		if( async_input.wait_for(100ms) == std::future_status::ready ){
+			char c;
+			try{
+				if(c == Display::QUIT_KEY){
+					this->reset_curses();	// free up memory
+
+					return;
+				}
+				helpArea.refresh();
+			}catch(std::future_error & e){
+				raise(SIGTERM);
+
+				this->parent_verse->kaal_day("Display");
+				return;
+			}
+
+			if( c == Display::QUIT_KEY )	return;
+			helpArea.refresh();
+			async_input = this->get_async_input();	// restart that task
+		}
+
+		std::this_thread::sleep_for(200ms);
+	}
+
+	this->optionScreen();
+
+}
+
+void Display::optionScreen(){
+	// @future @todo -> read comment in the declaration, and implement it
 }
 
 void Display::runInitTasks(){
@@ -28,6 +142,7 @@ void Display::runInitTasks(){
 
 	this->curses_init();
 
+	this->resumeRendering();
 	this->clearAll();
 
 	if( !top_area ) this->top_area.reset( new SubWindow( 3, 0, 0, 0 ) );
@@ -44,7 +159,7 @@ void Display::runInitTasks(){
 
 	legend_area->nladdstr("*All worlds continue on diff. threads,w/o blocking the display, or the verse");
 
-	legend_area->mvnextLine();
+	legend_area->newline();
 
 	legend_area->nladdstr("- Type the id to chose a particular world");
 
@@ -82,20 +197,20 @@ void Display::runInitTasks(){
 			// time to take input
 		if( async_input.wait_for(100ms) == std::future_status::ready ){
 			legend_area->addstr(static_cast<int>(0.75f*legend_area->getmax_y()), 1, "You entered -> ");
+			char c;
 			try{
-				auto c = async_input.get();
+				c = async_input.get();
 				legend_area->addch(c);
 
 				if(c == Display::QUIT_KEY){
-					this->reset_curses();	// first free up memory
-					raise(SIGTERM);
+					this->reset_curses();	// free up memory
 
 					// @note - Or maybe use inter thread communication here, using condition_variable, so to wait till verse tells all done, then this will return, and the destructor again sends signal to verse after all things done in destructor, then verse can be sure that all destructed
 					// @note - UNCOMMENT next line, later
 					// return this->parent_verse->kaal_day("Display");    // also passing the source so that it doesn't actually try to end this
 					return;
 				}
-				legend_area->refesh();
+				legend_area->refresh();
 			}catch(std::future_error & e){
 				raise(SIGTERM);
 
@@ -105,7 +220,8 @@ void Display::runInitTasks(){
 				return;
 			}
 
-			legend_area->refesh();
+			if( c == Display::QUIT_KEY )	return;
+			legend_area->refresh();
 			async_input = this->get_async_input();	// restart that task
 		}
 

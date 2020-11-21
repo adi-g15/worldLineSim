@@ -16,18 +16,21 @@ enum class position{    // only horizontal positions for now
             If newwin() is needed, create a new class Window to handle memory allocation for that, currently it's not needed so leaving
  */
 class SubWindow{
-    typedef std::shared_ptr<SubWindow> SubWindow_Ptr;
+    typedef std::shared_ptr<SubWindow> SubWindow_Ptr;   // NO OWNERSHIP for the parent will be held here
 public:
     bool enabled{false};
-    void box(char32_t = ACS_VLINE, char32_t = ACS_HLINE);
-    void refeshParent();
-    void refesh();
+    void box(chtype = '|', chtype = '-');
+    void refreshParent();
+    void refresh();
     void disable(); // @brief -> RESETS  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
     void enable(); // @brief -> ALLOCATES  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
     int getmax_x();
     int getmax_y();
     void updateDimen(); // @brief - Updates contents of this->dimensions
-    void mvnextLine();  // move to the next line (uses last_write_pos)
+    void newline();  // move to the next line (uses last_write_pos)
+    void moveCursor(int row, int col);
+    void hline(chtype = ACS_HLINE);   // @brief -> Draws a horizontal line on NEXT LINE
+    void hline(int y,int x,char, int len);   // not defined now, not needed
 
     /**
      * @brief - Wrappers around waddstr() and mvwaddstr()
@@ -38,9 +41,15 @@ public:
     */
     void addstr(std::string_view str, position = position::AT_CURS);
     void addstr(int row, int col, std::string_view str);
+    // @future - Later implement the wrapper to mvwprintw() too, since it provides the formatted output
     // @brief - Move to a new line, and add a string, there
     void nladdstr(std::string_view str, position = position::AT_CURS);
+
     void addch(char ch);
+
+    void printf(const char*);
+    template<typename T, typename... Types>
+    void printf(const char*, T, Types...);
 
     /**
      * @important @note - The pairs will be in the form of row*col
@@ -74,7 +83,7 @@ public:
         y_start(y_start),
         x_start(x_start),
         parent_win(parent_win),
-        win(subwin(parent_win->win.get(), height, width, y_start, x_start))
+        win(subwin(parent_win->win.get(), height, width, y_start + parent_win->dimensions.n_row + 1, x_start + parent_win->dimensions.n_col + 1))   // the corner params assume to be wrt. to stdscr
     {
         this->updateDimen();
         this->enabled = true;
@@ -106,6 +115,5 @@ private:
     std::shared_ptr<WINDOW> win;
     SubWindow_Ptr parent_win; // @note - this shared_ptr will hold NOTHING, when parent window is stdscr
 
-    void moveCursor(int row, int col);
 
 };
