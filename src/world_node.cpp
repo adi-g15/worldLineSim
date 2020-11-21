@@ -97,13 +97,13 @@ void World_Node::pauseWorld(){
     // @todo
 }
 
-void World_Node::remove_window(){   // invalidates the WINDOW* pointer held by this
+void World_Node::stop_display(){   // invalidates the WINDOW* pointer held by this
     this->adapter.reset();
 }
 
 void World_Node::update_disp(){
     if( ! this->adapter ){
-        this->adapter.update();
+        this->adapter->update();
     }
 }
 
@@ -111,7 +111,7 @@ const World_Ptr World_Node::get_world() const{
     return this->world;
 }
 
-const auto World_Node::get_world_dimen() const{
+const dimen_t World_Node::get_world_dimen() const{
     return this->world->get_curr_bound();
 }
 
@@ -120,7 +120,7 @@ World_Node::World_Node( World_Tree* tree ) : continued_world(false), adapter(tre
 
 }
 
-World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued = false) : /*world(old_world, t), */continued_world(is_continued), adapter(tree->access_disp_manager()->newNodeAdapter(this)){
+World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued) : /*world(old_world, t), */continued_world(is_continued), adapter(tree->access_disp_manager()->newNodeAdapter(this)){
     if( ! is_continued ){
         this->world = new World( parent_node->world, t );	// starting from parent_node->world
     }else

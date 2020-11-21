@@ -1,4 +1,5 @@
 #include "world_tree.hpp"
+#include "world.hpp"
 #include "world_node.hpp"
 #include "verse.hpp"
 

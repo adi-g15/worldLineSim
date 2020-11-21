@@ -121,30 +121,6 @@ void SubWindow::printf(const char* format){
     this->addstr(format);
 }
 
-template<typename T, typename... Types>
-void SubWindow::printf(const char* format, T first_val, Types... next_vals){
-    for (int i = 0; format[i] != '\0'; ++i)
-    {
-        if(format[i] == '%'){
-            if( std::is_integral<T>::value ){
-                this->addstr(std::to_string(first_val));
-            }else if( std::is_same<T, char>::value ){
-                this->addch(first_val);
-            }else if( std::is_same<T, const char*>::value ){
-                this->addstr(first_val);
-            }else if( std::is_same<T, std::string>::value || std::is_same<T, std::string_view>::value ){
-                this->addstr(first_val.data());
-            }else{
-                // else ignore any other type
-            }
-
-            return this->printf(format+i+1, next_vals...);
-        }else{
-            this->addch(format[i]);
-        }
-    }
-}
-
 void SubWindow::moveCursor(int row, int col){
     wmove(this->win.get(), row, col);
 

@@ -20,14 +20,14 @@ class World_Node : public _ID{
 
 public:
 	// std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
-	std::unique_ptr<node_adapter> adapter;	// the display controller
+	std::shared_ptr<node_adapter> adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
 	World_Tree* tree;
 
-	void update_node_disp();
+	void update_disp();
 
 	const World_Ptr get_world() const;
 
-	const auto get_world_dimen() const;
+	const dimen_t get_world_dimen() const;
 
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
 	World_Node( World_Tree* tree );
@@ -73,7 +73,7 @@ private:
 	/**This will pause the threads for the time being, and update the time, and states vector, then create a new node with the same World* pointer and the world_id */
 	void pauseWorld();
 
-	void remove_window();
+	void stop_display();
 
 	friend class Display;
 	friend class World_Tree;

@@ -1,5 +1,6 @@
 // @note @future -> Later try to get this into a single display.hpp for easier use with modifications later on
 
+#include "verse.hpp"
 #include "display/display.hpp"
 #include "display/node_adapter.hpp"
 
@@ -11,7 +12,7 @@ void Display::resumeRendering(){
 	this->paused = false;
 }
 
-node_adapter Display::newNodeAdapter(World_Node* node){
+std::shared_ptr<node_adapter> Display::newNodeAdapter(World_Node* node){
 	// @note - Not using the_occupy_currently
 	this->main_area->updateDimen();
 
@@ -39,11 +40,11 @@ node_adapter Display::newNodeAdapter(World_Node* node){
 		// here what we want is to `horizonatlly center` the node_adapter inside this big_box
 	x_corner = bigBox_coord_x + ( (main_area->getmax_x()+1)/4 - adapters_width ) / 2;
 
-	node_adapter adapter{this->shared_from_this(), node, this->adapters_height, this->adapters_width, y_corner, x_corner};
-	queue.push(adapter.node);
+	std::shared_ptr<node_adapter> adapter{ new node_adapter(this->shared_from_this(), node, this->adapters_height, this->adapters_width, y_corner, x_corner) };
+	queue.push(adapter->node);
 	queue.adapters.push_back(adapter);
 
-	return adapter;
+	return std::move(adapter);
 }
 
 void Display::helpScreen(){

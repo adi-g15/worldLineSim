@@ -4,20 +4,9 @@
 #include <utility>
 #include <stdexcept>
 
-#include "curses.h"
-#include "util/math.hpp"
-
-#include "declarations.hpp"
-#include "display/display.hpp"
-#include "world_node.hpp"
-
-// class disp_statics{
-// 	private:
-// 			// this should be in sync with the_occupy_table (since the positioning isn't random now, and is determined by that only)
-// 		static int next_index;	// expecting by default it will be 0
-
-// 	friend class node_adapter;
-// };
+#include "forward_decl.hpp"
+#include "util/coord.hpp"
+#include "display/curses_subwin.hpp"
 
 class node_adapter{
 	typedef util::_coord<int> coordinate;	// on a screen so won't need anything bigger than an int
@@ -39,43 +28,13 @@ public:
 
 	// bool world_stale;	// future - Remove nodes from display that are no more working
 
-	node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int height, int width,int y_corner, int x_corner)
-	 :  node(world_node),
-		dispMngr(dispMngr),
-		window(dispMngr->main_area, height, width, y_corner, x_corner)
-	{
-		this->node_id = node->getId();
-
-		window.box(ACS_VLINE, '-');
-
-		window.moveCursor(1, 1);
-		window.addstr(std::to_string(this->node_id).data(), position::MIDDLE);
-		window.hline();
-
-		window.newline();
-		window.printf("Dimen - (%, %)", this->node->get_world_dimen(), this->node->get_world_dimen());
-
-		for (int i = 0; i < 4; i++)
-		{
-			window.newline();
-			window.printf("E% - (%, %), %", i+1);	// snake number/id, head_coord.x, head_coord.y, points of snake
-		}
-
-		window.refresh();
-	}
+	node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int height, int width,int y_corner, int x_corner);
 
 public:
-	void update(){	// updates the content on the window, with updated content from the world_naode that is linked
-		if( this->dispMngr->paused )	return;
-
-		// @todo - Handle the display here
-	}
+	void update();
 
 	node_adapter() = delete;
-	~node_adapter(){
-		if( this->window != nullptr )
-			delwin(this->window);
-	}
+	~node_adapter(){}
 
 	friend class Display;
 };

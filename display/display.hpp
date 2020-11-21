@@ -7,18 +7,16 @@
 #include <thread>
 #include <future>
 
-#include "verse.hpp"
 #include "forward_decl.hpp"
 #include "multiTerm/single_term.hpp"
-#include "curses_subwin.hpp"
-
-class node_adapter;	// forward-declaration
+#include "display/curses_subwin.hpp"
+#include "display/node_adapter.hpp"
 
 	// @note - The queue member functions return World_Node* not the adapters (The adapters are meant to be modified by this class itself)
 struct _8_node_queue{   // @note - It has been separately defined as a wrapper class to std::queue, specially to be used by class Display, and to avoid all these if statements checking always in different functions that will be operating with the queue
 	std::list<World_Node*> data;   // @note - We may need to use list, since we also want random access, say to the 5th node currently on display on the screen
 	// std::list<std::unique_ptr<node_adapter>> adapters; 
-	std::list< node_adapter > adapters; 
+	std::list< std::weak_ptr<node_adapter> > adapters; 
 
 	public:
 	// START - Typical Queue Operations
@@ -72,7 +70,7 @@ class Display : public single_term, public std::enable_shared_from_this<Display>
 	public:
 	bool paused{ true };
 
-	node_adapter newNodeAdapter(World_Node* node);
+	std::shared_ptr<node_adapter> newNodeAdapter(World_Node* node);
 	void runInitTasks() override;
 	void showExit();
 	void helpScreen();
