@@ -51,6 +51,10 @@ public:
 			bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
 		public:
 			auto is_world_running() const{ return _world_runnning; }
+			auto reset_world_running(){
+				// @caution - Lock the mutex here
+				this->_world_runnning = false;
+			}
 			auto get_world_thread_id() const{ return std::this_thread::get_id(); }
 	} _shared_concurrent_data;
 

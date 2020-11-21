@@ -18,13 +18,22 @@
 // };
 
 class node_adapter{
+	public:
+	World_Node* node;
+};
+#if 0
+class node_adapter{
 	typedef util::_coord<int> coordinate;	// on a screen so won't need anything bigger than an int
+	typedef std::shared_ptr<Display> DispMngr;
+	typedef World_Node* World_Node_Ptr;
 // private:
 public:
 	WINDOW* window{nullptr};
+	DispMngr dispMngr;
 
 	// the further data can be replaced by having a pointer t the wrld_node instead of all this individually
 	size_t node_id;
+	const World_Node_Ptr node;
 	int index_num;	// index number
 
 	// int x_dimen;
@@ -39,7 +48,7 @@ public:
 	}
 
 	node_adapter() = delete;
-	node_adapter(WINDOW* parent_window, int par_y_corner, int par_x_corner, std::vector<std::vector<bool>>& the_occupy_table, int index ){	// the occupy table keeps record of what regions are occupied (also called, occupancy_table)
+	node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int par_y_corner, int par_x_corner, std::vector<std::vector<bool>>& the_occupy_table, int index ): node(world_node){	// the occupy table keeps record of what regions are occupied (also called, occupancy_table)
 		if(the_occupy_table.size() == 0){
 			throw std::logic_error("The OCCUPANCY_TABLE should have at least 1 row");	// since when deciding the coords for node_adapter, we access .at(0)
 		}
@@ -105,3 +114,4 @@ public:
 			delwin(this->window);
 	}
 };
+#endif

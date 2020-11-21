@@ -11,7 +11,7 @@
 #include "signal.h"
 #include "curses.h"
 
-void sig_handler(int SIGNAL){   // @warning -> It doesn't close the program itself, do that yourself (since way of doing so can be different according to preferences, for eg. i prefer using exceptions many a times)
+static void sig_handler(int SIGNAL){   // @warning -> It doesn't close the program itself, do that yourself (since way of doing so can be different according to preferences, for eg. i prefer using exceptions many a times)
 	static bool sig_handled = false;
 	if( sig_handled )	return;	// if signal already handles, then silently return
 		// @note - This handler maybe called twice due to the reason, a function calls single_term::reset_curses, and also raise(SIGTERM) is called (see for example, display::runInitTasks, where entering 'q' first calls reset_curses and then raise(SIGTERM) too), these cases may just have the raise() call removed, but it's there to make sense
@@ -123,10 +123,7 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 	//currently number of windows is fixed, since this is not the primary goal, this will be as such for some time maybe
 	single_term() = default;
 	single_term(std::string_view title,std::string_view desc) : title(title), description(desc){}
-	~single_term();
-};
-
-	single_term::~single_term(){
+	~single_term(){
 		if( !curses_initialized ){
 			return;
 		}
@@ -137,4 +134,4 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 
 		endwin();
 	}
-
+};

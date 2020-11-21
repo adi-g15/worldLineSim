@@ -5,6 +5,13 @@
 
 #include <memory>
 
+enum class position{    // only horizontal positions for now
+    LEFT,
+    MIDDLE,
+    RIGHT,
+    AT_CURS // don't change, just print AT the cursor position
+};
+
 /* @caution - DONT manipulate WINDOW* pointers directly
             If newwin() is needed, create a new class Window to handle memory allocation for that, currently it's not needed so leaving
  */
@@ -17,14 +24,23 @@ public:
     void refesh();
     void disable(); // @brief -> RESETS  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
     void enable(); // @brief -> ALLOCATES  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
+    int getmax_x();
+    int getmax_y();
     void updateDimen(); // @brief - Updates contents of this->dimensions
-    void mvnextLine();  // move to the next line (uses this->last_write_pos)
+    void mvnextLine();  // move to the next line (uses last_write_pos)
 
-    // @brief - Wrappers around waddstr() and mvwaddstr()
-    void addstr(std::string_view str);
+    /**
+     * @brief - Wrappers around waddstr() and mvwaddstr()
+     * @params - str - String,
+     *           position - Position to print at (LEFT(AT_CURS), MIDDLE, RIGHT)
+     *           row - Y dimension to write at
+     *           col - X dimension to write at
+    */
+    void addstr(std::string_view str, position = position::AT_CURS);
     void addstr(int row, int col, std::string_view str);
     // @brief - Move to a new line, and add a string, there
-    void nladdstr(std::string_view str);
+    void nladdstr(std::string_view str, position = position::AT_CURS);
+    void addch(char ch);
 
     /**
      * @important @note - The pairs will be in the form of row*col
@@ -86,93 +102,10 @@ private:
         int n_row{0};
         int n_col{0};
     }last_write_pos;    // last locations to which we wrote anything
+    bool boxed{false};  // @caution - Currently no function is available that resets this to false (though, since it's not required in our case, leaving)
     std::shared_ptr<WINDOW> win;
     SubWindow_Ptr parent_win; // @note - this shared_ptr will hold NOTHING, when parent window is stdscr
 
     void moveCursor(int row, int col);
 
 };
-
-void SubWindow::box(char32_t vline, char32_t hline){
-    if( this->win ){
-        ::box(win.get(), vline, hline); // calling the one available in global scope
-    }
-    this->updateDimen();
-}
-
-void SubWindow::refesh(){
-    wrefresh(this->win.get());
-    this->updateDimen();
-}
-
-void SubWindow::refeshParent(){
-    wrefresh(this->parent_win->win.get());
-    this->updateDimen();
-}
-
-void SubWindow::disable(){
-    if( ! this->enabled )  return;
-
-    if(this->win.use_count() == 1){ // @caution @ignore - Read about shared_ptr::unique and shared_ptr::use_count(), these are not really accurate in multi-threading cases, where another thread has a reference to this shared_ptr
-        delwin( this->win.get() );
-    }
-    this->win.reset();
-    this->dimensions.n_col = 0;
-    this->dimensions.n_row = 0;
-
-    this->enabled = false;
-}
-
-void SubWindow::enable(){
-    if( this->enabled )  return;
-    
-    if( !this->win ){
-        if( !this->parent_win )
-            this->win.reset( subwin(stdscr, height, width, y_start, x_start) );
-        else
-            this->win.reset( subwin(this->parent_win->win.get(), height, width, y_start, x_start) );
-    }
-
-    this->enabled = true;
-    this->updateDimen();
-}
-
-void SubWindow::updateDimen(){
-    // @note - May require mutex locks, to prevent multiple threads trying to wriet to the same thing
-    getmaxyx( win.get(), dimensions.n_col, dimensions.n_row );
-}
-
-void SubWindow::addstr(std::string_view str){
-    waddstr( this->win.get(), str.data() );
-}
-
-/**
- * @note - If either of row or col is negative, then it will be understood as max-the_value, for eg. row = -1, will be row = getmaxx(this->win.get())-1
-*/
-void SubWindow::addstr(int row, int col, std::string_view str){
-    if( row < 0 )
-        row = getmaxy( this->win.get() ) - row;
-
-    if( col < 0 )
-        col = getmaxx( this->win.get() ) - col;
-
-    this->moveCursor(row, col);
-    return this->addstr(str);
-}
-
-void SubWindow::moveCursor(int row, int col){
-    wmove( this->win.get(), row, col );
-    
-    this->last_write_pos.n_row = row;
-    this->last_write_pos.n_col = col;
-}
-
-    // move to the next line (NL), and add str
-void SubWindow::nladdstr(std::string_view str){
-    this->mvnextLine();
-    this->addstr(str);
-}
-
-void SubWindow::mvnextLine(){
-    this->moveCursor( this->last_write_pos.n_row + 1, this->last_write_pos.n_col );
-}
