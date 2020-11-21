@@ -56,6 +56,7 @@ class Display : public single_term, public std::enable_shared_from_this<Display>
 	Verse* parent_verse;
 
 	static constexpr char QUIT_KEY{'q'};
+	static constexpr char HELP_KEY{'h'};
 
 	int adapters_height{10};
 	int adapters_width{17};	// these should be same for all, as of the current situation
@@ -73,7 +74,7 @@ class Display : public single_term, public std::enable_shared_from_this<Display>
 	std::shared_ptr<node_adapter> newNodeAdapter(World_Node* node);
 	void runInitTasks() override;
 	void showExit();
-	void helpScreen();
+	void helpScreen();	// @bug - Doesn't work as of 21st Nov 20
 	void optionScreen();	// shows options -> 1. View verse state; 2. View help
 	void runPreEndTasks();
 	void resumeRendering();

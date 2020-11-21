@@ -110,10 +110,6 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 
 		this->curses_initialized = true;
 		getmaxyx(stdscr, this->_terminal_y, this->_terminal_x);
-
-		// an empty box
-		box( stdscr, ACS_VLINE, ACS_HLINE );
-		wrefresh( stdscr );
 	}
 	virtual void runInitTasks() = 0;
 

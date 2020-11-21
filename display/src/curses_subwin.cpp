@@ -3,7 +3,8 @@
 
 void SubWindow::box(chtype vline, chtype hline){
     if( this->win ){
-        ::box(win.get(), vline, hline); // calling the one available in global scope
+        // ::box(win.get(), ((vline != '\0') ? vline: ACS_VLINE) , ((hline != '\0') ? hline: ACS_HLINE)); // calling the one available in global scope
+        ::box(win.get(), vline , hline); // calling the one available in global scope
     }
     this->boxed = true;
 
@@ -92,7 +93,7 @@ void SubWindow::addstr(std::string_view str, position pos){
 
     // if boxed, then see if, (str.size() - 2), 2 for the border (right and left)
     if( (str.size() - (boxed ? 2 : 0)) > this->dimensions.n_col ){
-
+        // @todo - Case when string length is larger than available screen space
     }
     waddstr(this->win.get(), str.data());
 }

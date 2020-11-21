@@ -102,7 +102,6 @@ public:
 		this->enabled = true;
 	}
 
-
 	SubWindow(int height, int width, int y_start, int x_start) :
 		height(height),
 		width(width),

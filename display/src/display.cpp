@@ -191,6 +191,7 @@ void Display::runInitTasks(){
 		main_area->box();
 		legend_area->box();
 
+		top_area->moveCursor(1,1);
 		top_area->addstr(title, position::MIDDLE);
 
 		wrefresh(stdscr);
@@ -210,7 +211,12 @@ void Display::runInitTasks(){
 					// @note - UNCOMMENT next line, later
 					// return this->parent_verse->kaal_day("Display");    // also passing the source so that it doesn't actually try to end this
 					return;
+				}else if(c == Display::HELP_KEY)
+				{
+					this->clearAll();
+					return this->helpScreen();
 				}
+				
 				legend_area->refresh();
 			}catch(std::future_error & e){
 				raise(SIGTERM);
