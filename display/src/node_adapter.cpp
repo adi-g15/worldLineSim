@@ -10,7 +10,7 @@ node_adapter::node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int hei
     dispMngr(dispMngr),
     window(dispMngr->main_area, height, width, y_corner, x_corner)
 {
-    this->node_id = node->getId();
+    // this->node_id = node->getId();
 
     window.box(ACS_VLINE, '-');
 
@@ -19,15 +19,20 @@ node_adapter::node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int hei
     window.hline();
 
     window.newline();
-    window.printf("Dimen - (%, %)", this->node->get_world_dimen(), this->node->get_world_dimen());
+    // window.printf("Dimen - (%, %)", this->node->get_world_dimen(), this->node->get_world_dimen());
+    window.printf("Dimen - (, )");
 
     for (int i = 0; i < 4; i++)
     {
         window.newline();
-        window.printf("E% - (%, %), %", i+1);	// snake number/id, head_coord.x, head_coord.y, points of snake
+        window.printf("E - (, ), ");	// snake number/id, head_coord.x, head_coord.y, points of snake
+        // window.printf("E% - (%, %), %", i+1);	// snake number/id, head_coord.x, head_coord.y, points of snake
     }
 
     window.refresh();
+    wrefresh(stdscr);
+
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 void node_adapter::update(){	// updates the content on the window, with updated content from the world_naode that is linked

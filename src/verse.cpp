@@ -3,6 +3,7 @@
 #include "display/display.hpp"
 #include "graphMat/graph__square_mat.hpp"
 
+#include <iostream>	// @debug
 #include <memory>
 #include <stdexcept>
 #include <thread>
@@ -32,7 +33,12 @@ std::promise<bool> Verse::kaal_day(std::string_view origin){
 }
 
 void Verse::render_screen(){
-	return this->displayManager->runInitTasks();
+	this->displayManager->runInitTasks();
+	// this->displayManager->render();	// @note - Or may use disp::printScreen() too, and let the node_adapters trigger UI updates themselves from different threads
+
+	this->displayManager->printScreen();
+	std::cout << "Back here" << std::endl;	// @debug
+	Display::get_async_input().wait();	// @debug
 }
 
 Verse::Verse(): displayManager(new Display(this)), worldTree(new World_Tree(this->displayManager)){

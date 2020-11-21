@@ -73,6 +73,8 @@ class Display : public single_term, public std::enable_shared_from_this<Display>
 
 	std::shared_ptr<node_adapter> newNodeAdapter(World_Node* node);
 	void runInitTasks() override;
+	void printScreen();
+	void render();
 	void showExit();
 	void helpScreen();	// @bug - Doesn't work as of 21st Nov 20
 	void optionScreen();	// shows options -> 1. View verse state; 2. View help

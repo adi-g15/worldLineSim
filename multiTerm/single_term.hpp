@@ -64,7 +64,7 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 		// @future @me - Currently it will be managed inside the overloaded runInitTasks() member function, by the child class, though this function may contain a template like stuff for such a support, though it should not be used here
 	}
 
-	std::future<char> get_async_input(){
+	static std::future<char> get_async_input(){
 		return std::async(
 			std::launch::async,
 			[](){
