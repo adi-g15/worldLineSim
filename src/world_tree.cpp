@@ -17,20 +17,10 @@ bool World_Tree::initTree(std::promise<bool>& creation_promise){    //should be 
 
     // @future @todo - Set value for the creation_promise, after the world has been `asynchronously created`
 
-    #ifdef __DEBUG
-        return true;
-    #endif
+    return true;    // @debug
 }
 
 World_Tree::World_Tree(std::shared_ptr<Display> displayManager) : root(nullptr), num_nodes(0){
-    if( !displayManager ){
-        throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
-    }
-
-    this->displayManager = displayManager;
-}
-// @tip - Use delegation to have a `master` constructor that all other will call, or if not a single master, then decrease the duplicacy in the constructor body
-World_Tree::World_Tree(World_Node_Ptr root, std::shared_ptr<Display> displayManager) : root(root), num_nodes(1){
     if( !displayManager ){
         throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
     }

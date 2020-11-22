@@ -10,7 +10,7 @@ add_executable(simulator main.cpp ${SOURCES} ${DISP_SOURCES})
 
 # Edit the 3 lines, according to your build of curses (ncurse or pdcurses)
 set(CURSES_INCLUDE_PATH ./curses/includes)
-set(CURSES_LIBRARY ./curses/pdcurses.lib)
+set(CURSES_LIBRARY ./curses/curses.lib)
 target_include_directories(simulator PRIVATE curses/includes)
 # Edit the previous 3 lines, according to your build of curses (ncurse or pdcurses)
 

@@ -47,14 +47,18 @@ void SubWindow::disable(){
     this->enabled = false;
 }
 
+bool SubWindow::isEnabled(){
+    return this->enabled;
+}
+
 void SubWindow::enable(){
     if( this->enabled )  return;
 
     if( !this->win ){
         if( !this->parent_win )
-            this->win.reset(subwin(stdscr, height, width, y_start, x_start));
+            this->win.reset(subwin(stdscr, dimensions.n_row, dimensions.n_col, y_corner, x_corner));
         else
-            this->win.reset(subwin(this->parent_win->win.get(), height, width, y_start, x_start));
+            this->win.reset(subwin(this->parent_win->win.get(), dimensions.n_row, dimensions.n_col, y_corner, x_corner));
     }
 
     this->enabled = true;

@@ -23,6 +23,7 @@ public:
 	void box(chtype = ' ', chtype = ' ');
 	void refreshParent();
 	void refresh();
+	bool isEnabled();
 	void disable(); // @brief -> RESETS  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
 	void enable(); // @brief -> ALLOCATES  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
 	int getmax_x();
@@ -94,31 +95,32 @@ public:
 	 * @important @note - The pairs will be in the form of row*col
 	 * @brief - Uses stdscr as the parent screen
 	*/
-	SubWindow(const std::pair<int, int>& dimensions, const std::pair<int, int>& start_coords) :
-		SubWindow(height, width, y_start, x_start){
+	SubWindow(const std::pair<int, int>& dimensions, const std::pair<int, int>& start_yx) :
+		SubWindow(dimensions.first, dimensions.second, start_yx.first, start_yx.second)
+	{
 		this->enabled = true;
 	}
-	SubWindow(SubWindow_Ptr& parent_win, const std::pair<int, int>& dimensions, const std::pair<int, int>& start_coords) :
-		SubWindow(parent_win, height, width, y_start, x_start){
+	SubWindow(SubWindow_Ptr& parent_win, const std::pair<int, int>& dimensions, const std::pair<int, int>& start_yx) :
+		SubWindow(parent_win, dimensions.first, dimensions.second, start_yx.first, start_yx.second)
+	{
 		this->enabled = true;
 	}
 
-	SubWindo) :
-		height(height),
-		width(width),
-		y_start(y_start),
-		x_start(x_start),
-		win(subwin(stdscr, height, width, y_start, x_start)){
+	SubWindow(int height, int width, int y_corner, int x_corner) :
+		dimensions{height, width},
+		y_corner(y_corner),
+		x_corner(x_corner),
+		win(subwin(stdscr, height, width, y_corner, x_corner))
+	{
 		this->updateDimen();
 		this->enabled = true;
 	}
-	SubWindow(SubWindow_Ptr& parent_win, int height, int width, int y_start, int x_start) :
-		height(height),
-		width(width),
-		y_start(y_start),
-		x_start(x_start),
+	SubWindow(SubWindow_Ptr& parent_win, int height, int width, int y_corner, int x_corner) :
+		dimensions{height, width},
+		y_corner(y_corner),
+		x_corner(x_corner),
 		parent_win(parent_win),
-		win(subwin(parent_win->win.get(), height, width, y_start + parent_win->dimensions.n_row + 1, x_start + parent_win->dimensions.n_col + 1))   // the corner params assume to be wrt. to stdscr
+		win(subwin(parent_win->win.get(), height, width, y_corner + parent_win->dimensions.n_row + 1, x_corner + parent_win->dimensions.n_col + 1))   // the corner params assume to be wrt. to stdscr
 	{
 		this->updateDimen();
 		this->enabled = true;

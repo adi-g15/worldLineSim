@@ -25,7 +25,7 @@ private:
 	// std::vector<Tree_Node_Ptr> all_nodes;    //vector of pointers to all nodes, this maybe additional storage, but gives ease destructing, and to know number of nodes
 	int16_t num_nodes;
 
-, 	struct {
+ 	struct {
 	// private:
 	// 	World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
 

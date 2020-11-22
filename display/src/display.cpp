@@ -109,7 +109,7 @@ void Display::helpScreen(){
 		this->refreshAll();
 
 		if( async_input.wait_for(100ms) == std::future_status::ready ){
-			char c;
+			char c = async_input.get();
 			try{
 				if(c == Display::QUIT_KEY){
 					this->reset_curses();	// free up memory
@@ -117,7 +117,7 @@ void Display::helpScreen(){
 					return;
 				}
 				helpArea.refresh();
-			}catch(std::future_error & e){
+			}catch(std::future_error&){
 				raise(SIGTERM);
 
 				this->parent_verse->kaal_day("Display");
