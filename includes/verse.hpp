@@ -17,9 +17,6 @@ public:
 	std::promise<bool> kaal_day(std::string_view origin); // mahesh, the destroyer
 	 // @don't try to destruct the origin, since that will just be kind of a deadlock like situation, both trying to stop the other
 
-	std::shared_ptr<Display> displayManager; // this class will manage the rendering
-	std::map< id_type, World_Node* > mapping_of_world_id_to_world_node_ptr; // to call pause on a particular world `through` the node
-
 	const std::shared_ptr<Display> disp_manager() const{
 		return this->displayManager;
 	}
@@ -29,6 +26,9 @@ public:
 private:
 	// std::unordered_map< State, World* > stateMap;   //If a particular state is already on the tree, resume that world instead of creating a totally new node, which will effectively just be an array
 	std::unique_ptr<World_Tree> worldTree;    //the tree will also hold number of nodes, and other properties
+	std::shared_ptr<Display> displayManager; // this class will manage the rendering
+	std::map< id_type, World_Node* > id_to_node; // to call pause on a particular world `through` the node
+
 
 	friend class Display;
 };

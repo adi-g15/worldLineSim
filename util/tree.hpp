@@ -10,7 +10,7 @@ struct _tree_node{
 	typedef tree_node* tree_node_ptr;
 
 private:
-	std::list<tree_node_ptr> nodes;
+//	std::list<tree_node_ptr> nodes;
 	data_type data;
 public:
 

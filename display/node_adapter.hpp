@@ -20,17 +20,11 @@ public:
 	// the further data can be replaced by having a pointer t the wrld_node instead of all this individually
 	size_t node_id;
 	const World_Node_Ptr node;
-	int index_num;	// index number
-
-	// int x_dimen;
-	// int y_dimen;
-	std::vector< coordinate > vector_of_pos;	// vector of 2D `coordinates`
-
-	// bool world_stale;	// future - Remove nodes from display that are no more working
 
 	node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int height, int width,int y_corner, int x_corner);
 
 public:
+	void disable();	// once disabled, can NOT be enabled again for NOW (since we can't chose which worlds to show and which ones not to show) !
 	void update();
 
 	node_adapter() = delete;

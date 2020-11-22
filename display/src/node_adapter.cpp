@@ -31,8 +31,6 @@ node_adapter::node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int hei
 
     window.refresh();
     wrefresh(stdscr);
-
-    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
 void node_adapter::update(){	// updates the content on the window, with updated content from the world_naode that is linked

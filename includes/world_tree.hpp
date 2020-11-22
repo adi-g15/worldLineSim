@@ -14,7 +14,7 @@ NOTE - This time, i will first complete World_Tree class from start, and then wh
 */
 // it will actuall ystore dynamiucally allocated objects, not just there pointers
 // template<typename node_data_type = World>  // @for_now - For now only, we are giving it this default templated version
-class World_Tree : public Tree<World>{
+class World_Tree{
 	// typedef Tree_Node* Tree_Node_Ptr;
 	typedef World_Node* World_Node_Ptr;
 	// typedef _tree_node<World>* World_Node_Ptr;
@@ -25,7 +25,7 @@ private:
 	// std::vector<Tree_Node_Ptr> all_nodes;    //vector of pointers to all nodes, this maybe additional storage, but gives ease destructing, and to know number of nodes
 	int16_t num_nodes;
 
-	struct {
+, 	struct {
 	// private:
 	// 	World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
 
@@ -41,7 +41,5 @@ public:
 	bool initTree(std::promise<bool>& creation_promise);
 
 	World_Tree(std::shared_ptr<Display> displayManager);
-	// @tip - Use delegation to have a `master` constructor that all other will call, or if not a single master, then decrease the duplicacy in the constructor body
-	World_Tree(World_Node_Ptr root, std::shared_ptr<Display> displayManager);
 	~World_Tree();
 };

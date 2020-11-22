@@ -82,7 +82,7 @@ class Display : public single_term, public std::enable_shared_from_this<Display>
 	void resumeRendering();
 	void pauseRendering();
 
-	Display() = delete;
+	Display(Display&) = delete;
 	Display(Verse*);
 	~Display();
 

@@ -1,5 +1,6 @@
 #pragma once
 
+			#include <iostream>
 #include "curses.h"
 #include "util/coord.hpp"
 
@@ -19,7 +20,7 @@ class SubWindow{
 	typedef std::shared_ptr<SubWindow> SubWindow_Ptr;   // NO OWNERSHIP for the parent will be held here
 public:
 	bool enabled{ false };
-	void box(chtype = '|', chtype = '-');
+	void box(chtype = ' ', chtype = ' ');
 	void refreshParent();
 	void refresh();
 	void disable(); // @brief -> RESETS  this->win to nullptr (All data used to construct is still stored, to enable at later stage)
@@ -102,7 +103,7 @@ public:
 		this->enabled = true;
 	}
 
-	SubWindow(int height, int width, int y_start, int x_start) :
+	SubWindo) :
 		height(height),
 		width(width),
 		y_start(y_start),
@@ -126,17 +127,16 @@ public:
 	~SubWindow(){
 		// @note @future - for multi-threading, this next if MUST be atomic (for eg. two owners release the pointers simulateusly but for both this if may give false, that's the problem)
 		if( win.use_count() == 1 ){	//  only we ourselves remain as its owner
-			delwin(win.get());
-			win.reset();	// not actually needed, but seems more explaining
+			// @note @caution - Currently the delwin() calls have been commented, since it's causing double free, since the smart pointer also implicitly calls reset()
+			// delwin(win.get());
 		}
-		if( parent_win.use_count() == 1 ){
-			delwin(parent_win->win.get());
-			parent_win.reset();	// not actually needed, but seems more explaining
+		if( parent_win && parent_win.use_count() == 1 ){
+			// delwin(parent_win->win.get());
 		}
 	}
 
 private:
-	const int height, width, y_start, x_start;  // data required for enable disable
+	const int y_corner, x_corner;  // data required for enable disable
 	struct {
 		int n_row;
 		int n_col;

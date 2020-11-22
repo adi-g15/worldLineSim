@@ -37,8 +37,19 @@ void Verse::render_screen(){
 	// this->displayManager->render();	// @note - Or may use disp::printScreen() too, and let the node_adapters trigger UI updates themselves from different threads
 
 	this->displayManager->printScreen();
-	std::cout << "Back here" << std::endl;	// @debug
-	Display::get_async_input().wait();	// @debug
+	// this->displayManager->newNodeAdapter(nullptr);
+
+	// std::cout << "Back here" << std::endl;	// @debug
+	// Display::get_async_input().wait();	// @debug
+
+	// displayManager->main_area->refresh();
+	// std::cout << "Back Again" << std::endl;	// @debug
+	// Display::get_async_input().wait();	// @debug
+
+	// wrefresh(stdscr);
+	// std::cout << "Back Again2" << std::endl;	// @debug
+	// Display::get_async_input().wait();	// @debug
+
 }
 
 Verse::Verse(): displayManager(new Display(this)), worldTree(new World_Tree(this->displayManager)){
