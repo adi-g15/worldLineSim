@@ -49,6 +49,12 @@ Other than these, usual single line comments, are 'low-priority comments' more g
 
 And, multi line comments are generally for briefly telling about some struct or class
 
+# Class Chart
+
+> Made with draw.io
+
+![Class Chart](https://github.com/AdityaGupta150/Sources/raw/main/worldLineSim.png "WorldLine Sim")
+
 ## Future Ideas
 
 > There have been lots of ideas, all just in code, from now on, adding here, what i feel...
