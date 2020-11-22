@@ -53,7 +53,7 @@ And, multi line comments are generally for briefly telling about some struct or 
 
 > Made with draw.io
 
-![Class Chart](https://github.com/AdityaGupta150/Sources/raw/main/worldLineSim.png "WorldLine Sim")
+![Class Chart](https://raw.githubusercontent.com/AdityaGupta150/Sources/main/worldLineSim.png "WorldLine Sim")
 
 ## Future Ideas
 
