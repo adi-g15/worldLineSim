@@ -14,6 +14,24 @@ void Display::resumeRendering(){
 	this->paused = false;
 }
 
+// @note - Display::startEventLoop() MUST be on a different thread than main thread
+void Display::startEventLoop() {	// MUST BE CALLED ONLY ONCE DURING EACH INTERVAL IN WHICH THE DISPAY is active
+	if (!this->event_mutex.try_lock()) {
+		return;	// return immediately if some other thread already is managing the event loop
+	}
+
+	this->event_mutex.lock();
+
+	// to add other event sources to the event loop, other events can be added, for now ONLY kbhit even is there
+	auto kb_event = this->get_async_input();
+	while ( ! this->paused )
+	{
+		kb_event.wait();	// @caution -> It is blocking, but shouldn't actually be consuming all of CPU power !
+		this->handlers.kbhit(kb_event.get(), this->shared_from_this());
+	}
+	this->event_mutex.unlock();
+}
+
 std::shared_ptr<node_adapter> Display::newNodeAdapter(World_Node* node){
 	// @note - Not using the_occupy_currently
 	this->main_area->updateDimen();
@@ -141,14 +159,15 @@ void Display::optionScreen(){
 }
 
 void Display::printScreen(){
+	this->runInitTasks();	// set the subwindows
 
-	if( !top_area ) this->top_area.reset( new SubWindow( 3, 0, 0, 0 ) );
-	if( !main_area ) this->main_area.reset( new SubWindow( 0, 0.8f * _terminal_x, 3, 0 ) );
-	if( !legend_area ) this->legend_area.reset( new SubWindow( 0, 0, 3, 0.8f*_terminal_x ) );
+	this->updateScreen();
+}
 
-	if( top_area->enabled ) this->top_area->enable();
-	if( main_area->enabled ) this->top_area->enable();
-	if( legend_area->enabled ) this->top_area->enable();
+void Display::updateScreen(){
+
+	if( !top_area || !main_area || !legend_area )
+		this->runInitTasks();
 
 	legend_area->addstr(1, 1, "Legend");
 
@@ -194,18 +213,7 @@ void Display::printScreen(){
 
 void Display::runInitTasks(){
 
-	// if( std::this_thread::get_id() == this->parent_verse->thread_id ){
-	//     ERROR: DISPLAY SHOULD BE ON A DIFFERENT THREAD, THAN THE VERSE
-	// }
-
-	this->curses_init();
-
-	this->resumeRendering();
-	this->clearAll();
-}
-
-void Display::render(){
-	using namespace std::chrono_literals;
+	this->curses_init();	// also handles the case when curses wis already initialised
 
 	if( !top_area ) this->top_area.reset( new SubWindow( 3, 0, 0, 0 ) );
 	if( !main_area ) this->main_area.reset( new SubWindow( 0, 0.8f * _terminal_x, 3, 0 ) );
@@ -215,27 +223,17 @@ void Display::render(){
 	if( main_area->enabled ) this->top_area->enable();
 	if( legend_area->enabled ) this->top_area->enable();
 
+	this->resumeRendering();
+	std::thread(&Display::startEventLoop, this).detach();	// the event loop should be on a different thread
+
+}
+
+void Display::render(){
+	using namespace std::chrono_literals;
+
+	printScreen();	// start of with an already printed screen
+
 	auto async_input = this->get_async_input();
-
-	legend_area->addstr(1, 1, "Legend");
-
-	legend_area->nladdstr("*All worlds continue on diff. threads,w/o blocking the display, or the verse");
-
-	legend_area->newline();
-
-	legend_area->nladdstr("- Type the id to chose a particular world");
-
-	legend_area->nladdstr("- Commands");
-	legend_area->nladdstr("-   N - Namaste World(New)");
-	legend_area->nladdstr("-   P - Pause");
-	legend_area->nladdstr("-   R - Resume");
-	legend_area->nladdstr("-   T - Time Travel !!");
-	legend_area->nladdstr("-   L - Logs (of World)");
-	legend_area->nladdstr("-   V - Logs (of Verse)");
-
-	legend_area->addstr(-3, 1, "If you find a problem...");
-	legend_area->nladdstr("Please solve it yourselves");
-	legend_area->nladdstr(":copy: AdityaG15 :D");
 
 	int cur_dimen_y, cur_dimen_x;
 	getmaxyx(stdscr, this->_terminal_y, this->_terminal_x);
@@ -267,6 +265,7 @@ void Display::render(){
 
 				if(c == Display::QUIT_KEY){
 					this->reset_curses();	// free up memory
+					this->pauseRendering();
 
 					// @note - Or maybe use inter thread communication here, using condition_variable, so to wait till verse tells all done, then this will return, and the destructor again sends signal to verse after all things done in destructor, then verse can be sure that all destructed
 					// @note - UNCOMMENT next line, later
@@ -282,8 +281,6 @@ void Display::render(){
 			}catch(std::future_error & e){
 				raise(SIGTERM);
 
-				// verse::LOGGER << std::boolalpha << async_input.valid() << std::endl;
-				// verse::ERR_LOGGER << e.code()<< " " << e.what() << std::endl;
 				this->parent_verse->kaal_day("Display");
 				return;
 			}

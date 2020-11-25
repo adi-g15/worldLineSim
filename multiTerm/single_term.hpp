@@ -103,13 +103,15 @@ class single_term{  //initially will have 3 windows, a square one at bottom left
 
 		initscr();
 		curs_set(FALSE);    // cursor won't show
-		keypad(stdscr, TRUE);
+		keypad(stdscr, TRUE);	// not being used in worldLine simulator
 		nonl(); // tells cursor not to do NL -> CR/NL on output
 		noecho();
 		cbreak();   // no wait for '\n', one char at a time
 
 		this->curses_initialized = true;
 		getmaxyx(stdscr, this->_terminal_y, this->_terminal_x);
+
+		this->clearAll();
 	}
 	virtual void runInitTasks() = 0;
 

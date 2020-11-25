@@ -33,7 +33,6 @@ std::promise<bool> Verse::kaal_day(std::string_view origin){
 }
 
 void Verse::render_screen(){
-	this->displayManager->runInitTasks();
 	// this->displayManager->render();	// @note - Or may use disp::printScreen() too, and let the node_adapters trigger UI updates themselves from different threads
 
 	this->displayManager->printScreen();
