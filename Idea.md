@@ -1,6 +1,11 @@
 A parallel world simulator... similar to snakes game, just that there are 4 snakes. Now each chases the food, and as such, each others presence matters, and as one gets food, its value incremented by one, so each 'action'(only one action in this world, that is to grab food), Two things the program does -> Remove a snake, this creates another graph(ie. a world), and simulates it from the origin point,(ie. each has 0 points), without presence of the removed one, and we get the situation at current (which will definitely be different, since the chances of the action being done by one is 1/3rd instead of 1/4th. The second action is... chose a snake, chose a time point (like 3 food earlier), and then chose a position, at which the snake should have been at that time... this action creates another graph(ie. a world), `from that point of time, it will rerender through actions and give the situation at current point`, this world 'can' be different (degree of difference, the divergence number varies, according to chosen position is likely to give it the most food in future moves (future to that chosen past, and is actually the present)).... this is how it works. It may seem simple, but indeed GREAT :D !!
 
-* Can all snakes be put on different threads, this will greatly make it more real world, not waiting for a move... though one important thing will be that two snakes don't try to eat the same food, at same point of time
-> But, i now think, this can highly affect our ability to log time points as simple integers ?
+* [Theoretically Implemented] Can all snakes be put on different threads, this will greatly make it more real world, not waiting for a move... though one important thing will be that two snakes don't try to eat the same food, at same point of time
+> [Unsolved] But, i now think, this can highly affect our ability to log time points as simple integers ?
 
-* There can be a rate at which the world will keep growing, and at the moment, the world doesn't have enough space, enough storage will be made, as well as increases the spread rate... Or it can be made such that the rate itself increase too with course of time
+* [Theoretically Implemented] There can be a rate at which the world will keep growing, and at the moment, the world doesn't have enough space, enough storage will be made, as well as increases the spread rate... Or it can be made such that the rate itself increase too with course of time
+
+Domain of e -> when length reaches a particular 10e4 or similar
+
+Allocator -> All worldPlots consult this global class to allocate data, it basically keeps count of how much data allocated
+	For now, it can simply just have about 1 function which just returns pointer to location of object type... we don't really need to decrease the counter or something after dweletion, since there is just so less deleteion happeninng in our case

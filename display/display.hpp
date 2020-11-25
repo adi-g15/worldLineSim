@@ -63,7 +63,7 @@ public:
 	void printScreen();
 	void updateScreen();
 
-	std::condition_variable event_convar;
+//	std::condition_variable event_convar;	// not needed, work done by mutex
 	std::mutex event_mutex;	// used to lock mutex so that ONLY ONE thread accesses it during each time interval the display is active
 	void startEventLoop();
 

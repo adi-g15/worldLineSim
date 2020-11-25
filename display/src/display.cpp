@@ -165,7 +165,12 @@ void Display::printScreen(){
 }
 
 void Display::updateScreen(){
+	using namespace std::chrono_literals;
+	if ( ! this->dispMutex.try_lock_for(1s)) {	// there will be gap of ATLEAST 1 second before any updations happen on screen
+		return;	// so repeating threads in same interval of time, will exit
+	}
 
+	this->dispMutex.lock();
 	if( !top_area || !main_area || !legend_area )
 		this->runInitTasks();
 
@@ -208,6 +213,7 @@ void Display::updateScreen(){
 	top_area->addstr(title, position::MIDDLE);
 
 	wrefresh(stdscr);
+	this->dispMutex.unlock();
 
 }
 
@@ -228,6 +234,7 @@ void Display::runInitTasks(){
 
 }
 
+// @deprecated
 void Display::render(){
 	using namespace std::chrono_literals;
 

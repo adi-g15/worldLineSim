@@ -24,20 +24,13 @@ void Snake::simulateExistence(){
 
     // a one time check, before an entity starts existing
     if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
-        #ifdef NO_THREAD_ENTITY
-            continue;
-        #endif
         throw std::logic_error( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
     }
 
     while ( this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
         this->moveForward();
 
-        #ifdef NO_THREAD_ENTITY
-            continue;   // don't pause the current thread, if it's the main thread itself
-        #endif
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
-
     }
 }
 
