@@ -18,7 +18,6 @@ const coord& Snake::getPos() const{
     return this->getHeadCoord();
 }
 
-
 void Snake::simulateExistence(){
     // @future -> Can add more logic here, when more interaction options between entities are added
 
@@ -41,6 +40,29 @@ bool Snake::eatFood(){  //can only eat, if AT the position
         return true;
     }
     return false;
+}
+
+bool Snake::hasRoundTrips() const{
+        // since array calls the initializer for its object type, so it is `value initialised IN THIS CASE`, ie 0
+    std::array<int, 5>& temp_bucket{ this->__temp.bucket };
+    std::fill(temp_bucket.begin(), temp_bucket.end(), 0); // in case bucket has been used earlier
+
+    for each (auto dir in this->body) {
+        temp_bucket[static_cast<uint8_t>(dir)] += static_cast<uint8_t>(dir) > 4 ? -1 : 1;
+        // @warning - `dir` should be static cast only to the type given as the type of values of enum class Direction
+    }
+
+    return std::all_of(temp_bucket.begin(), temp_bucket.end(), [](int i) {return i == 0;});
+}
+
+bool Snake::isPathValid() const{    // checks that `no two adjacent` directions should be opposites
+    auto& p = this->body;
+
+    return std::adjacent_find(p.begin(), p.end(), &util::areDirectionsOpposite) == p.end();
+}
+
+bool Snake::isSnakeBodyOK() const{
+    return isPathValid() && !hasRoundTrips();
 }
 
 //Returns if `this` snake has ate the food or not
@@ -97,7 +119,7 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
         this->head = this->head->get_adj_box( Direction(util::Random::random<dimen_t>(4)) );    // @warning- randomly assigning any number from 0 to 3
     }
 
-    // this->body.push_back(this->head);    // since it's a list of directions, we don't require the head, its not direction, and also it is the starting point
+    this->body.push_back(this->head);    // since it's a list of directions, we don't require the head, its not direction, and also it is the starting point
     for( uint16_t i = 0; i < init_len - 1; i++ ){
         // @todo - Randomly chose a direction out of 4 directions currently
         auto* prev_box = this->head;
@@ -106,16 +128,14 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
         auto rand_direction = statics::directions[ util::Random::random(4) ];
 
         while( ! prev_box->getData().hasEntities() ){
-            prev_box = prev_box->get_adj_box(Direction::UP);
+            prev_box = prev_box->get_adj_box(Direction::FRONT);
             rand_direction = statics::directions[ util::Random::random(4) ];
         }
         this->body.push_back(rand_direction);
     }
 
-
     this->length = init_len;
 }
 
 // Snake::Snake(){
-
 // }

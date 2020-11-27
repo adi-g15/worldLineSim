@@ -3,6 +3,8 @@ project(World-Line-Simulator VERSION 0.271)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_executable(test test.cxx)
+
 file(GLOB SOURCES "src/*.cpp")
 # later distribute display into a library, and link to it
 file(GLOB DISP_SOURCES "display/src/*.cpp")

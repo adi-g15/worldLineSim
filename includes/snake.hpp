@@ -20,6 +20,10 @@ class Snake: public Entity{
 
     typedef std::list<Direction> SnakeBody; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
 
+    mutable struct {
+        std::array<int, 5> bucket;  // a temporary bucket for use in Snake::hasRoundTrips
+    }__temp;
+
 public:
     const World_Ptr parent_world;
 
@@ -31,6 +35,7 @@ public:
     void _Action2() override;   //calls eatFood()
     const coord& getPos() const override;
 
+    bool isSnakeBodyOK() const;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
     const coord& getHeadCoord() const;
@@ -47,5 +52,8 @@ private:
     const Graph_Box<_box>* head;    // just a constant pointer to the actual box in graph
 
     bool eatFood(); //returns true if it can eat, else false and no change
+    bool hasRoundTrips() const;
+    bool isPathValid() const;
+    bool isSnakeBodyOK() const;
     bool moveForward(); // continue on the acquired path, or if it's not available, find a new one
 };
