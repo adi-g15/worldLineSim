@@ -1,3 +1,6 @@
+@todo - Changing the GraphMatrix to use 10 dimensions now
+@todo - Make Graph_Box::data to a pointer (and these will be accordingly deleted when they aren't being referenced by )
+
 # Matrix as a Graph
 ----
 

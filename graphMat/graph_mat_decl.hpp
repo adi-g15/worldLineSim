@@ -15,21 +15,29 @@
 #include <iostream> // use at displaing matrix
 #include <cstdint>
 #include <utility>
+#include <list>
 // #include <concepts>
 
 #include "graph_box.hpp"
+#include "util/coord.hpp"
+
+typedef util::_coord<int32_t> coord;
 
     // @limitation (wrt vector<vector>) - Currently you can't get back the nth row, say mat[4], isn't valid, though can be implemented by simply returning, mat[4][0] which will logically be a linked list
 
 // dimen_t will be the unit of dimension
 template< typename node_dtype, typename dimen_t=int32_t> // @concepts -> make sure that std::is_signed<dimen_t> == true
 class Graph_Matrix{
-    static_assert(std::is_signed_v<dimen_t> == true);
+    static_assert(std::is_signed_v<dimen_t> == true, "Dimension type must be a signed integral (for safety reasons, so that bugs don't appear due to unsigned subtractions)");
+    static_assert(std::is_default_constructible<node_dtype>::value == true, "The data type of values in the matrix must be default constructible");
+    static_assert(std::is_pointer<node_dtype>::value != true, "Currently it doesn't support using pointers to be the data held by each box, though it maybe implemented, but not now");
+
     typedef Graph_Box<node_dtype> graph_box_type;
     typedef std::make_unsigned_t<dimen_t> udimen_t;
     // typedef int32_t dimen_t;  //dimension unit
 
 protected:
+    std::list<graph_box_type*> special_nodes;   // special_nodes.begin() will always be the techincal ROOT (ORIGIN, 0,0,0)
     graph_box_type origin; // [0,0]; will never change
 
         //pointers to the 3 nodes
@@ -84,6 +92,9 @@ public:
     graph_box_type* operator[](const graph_position& pos);
     const graph_box_type* operator[](const graph_position& pos) const;
 
+//    // data_cleaner() is meant to be called only once
+//    const void data_cleaner();    // clears the `node_dtype *data;` inside nodes, which haven't been used for 
+
     // @future - These two to be implemented later and should utilize this->__capacity
     // void reserve(int _x_dimen, int _y_dimen);
     // void shrink_to_fit();
@@ -102,3 +113,8 @@ public:
     // Graph_Matrix(dimen_t _x_dimen, dimen_t _y_dimen, std::function);   //takes a function, that takes in two values (the x and y coord of that point), and give out a value to be alloted to the new box created there
     ~Graph_Matrix();
 };
+
+//struct empty_struct {};
+ /* specialiazation for Graph_Matrix<> */
+//template<> Graph_Matrix < empty_struct > {
+//}

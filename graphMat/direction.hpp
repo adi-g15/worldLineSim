@@ -5,9 +5,9 @@
 
 enum class Direction: uint8_t{ // intentionally not enum class now
 	UTTAR = 0,	// North
-	PURVA,		// South
-	PASHCHIM,	// West
-	DAKSHIN,	// East
+	PURVA,		// EAST
+	PASHCHIM,	// WEST
+	DAKSHIN,	// SOUTH
 	ISHANYA,	// North-East
 	AGNEYA,		// South-East
 	NAIRUTYA,	// South-West
@@ -45,7 +45,7 @@ namespace util {
 }
 
 namespace statics{
-    static std::array<Direction, 4> directions{ Direction::FRONT, Direction::DOWN, Direction::RIGHT, Direction::LEFT };
+    static std::array<Direction, 10> directions{ Direction::UTTAR, Direction::PURVA, Direction::PASHCHIM, Direction::DAKSHIN, Direction::ISHANYA, Direction::AGNEYA, Direction::NAIRUTYA, Direction::VAYAVYA, Direction::URDHWA, Direction::ADHARASTHA };
 }
 
 // could use std::queue or std::list too, that would allow popping too, but i have not done so that the allocations are at minimum
