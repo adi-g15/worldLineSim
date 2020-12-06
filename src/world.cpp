@@ -40,7 +40,7 @@ bool World::_RangeCheck(const coord_type& c) const{
     return this->world_plot.getCurrentOrder() > c.mX || this->world_plot.getCurrentOrder() > c.mY;
 }
 
-World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this){
+World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this), path_finder(world_plot){
     // @todo
 
     for( auto i = 0; i < this->_MAX_NumSnakes; i++ ){

@@ -9,8 +9,16 @@ namespace util
     struct _coord{
         dimen_t mX, mY;
 
-        bool operator==(const _coord<dimen_t>& second) const{
-            return this->mX == second.mX && this->mY == second.mY;
+        inline bool operator==(const _coord<dimen_t>& second) const = default;
+
+        inline bool operator<(const _coord<dimen_t>& second) const {
+            if (this->mX < second.mX)  return true;
+            else
+                return this->mY < second.mY;
+        }
+
+        inline bool operator>(const _coord<dimen_t>& second) const {
+            return !this->operator==(second) && !this->operator<(second);
         }
 
         friend std::ostream& operator<<(std::ostream& os, const _coord<dimen_t>& coord){

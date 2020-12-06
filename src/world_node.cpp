@@ -8,7 +8,7 @@ void World_Node::captureState(){
     State latest_state(this->paused_time);
 
     for( Entity& entity : world->snakes ){
-        latest_state.curr_pos.push_back(entity.getPos());
+        latest_state.curr_pos.push_back(entity.getPrimaryPos());
     }
 
     this->states.push_back(latest_state);

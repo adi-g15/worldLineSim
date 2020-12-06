@@ -84,5 +84,6 @@ struct Graph_Box    // @node - it should be non-copyable
         // LEARNT - friending a templated class (down below is the `syntax` found, to friend `all` templated versions of Graph_Matrix)
         template<typename, typename> friend class Graph_Matrix;    //will make all Graph_Matrix friend to this
         friend class Graph_Matrix<int, int32_t>;    //will make all Graph_Matrix friend to this
+        friend class WorldPlot; // This line maybe removed later, it is worldLine Simulator specific
 
 };

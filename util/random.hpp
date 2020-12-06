@@ -8,7 +8,7 @@ namespace util{
     public:
         template<typename T = uint32_t> // so that, if signed BUT positive integer type is required, it can be given (it required narrowing conversions)
         static T random(){
-            static_assert( std::is_integral_v<T> );
+            static_assert(std::is_integral_v<T>);
 
             return random<T>(0, std::numeric_limits<uint32_t>::max() );
         }
@@ -24,6 +24,8 @@ namespace util{
         static T random(uint32_t min, uint32_t max){ // [`min`, `max`)     ie. max excluded
             static_assert( std::is_integral_v<T> );
 
+            static Random::device;
+            static Random::generator(Random::device());
             uint32_t num = std::random_device{}();
             // @future - Later use this generator too
 
@@ -31,9 +33,8 @@ namespace util{
             return static_cast<T>((((num-min)%max) + num ));
         }
 
-    private:
-        // static std::mt19937 generator(std::random_device{}());
         static std::random_device device;
+        static std::mt19937 generator;
 
     };
 }

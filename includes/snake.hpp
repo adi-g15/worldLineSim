@@ -33,7 +33,7 @@ public:
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
-    const coord& getPos() const override;
+    const std::optional<coord&> getPrimaryPos() const override;
 
     bool isSnakeBodyOK() const;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
@@ -49,7 +49,7 @@ private:
 
     // std::vector< coord_type > body;
     SnakeBody body;
-    const Graph_Box<_box>* head;    // just a constant pointer to the actual box in graph
+    const Entity_Point* head;
 
     bool eatFood(); //returns true if it can eat, else false and no change
     bool hasRoundTrips() const;

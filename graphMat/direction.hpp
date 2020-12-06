@@ -45,7 +45,9 @@ namespace util {
 }
 
 namespace statics{
-    static std::array<Direction, 10> directions{ Direction::UTTAR, Direction::PURVA, Direction::PASHCHIM, Direction::DAKSHIN, Direction::ISHANYA, Direction::AGNEYA, Direction::NAIRUTYA, Direction::VAYAVYA, Direction::URDHWA, Direction::ADHARASTHA };
+	inline namespace graph_statics {
+		static std::array<Direction, 10> directions{ Direction::UTTAR, Direction::PURVA, Direction::PASHCHIM, Direction::DAKSHIN, Direction::ISHANYA, Direction::AGNEYA, Direction::NAIRUTYA, Direction::VAYAVYA, Direction::URDHWA, Direction::ADHARASTHA };
+	}
 }
 
 // could use std::queue or std::list too, that would allow popping too, but i have not done so that the allocations are at minimum

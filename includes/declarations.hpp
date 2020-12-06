@@ -39,6 +39,7 @@ enum class Event{  //for logging puposes
 
 namespace statics
 {
+    typedef int32_t dimen_t;
     // static constexpr std::pair< uint16_t, uint16_t > MAX_BOUNDS{ 1000, 1000 };    //applicable to ALL WORLDS CREATED
     // static constexpr std::pair< uint16_t, uint16_t > init_Max_Bound{ 40, 40 };    //applicable to A NEW WORLD
         // Currently using square matrix as parent, since it will be equally expanding later

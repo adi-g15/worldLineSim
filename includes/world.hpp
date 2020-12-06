@@ -60,6 +60,7 @@ public:
 
 	//wil be required to join these threads, in stopSimulation();
 	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
+	std::vector< Snake > snakes;	// accessed by World_Plot::createFood()
 
 	const Graph_Box<_box>* get_box(const coord& pos) const{
 		return this->world_plot.get_box(pos);
@@ -80,8 +81,7 @@ private:
 	udimen_t _curr_BOUND; //current `reserved` `order` of this world
 
 	WorldPlot world_plot;    // @todo - Will be 3D in future
-
-	std::vector< Snake > snakes;
+	Path_Finder path_finder;
 
 	// bool _CheckBounds();    //for checking `need` to increase size
 

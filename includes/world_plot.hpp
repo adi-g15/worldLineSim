@@ -3,16 +3,33 @@
 #include "graphMat/graph__square_mat_decl.hpp"
 #include "declarations.hpp"
 #include "forward_decl.hpp"
+#include "path_finder.hpp"
 
 /*MUST ALWAYS BE ON A SINGLE THREAD AT MAX, SINCE TEMPORARY VARIABLES ARE USED AS MEMBER OF THIS CLASS*/
+
+struct Food {
+	const Graph_Box<_box>* box;   // @future - food may have different points/nutitional values too
+	coord coordinate;	// food and entities will be having coordinates
+
+private:
+	static coord&& get_new_food_pos(std::vector<coord>&& entity_pos);
+	void reset(Food&& food);
+
+	Food() = default;
+	Food(Food&) = default;
+	Food(Food&&) = default;
+	friend class WorldPlot;
+	friend class World;
+};
 
 // @future - If it lives on its own thread, put a auto expansion logic, that sleeps for 1 time unit, and then calls auto_expand()
 class WorldPlot: public Square_Matrix<_box>{
 	typedef int32_t dimen_t;
 	typedef World* World_Ptr;
+	typedef Graph_Box<_box> graph_box_type;
 
 	const World_Ptr parent_world;
-	Graph_Box<_box>* food;   // @future - food may have different points/nutitional values too
+	Food food;   // @future - food may have different points/nutitional values too
 
 	void auto_expand();   //expands this->__temp.expansion_speed unit on each side
 	void __expand_n_units(int8_t n);    //to be used when there's rate
@@ -28,6 +45,9 @@ class WorldPlot: public Square_Matrix<_box>{
 		}
 		void createFood();
 		dimen_t getCurrentOrder() const;
+
+		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
+			
 		bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
 		directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;    // @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
@@ -46,5 +66,6 @@ class WorldPlot: public Square_Matrix<_box>{
 	WorldPlot(const World_Ptr);
 
 	friend class World;
+	friend class Path_Finder;	// it will be a frienf of world_plot too, so as to control its ability to auto expand
 
 };

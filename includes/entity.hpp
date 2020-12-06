@@ -4,6 +4,7 @@
 #include <string_view>
 #include <vector>
 #include <any>
+#include <optional>
 
 #include "id_creator.hpp"
 #include "util/coord.hpp"
@@ -24,12 +25,20 @@ enum class entity_Types: uint8_t {
     // more can be added later, it's made to be expandible, though do see the member declarations as for what ANY entity must have
 };
 
+struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
+    Graph_Box<_box>* graph_box;
+
+    coord point_coord;
+};
+
 // In our case, each entity will have atleast one id, and can have 2 ids, if their simulatoon is running (the second ID being the thread::id they are running on)
 
 // Meant to be inherited from; Also since some member functions are pure virtuals, so you can't have an object of Entity either
 class Entity: public _ID{
-    typedef int32_t dimen_t;
+//    using statics::dimen_t;
+    typedef statics::dimen_t dimen_t;
 protected:
+    coord coordinate;
     entity_Types type;
     std::vector<Action_Ptr> supported_Operations;
     // std::vector<void (*)()> supported_Operations;
@@ -38,7 +47,7 @@ public:
     id_type getEntityId() const{
         return this->_id;
     }
-    virtual const coord& getPos() const = 0;
+    virtual const std::optional<coord&> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 

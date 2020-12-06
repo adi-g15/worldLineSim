@@ -14,7 +14,7 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-const coord& Snake::getPos() const{
+const coord& Snake::getPrimaryPos() const{
     return this->getHeadCoord();
 }
 
