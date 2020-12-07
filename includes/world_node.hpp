@@ -32,6 +32,9 @@ public:
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
 	World_Node( World_Tree* tree );
 
+	World_Node();
+		// @DEBUG -> REMOVE IT LATER
+
 	World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued = false);
 
 	~World_Node();

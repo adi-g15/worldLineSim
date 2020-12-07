@@ -6,8 +6,10 @@
 #include <any>
 #include <optional>
 
+#include "declarations.hpp"
 #include "id_creator.hpp"
 #include "util/coord.hpp"
+#include "graphMat/graph_box.hpp"   // for Graph_Box
 
 typedef util::_coord<int32_t> coord;
 typedef void (*Action_Ptr)(void);
@@ -26,9 +28,14 @@ enum class entity_Types: uint8_t {
 };
 
 struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
-    Graph_Box<_box>* graph_box;
+    const Graph_Box<_box>* graph_box;
 
     coord point_coord;
+
+    void reset(Graph_Box<_box>* new_box, coord& new_coord) {
+        this->graph_box = new_box;
+        this->point_coord = new_coord;
+    }
 };
 
 // In our case, each entity will have atleast one id, and can have 2 ids, if their simulatoon is running (the second ID being the thread::id they are running on)
@@ -38,7 +45,6 @@ class Entity: public _ID{
 //    using statics::dimen_t;
     typedef statics::dimen_t dimen_t;
 protected:
-    coord coordinate;
     entity_Types type;
     std::vector<Action_Ptr> supported_Operations;
     // std::vector<void (*)()> supported_Operations;

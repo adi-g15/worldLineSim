@@ -38,10 +38,9 @@ public:
     bool isSnakeBodyOK() const;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
-    const coord& getHeadCoord() const;
     int getUniqProp() const override;
 
-    const Graph_Box<_box>* getHead() const;
+    const Entity_Point& getHead() const;
 
     Snake(const World_Ptr);
     Snake(const World_Ptr, uint16_t);
@@ -49,11 +48,13 @@ private:
 
     // std::vector< coord_type > body;
     SnakeBody body;
-    const Entity_Point* head;
+    Entity_Point head;
 
     bool eatFood(); //returns true if it can eat, else false and no change
     bool hasRoundTrips() const;
     bool isPathValid() const;
-    bool isSnakeBodyOK() const;
     bool moveForward(); // continue on the acquired path, or if it's not available, find a new one
+
+    // HELPER FuNCTIonS
+    void _add_dir_to_coord(coord&, Direction) const;
 };

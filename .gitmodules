@@ -1,0 +1,3 @@
+[submodule "graphMat"]
+	path = graphMat
+	url = https://github.com/AdityaGupta150/graphMat

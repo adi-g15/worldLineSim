@@ -8,7 +8,10 @@ void World_Node::captureState(){
     State latest_state(this->paused_time);
 
     for( Entity& entity : world->snakes ){
-        latest_state.curr_pos.push_back(entity.getPrimaryPos());
+        if (entity.getPrimaryPos()) {}
+        else break;
+
+        latest_state.curr_pos.push_back(entity.getPrimaryPos().value());
     }
 
     this->states.push_back(latest_state);
@@ -118,6 +121,11 @@ const dimen_t World_Node::get_world_dimen() const{
 // @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
 World_Node::World_Node( World_Tree* tree ) : continued_world(false), adapter(tree->access_disp_manager()->newNodeAdapter(this)){
 
+}
+
+World_Node::World_Node() : continued_world(false), adapter(nullptr)
+{
+    this->world = new World();
 }
 
 World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued) : /*world(old_world, t), */continued_world(is_continued), adapter(tree->access_disp_manager()->newNodeAdapter(this)){

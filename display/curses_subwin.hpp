@@ -1,10 +1,11 @@
 #pragma once
 
-			#include <iostream>
+#include <iostream>
 #include "curses.h"
 #include "util/coord.hpp"
 
 #include <memory>
+#include <string>	// for std::to_string
 
 enum class position{    // only horizontal positions for now
 	LEFT,

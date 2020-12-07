@@ -26,9 +26,7 @@ class World: public _ID{
 public:
 	_timePoint currentTime;
 
-	const coord_type& get_food_coords() const{
-		return this->world_plot.food->getCoords();
-	}
+//	const coord_type& get_food_coords() const;	// @deprecated
 	void ateFood(const Snake*); //which snake ate it, log it, then randomize the food again
 
 	//------constants for this world------//
@@ -40,9 +38,7 @@ public:
 	bool isCellEmpty( const Graph_Box<_box>* ) const;
 
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
-	bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
-	directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;
-	void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
+	void getShortestPathToFood( const Entity_Point& origin, directionalPath& ) const;
 	// x-Just abstracted access to private worldPlot member function, no logic in these of their own-x //
 
 	struct {

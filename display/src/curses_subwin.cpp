@@ -92,7 +92,7 @@ void SubWindow::addstr(std::string_view str, position pos){
             if( boxed ) this->moveCursor(last_write_pos.n_row, -1);
             else this->moveCursor(last_write_pos.n_row, dimensions.n_col);
         else if( pos == position::MIDDLE )
-            this->moveCursor(last_write_pos.n_row, (dimensions.n_col - str.size()) / 2);
+            this->moveCursor(last_write_pos.n_row, (dimensions.n_col - static_cast<int>(str.size())) / 2);
     }
 
     // if boxed, then see if, (str.size() - 2), 2 for the border (right and left)

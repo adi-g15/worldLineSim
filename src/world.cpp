@@ -29,8 +29,10 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
 }
 
 bool World::isCellEmpty(const Graph_Box<_box>* c) const{
-    if( !this->_RangeCheck(c->getCoords()) )   return false;
 
+    if (!c) {
+        throw std::invalid_argument("Graph_Box passed to isCellEmpty() MUST not be null");
+    }
     // @todo -> Don't need this, remove it later, since with current graph matrix
     // return this->world_plot.isEmpty(c);
     return c->getData().entities.empty();
@@ -71,18 +73,8 @@ const World::dimen_t& World::get_curr_bound() const{
     return this->_curr_BOUND;
 }
 
-bool World::isPathClear(const Graph_Box<_box>* origin, const directionalPath& path) const{
-    // return this->world_plot.isPathClear( std::forward(origin), std::forward(path) );
-    return this->world_plot.isPathClear(origin, path);
-}
-
-directionalPath World::getShortestPathToFood(const Graph_Box<_box>* origin) const{
+void World::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const{
     // @question -> Will std::forward with pointers work as well, (seems so, since it's just taking the value stored, which is the address in the pointer)
   // return this->world_plot.getShortestPathToFood( std::forward(origin) );
-    return this->world_plot.getShortestPathToFood(origin);
-}
-
-void World::getShortestPathToFood(const Graph_Box<_box>* origin, directionalPath& path) const{
-    // return this->world_plot.getShortestPathToFood( std::forward(origin), path );
-    return this->world_plot.getShortestPathToFood(origin, path);
+    return this->world_plot.getShortestPathToFood(origin, old_path);
 }

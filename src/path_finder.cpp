@@ -1,7 +1,7 @@
 #include "path_finder.hpp"
 
 	// @note - basic_rect doesn't check if the path is empty or not
-directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coord& end )	// start is a graph box, only to efficiently check if a path is clean or not
+directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coord& end ) const	// start is a graph box, only to efficiently check if a path is clean or not
 {
 	directionalPath path;
 	path.reserve( std::abs( start.point_coord.mX - end.mX ) + std::abs(start.point_coord.mY - end.mY) );
@@ -22,7 +22,7 @@ directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coor
 	return std::move(path);
 }
 
-directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const coord& end)
+directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const coord& end) const
 {
 	directionalPath path ( this->basic_rect(start, end) ) ;
 
@@ -33,9 +33,9 @@ directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const 
 	return std::move(path);
 }
 
-bool Path_Finder::is_path_clean(const Graph_Box<_box>* start, const directionalPath& path)
+bool Path_Finder::is_path_clean(const Graph_Box<_box>* start, const directionalPath& path) const
 {
-	auto* tmp{ start };	// we don't check for the start position, it already has an entity, ie. Us ! :D
+	auto* tmp{ start };	// we don't check for the start position, it already has an entity_point, ie. Hum khud ! :D
 
 	for (auto& dir : path)
 	{
@@ -46,37 +46,37 @@ bool Path_Finder::is_path_clean(const Graph_Box<_box>* start, const directionalP
 	return true;
 }
 
-directionalPath&& Path_Finder::shortest_path(Entity& start) // end defaults to food position
+directionalPath&& Path_Finder::shortest_path(const Entity_Point& start) const // end defaults to food position
 {
 	directionalPath path;
 	// @todo @not_priority
 	return std::move(path);
 }
 
-directionalPath&& Path_Finder::shortest_path(Entity_Point& start, Graph_Box<_box>& end)
+directionalPath&& Path_Finder::shortest_path(const Entity_Point& start, Graph_Box<_box>& end) const
 {
 	directionalPath path;
 	// @todo @not_priority
 	return std::move(path);
 }
 
-inline directionalPath&& Path_Finder::getPath(Entity& entity, bool shortest)
+inline directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, bool shortest) const
 {
 	directionalPath path;
 	if (shortest) {
-		path = this->shortest_path(entity);
+		path = this->shortest_path(entity_point);
 	}
 	else
 	{
-		path = this->basic_rect(entity.getPrimaryPos().value(), this->plot->food.coord);
+		path = this->basic_rect(entity_point, this->plot->food.coordinate);
 	}
-	if (!is_path_clean(path)) {
+	if (!is_path_clean(entity_point.graph_box, path)) {
 		if ( ! shortest ) {	// that is the basic rect path was used, and it can cause problems at times, so now dcall shortest paths to find a new path
-			return this->getPath(entity, true);
+			return this->getPath(entity_point, true);
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(400));	// check for a new path after 400ms	(This behaviour may change as more path finder methods are added)
-		return this->getPath(entity, true);
+		return this->getPath(entity_point, true);
 	}
 
 	return std::move(path);

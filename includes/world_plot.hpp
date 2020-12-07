@@ -29,6 +29,7 @@ class WorldPlot: public Square_Matrix<_box>{
 	typedef Graph_Box<_box> graph_box_type;
 
 	const World_Ptr parent_world;
+	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too
 
 	void auto_expand();   //expands this->__temp.expansion_speed unit on each side
@@ -38,19 +39,19 @@ class WorldPlot: public Square_Matrix<_box>{
 
 		return &(this->origin);    // @debug - just for now
 	}
+	directionalPath&& getShortestPathToFood(const Entity_Point& origin) const;
 
 	public:
-		const Graph_Box<_box>* get_food() const{
+		const auto& get_food() const{
 			return this->food;
 		}
 		void createFood();
 		dimen_t getCurrentOrder() const;
 
 		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
-			
-		bool isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const;
-		directionalPath getShortestPathToFood( const Graph_Box<_box>* origin ) const;    // @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
-		void getShortestPathToFood( const Graph_Box<_box>* origin, directionalPath& ) const;
+
+		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
+		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;
 
 		void start_auto_expansion();
 		dimen_t getFreeSpace() const; //returns num of boxes empty
@@ -66,6 +67,6 @@ class WorldPlot: public Square_Matrix<_box>{
 	WorldPlot(const World_Ptr);
 
 	friend class World;
-	friend class Path_Finder;	// it will be a frienf of world_plot too, so as to control its ability to auto expand
+	friend class Path_Finder;	// it will be a friend of world_plot too, so as to control its ability to auto expand
 
 };

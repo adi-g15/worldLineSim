@@ -117,20 +117,18 @@ int32_t WorldPlot::getCurrentOrder() const{  //size
     return this->getOrder();
 }
 
-directionalPath WorldPlot::getShortestPathToFood(const Graph_Box<_box>* origin) const{
-    directionalPath shortest_path;
-    // this->getShortestPathToFood(std::forward(origin), shortest_path);
-    this->getShortestPathToFood(origin, shortest_path);
+void WorldPlot::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const {
+    if (path_finder.is_path_clean(origin.graph_box, old_path)) {
+        return;
+    }
 
-    return shortest_path;
+    else old_path = this->getShortestPathToFood(origin);
 }
 
-void WorldPlot::getShortestPathToFood(const Graph_Box<_box>* origin, directionalPath& old_path) const{
-    old_path.clear();   //the old path will be cleared !! If you wish to be more optimised, call WorldPlot::isPathClear() before calling this function
+directionalPath&& WorldPlot::getShortestPathToFood(const Entity_Point& origin) const{
+    // @important @note - snake class expects the path to be like a stack, ie. the first move, will be the last one, which will be popped, then move_on
 
-    // @todo - Apply the BFS here
-    // @note - snake class expects the path to be like a stack, ie. the first move, will be the last one, which will be popped, then move_on
-
+    return this->path_finder.getPath(origin);
 }
 
 coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)

@@ -3,6 +3,7 @@
 #include "declarations.hpp"
 #include "util/random.hpp"
 
+#include <map>
 #include <thread>
 #include <chrono>
 
@@ -14,8 +15,8 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-const coord& Snake::getPrimaryPos() const{
-    return this->getHeadCoord();
+const std::optional<coord&> Snake::getPrimaryPos() const{
+    return this->getHead();
 }
 
 void Snake::simulateExistence(){
@@ -72,22 +73,69 @@ bool Snake::moveForward(){  // this will also be on the snake's thread, and not 
         if( this->eatFood() ){
             return true;
         }
-        this->parent_world->getShortestPathToFood( this->head, curr_Path );
-    } else{
-        if( !this->parent_world->isPathClear( head, curr_Path ) ) //if path is not clear, search for a new path
-            this->parent_world->getShortestPathToFood( head, curr_Path );
     }
 
-    // move with path.back()
+    this->parent_world->getShortestPathToFood(this->head, this->curr_Path);
+
+    this->head.graph_box = this->head.graph_box->get_adj_box(curr_Path.front());
+    this->_add_dir_to_coord( this->head.point_coord, curr_Path.front());
+
+//    this->body.push_back( curr_Path.insert )
+    // move with path.front()
     // @todo
 
 }
 
-const coord& Snake::getHeadCoord() const{
-    return this->head->getCoords();
+void Snake::_add_dir_to_coord(coord& c, Direction dir) const
+{
+//    static const std::map<Direction, coord> dir_to_incrementing_coord{ {
+//        {Direction::ADHARASTHA, {0,0,-1}},
+//        {Direction::AGNEYA, {1,-1,0}},
+//        {Direction::DAKSHIN, {}},
+//        {},
+//        {},
+//        {},
+//        {},
+//        {},
+//
+//    }};
+
+    switch (dir)
+    {
+    case Direction::UTTAR:
+        c += std::array{0, 1, 0};
+        break;
+    case Direction::PURVA:
+        c += std::array{1, 0, 0};
+        break;
+    case Direction::PASHCHIM:
+        c += std::array{-1, 0, 0};
+        break;
+    case Direction::DAKSHIN:
+        c += std::array{0, -1, 0};
+        break;
+    case Direction::ISHANYA:
+        c += std::array{1, 1, 0};
+        break;
+    case Direction::AGNEYA:
+        c += std::array{1, -1, 0};
+        break;
+    case Direction::NAIRUTYA:
+        c += std::array{-1, -1, 0};
+        break;
+    case Direction::VAYAVYA:
+        c += std::array{-1, 1, 0};
+        break;
+    case Direction::URDHWA:
+        c += std::array{0, 0, 1};
+        break;
+    case Direction::ADHARASTHA:
+        c += std::array{0, 0, -1};
+        break;
+    }
 }
 
-const Graph_Box<_box>* Snake::getHead() const{
+const Entity_Point& Snake::getHead() const{
     return this->head;
 }
 
@@ -108,34 +156,42 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
 */
 
 Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SNAKE), parent_world(world){
+    if (!world) {
+        throw std::invalid_argument("World Pointer to Snake Type must be not null");
+    }
+
     coord head_pos = {
         util::Random::random<dimen_t>(parent_world->get_curr_bound()),
         util::Random::random<dimen_t>(parent_world->get_curr_bound()),
+        util::Random::random<dimen_t>(parent_world->get_curr_bound())
     };
 
-    this->head = parent_world->get_box(head_pos);
+    this->head = { parent_world->get_box(head_pos), head_pos };
 
-    while( !this->parent_world->isCellEmpty(this->head) ){  // loop until you chose an empty box as the head
-        this->head = this->head->get_adj_box( Direction(util::Random::random<dimen_t>(4)) );    // @warning- randomly assigning any number from 0 to 3
+    Direction rand_direction;
+    while( !this->parent_world->isCellEmpty(this->head.graph_box) ){  // loop until you chose an empty box as the head
+        rand_direction = statics::directions[util::Random::random(statics::directions.size())];
+        this->_add_dir_to_coord(this->head.point_coord, rand_direction);
+        this->head.reset(
+            this->head.graph_box->get_adj_box(rand_direction),
+            head.point_coord    /*modified above using _add_dir_to_coord() */
+        );    // @warning- randomly assigning any number from 0 to 3
     }
 
-    this->body.push_back(this->head);    // since it's a list of directions, we don't require the head, its not direction, and also it is the starting point
-    for( uint16_t i = 0; i < init_len - 1; i++ ){
-        // @todo - Randomly chose a direction out of 4 directions currently
-        auto* prev_box = this->head;
+    do {
+        auto* prev_box = this->head.graph_box;
+        for (uint16_t i = 0; i < init_len - 1; i++) {
+            rand_direction = statics::directions[util::Random::random(statics::directions.size())];
 
-        // util::Random::rand_neighbour(this->body.back())
-        auto rand_direction = statics::directions[ util::Random::random(4) ];
+            while (!prev_box->getData().hasEntities()) {
+                prev_box = prev_box->get_adj_box(rand_direction);
+                rand_direction = statics::directions[util::Random::random(4)];
+            }
 
-        while( ! prev_box->getData().hasEntities() ){
-            prev_box = prev_box->get_adj_box(Direction::FRONT);
-            rand_direction = statics::directions[ util::Random::random(4) ];
+            prev_box = prev_box->get_adj_box(rand_direction);
+            this->body.push_back(rand_direction);
         }
-        this->body.push_back(rand_direction);
-    }
 
-    this->length = init_len;
+        this->length = init_len;
+    } while ( !isSnakeBodyOK() );
 }
-
-// Snake::Snake(){
-// }
