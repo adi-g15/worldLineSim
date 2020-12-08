@@ -4,6 +4,7 @@
 #include "declarations.hpp"
 #include "forward_decl.hpp"
 #include "path_finder.hpp"
+#include <atomic>	// For std::atomic_bool (actually not mandatory, some extra loops are okay in auto_expand)
 
 /*MUST ALWAYS BE ON A SINGLE THREAD AT MAX, SINCE TEMPORARY VARIABLES ARE USED AS MEMBER OF THIS CLASS*/
 
@@ -32,7 +33,12 @@ class WorldPlot: public Square_Matrix<_box>{
 	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too
 
-	void auto_expand();   //expands this->__temp.expansion_speed unit on each side
+	std::atomic_bool expansion_flag;
+	void auto_expansion();	 //keeps expanding TILL expansion_flag is TRUE
+	void pause_auto_expansion();
+	void resume_auto_expansion();
+	dimen_t getFreeSpace() const;
+	void _expand_once();
 	void __expand_n_units(int8_t n);    //to be used when there's rate
 	const Graph_Box<_box>* get_box(const coord& position) const{
 		// @todo - Return the graph_box with that coordinate
@@ -53,9 +59,6 @@ class WorldPlot: public Square_Matrix<_box>{
 		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;
 
-		void start_auto_expansion();
-		dimen_t getFreeSpace() const; //returns num of boxes empty
-
 		struct {
 			float expansion_speed{ statics::init_expansion_speed }; //initially it will auto_expand statics::init_expansion_speed unit at time, each side
 			float free_space_ratio{100.0f};
@@ -64,6 +67,7 @@ class WorldPlot: public Square_Matrix<_box>{
 		} __temp;   //temporary vars
 
 
+	// @note - The world_plot starts AUTO EXPANSION, from constructor itself
 	WorldPlot(const World_Ptr);
 
 	friend class World;

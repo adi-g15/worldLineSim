@@ -5,6 +5,7 @@
 #include <vector>
 #include <any>
 #include <optional>
+#include <functional>   // for std::reference_wrapper
 
 #include "declarations.hpp"
 #include "id_creator.hpp"
@@ -53,7 +54,10 @@ public:
     id_type getEntityId() const{
         return this->_id;
     }
-    virtual const std::optional<coord&> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
+
+    // @warning -> Check for any additional copy being created due to use of std::reference_wrapper::get() over the places in code
+    virtual std::optional<std::reference_wrapper<const Entity_Point>> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
+    virtual std::optional<std::reference_wrapper<Entity_Point>> getPrimaryPos() = 0;
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 

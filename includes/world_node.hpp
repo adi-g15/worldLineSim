@@ -29,6 +29,7 @@ public:
 
 	const dimen_t get_world_dimen() const;
 
+	// @note - Simulation -> The constructors themselves will AUTOMATICALLY start the simulation just before constructor finishes, by calling start_simultaion()
 	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
 	World_Node( World_Tree* tree );
 

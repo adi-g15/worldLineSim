@@ -60,6 +60,8 @@ void World_Node::handle_pause(State that_state){    // the time of pause to be d
 
 void World_Node::start_simulation(){    // causes the world to start running
 
+    WorldPlot
+
     for( auto&& snake : this->world->snakes ){
         this->world->entity_threads.push_back(
             std::thread(&Snake::simulateExistence, snake)
@@ -67,7 +69,7 @@ void World_Node::start_simulation(){    // causes the world to start running
     }
 
     // @debug - Uncomment next line, just commented it for successful build
-    // std::thread(&WorldPlot::start_auto_expansion(), this->world_plot);    // @future - Explore the possibilities of doing the world_plot expansion in this_thread, ie. the world's thread itself (that will likely have modifying the next while loop)
+    // std::thread(&WorldPlot::auto_expansion(), this->world_plot);    // @future - Explore the possibilities of doing the world_plot expansion in this_thread, ie. the world's thread itself (that will likely have modifying the next while loop)
 
     // this loop `just waits AND ensures the world_plot has food avaialable`, (since the entities are on there own threads)
     while( this->world->_shared_concurrent_data.is_world_running() ){

@@ -11,6 +11,18 @@
 #include <cstdint>
 
 // @note - `directionalPath` is alias for a `std::vector`, while `SnakeBody` is an alias for a `std::list`
+struct SnakeBody {
+   // @order -> body.front() is the first direction from the body_head
+    std::list<Direction> body; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
+
+    auto pop_back() { body.pop_back(); }
+    void grow(Direction move_dir);
+    void move(Direction move_dir);  // push front opposite direction to this
+
+    auto length() const { return body.size(); }
+    const auto begin() const { return body.begin(); }
+    const auto end() const { return body.end(); }
+};
 
 class Snake: public Entity{
     // typedef std::shared_ptr<World> World_Ptr;
@@ -18,10 +30,9 @@ class Snake: public Entity{
     typedef int32_t dimen_t;
     typedef std::make_unsigned_t<dimen_t> udimen_t;
 
-    typedef std::list<Direction> SnakeBody; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
-
     mutable struct {
         std::array<int, 5> bucket;  // a temporary bucket for use in Snake::hasRoundTrips
+        Direction last_dir; // used in move_Forward()
     }__temp;
 
 public:
@@ -29,16 +40,18 @@ public:
 
     // std::vector< coord_type > curr_path;
     directionalPath curr_Path;
-    udimen_t length;   //starts with _world.init_length
+    //udimen_t length;   //starts with _world.init_length
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
-    const std::optional<coord&> getPrimaryPos() const override;
+    std::optional<std::reference_wrapper<const Entity_Point>> getPrimaryPos() const override;
+    std::optional<std::reference_wrapper<Entity_Point>> getPrimaryPos() override;
 
     bool isSnakeBodyOK() const;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
     int getUniqProp() const override;
+    int getLength() const;
 
     const Entity_Point& getHead() const;
 
@@ -50,10 +63,11 @@ private:
     SnakeBody body;
     Entity_Point head;
 
+    // @note - eating doesn't do ANY movemoent
     bool eatFood(); //returns true if it can eat, else false and no change
     bool hasRoundTrips() const;
     bool isPathValid() const;
-    bool moveForward(); // continue on the acquired path, or if it's not available, find a new one
+    void moveForward(); // continue on the acquired path, or if it's not available, find a new one
 
     // HELPER FuNCTIonS
     void _add_dir_to_coord(coord&, Direction) const;

@@ -24,8 +24,8 @@ namespace util{
         static T random(uint32_t min, uint32_t max){ // [`min`, `max`)     ie. max excluded
             static_assert( std::is_integral_v<T> );
 
-            static std::random_device Random::device;
-            static std::mt19937 Random::generator(Random::device());
+            //static std::random_device Random::device;
+            //static std::mt19937 Random::generator(Random::device());
             uint32_t num = std::random_device{}();
             // @future - Later use this generator too
 
@@ -33,6 +33,7 @@ namespace util{
             return static_cast<T>((((num-min)%max) + num ));
         }
 
+        // @note - Not initialised in code anywhere
         static std::random_device device;
         static std::mt19937 generator;
 

@@ -19,6 +19,19 @@
 #include <algorithm>
 #include <chrono>
 
+const coord& World::getFoodCoord()
+{
+    return world_plot.get_food().coordinate;
+}
+
+bool World::lockFood(const Snake*)
+{
+    if (!this->food_mutex.try_lock())   return false;
+
+    this->food_mutex.lock();
+    return true;
+}
+
 void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize the food again
     //log the event, with snakeId
 
@@ -42,7 +55,7 @@ bool World::_RangeCheck(const coord_type& c) const{
     return this->world_plot.getCurrentOrder() > c.mX || this->world_plot.getCurrentOrder() > c.mY;
 }
 
-World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this), path_finder(world_plot){
+World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this), path_finder(&world_plot){
     // @todo
 
     for( auto i = 0; i < this->_MAX_NumSnakes; i++ ){
@@ -56,7 +69,7 @@ World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(t
 
 }
 
-World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this){
+World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this), path_finder(&world_plot){
     // @todo
 
     // @todo - Initialise the world_plot here, or get it on another thread (not really required, can be on the same thread as of the world)

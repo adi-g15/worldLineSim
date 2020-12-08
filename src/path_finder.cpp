@@ -1,4 +1,5 @@
 #include "path_finder.hpp"
+#include "world_plot.hpp"
 
 	// @note - basic_rect doesn't check if the path is empty or not
 directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coord& end ) const	// start is a graph box, only to efficiently check if a path is clean or not
@@ -7,16 +8,16 @@ directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coor
 	path.reserve( std::abs( start.point_coord.mX - end.mX ) + std::abs(start.point_coord.mY - end.mY) );
 
 	if (end.mX < start.point_coord.mX) {
-		path.insert(path.end(), std::abs(start.point_coord.mX - end.mX), Direction::PASHCHIM );
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mX - end.mX), Direction::PASHCHIM );
 	}else{
-		path.insert(path.end(), std::abs(start.point_coord.mX - end.mX), Direction::PURVA);
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mX - end.mX), Direction::PURVA);
 	}
 
 	if ( end.mY < start.point_coord.mY ) {
-		path.insert(path.end(), std::abs(start.point_coord.mY - end.mY), Direction::DAKSHIN);
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mY - end.mY), Direction::DAKSHIN);
 	}
 	else {
-		path.insert(path.end(), std::abs(start.point_coord.mY - end.mY), Direction::UTTAR);
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mY - end.mY), Direction::UTTAR);
 	}
 
 	return std::move(path);

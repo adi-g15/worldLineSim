@@ -26,8 +26,12 @@ class World: public _ID{
 public:
 	_timePoint currentTime;
 
-//	const coord_type& get_food_coords() const;	// @deprecated
-	void ateFood(const Snake*); //which snake ate it, log it, then randomize the food again
+	// @note - the below two functions are complementary to the other
+	// @note2 - ateFood() is expected NEVER to fail, based on the food_mutex, hence returns void
+	std::mutex food_mutex;	// locks JUST AFTER Snake::eatFood() starts and BEFORE World::ateFood(Snake*)
+	const coord& getFoodCoord();
+	bool lockFood(const Snake*);
+	void ateFood(const Snake*); //which snake ate it, log it, then create the food again
 
 	//------constants for this world------//
 	int _MAX_NumSnakes = 4;

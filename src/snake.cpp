@@ -15,8 +15,13 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-const std::optional<coord&> Snake::getPrimaryPos() const{
-    return this->getHead();
+std::optional<std::reference_wrapper<const Entity_Point>> Snake::getPrimaryPos() const{
+    return std::cref( getHead() );
+}
+
+std::optional<std::reference_wrapper<Entity_Point>> Snake::getPrimaryPos()
+{
+    return std::ref( this->head );
 }
 
 void Snake::simulateExistence(){
@@ -35,9 +40,10 @@ void Snake::simulateExistence(){
 }
 
 bool Snake::eatFood(){  //can only eat, if AT the position
-    if( this->head->getCoords() == this->parent_world->get_food_coords()){
+    if (!parent_world->lockFood(this))   return false;   // couldn't eat, food is locked
+
+    if( head.point_coord == parent_world->getFoodCoord()){
         this->parent_world->ateFood(this);
-        ++ this->length;
         return true;
     }
     return false;
@@ -48,7 +54,8 @@ bool Snake::hasRoundTrips() const{
     std::array<int, 5>& temp_bucket{ this->__temp.bucket };
     std::fill(temp_bucket.begin(), temp_bucket.end(), 0); // in case bucket has been used earlier
 
-    for each (auto dir in this->body) {
+    for (auto& dir : this->body)
+    {
         temp_bucket[static_cast<uint8_t>(dir)] += static_cast<uint8_t>(dir) > 4 ? -1 : 1;
         // @warning - `dir` should be static cast only to the type given as the type of values of enum class Direction
     }
@@ -66,40 +73,33 @@ bool Snake::isSnakeBodyOK() const{
     return isPathValid() && !hasRoundTrips();
 }
 
-//Returns if `this` snake has ate the food or not
-bool Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
-
-    if( this->curr_Path.empty() ){
-        if( this->eatFood() ){
-            return true;
-        }
-    }
+/**
+ * @brief -> Move using path.front()
+ * 
+ * If path is empty, that means the snake has already mved using the path, and is now JUST on the food, so eat it now
+ *
+ **/
+void Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
 
     this->parent_world->getShortestPathToFood(this->head, this->curr_Path);
 
-    this->head.graph_box = this->head.graph_box->get_adj_box(curr_Path.front());
-    this->_add_dir_to_coord( this->head.point_coord, curr_Path.front());
+    this->__temp.last_dir = curr_Path.next_dir();
+    curr_Path.pop();
 
-//    this->body.push_back( curr_Path.insert )
-    // move with path.front()
-    // @todo
+    this->head.graph_box = this->head.graph_box->get_adj_box(__temp.last_dir);
+    this->_add_dir_to_coord( this->head.point_coord, __temp.last_dir);
 
+
+    if (this->curr_Path.empty() && this->eatFood()) {
+        body.grow(__temp.last_dir);
+    }
+    else {
+        body.move( __temp.last_dir );
+    }
 }
 
 void Snake::_add_dir_to_coord(coord& c, Direction dir) const
 {
-//    static const std::map<Direction, coord> dir_to_incrementing_coord{ {
-//        {Direction::ADHARASTHA, {0,0,-1}},
-//        {Direction::AGNEYA, {1,-1,0}},
-//        {Direction::DAKSHIN, {}},
-//        {},
-//        {},
-//        {},
-//        {},
-//        {},
-//
-//    }};
-
     switch (dir)
     {
     case Direction::UTTAR:
@@ -140,7 +140,12 @@ const Entity_Point& Snake::getHead() const{
 }
 
 int Snake::getUniqProp() const{
-    return this->length;
+    return this->getLength();
+}
+
+int Snake::getLength() const
+{
+    return this->body.length() + 1;
 }
 
 Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
@@ -194,4 +199,17 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
 
         this->length = init_len;
     } while ( !isSnakeBodyOK() );
+}
+
+void SnakeBody::grow(Direction move_dir)
+{
+    body.push_front(
+        util::getOppositeDirection(move_dir)
+    );
+}
+
+void SnakeBody::move(Direction move_dir)
+{
+    this->grow(move_dir);
+    this->pop_back();
 }

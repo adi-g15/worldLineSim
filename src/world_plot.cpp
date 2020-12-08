@@ -9,7 +9,7 @@ void WorldPlot::createFood(){
 
     std::vector<coord> tmp_list;
     for (const auto& en : this->parent_world->snakes) {
-        tmp_list.push_back(en.getPrimaryPos().value()); // directly used optional<>::value since entities depending on this food will have it, as of now
+        tmp_list.push_back(en.getPrimaryPos().value().get().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
     }
 
     coord new_coord{ Food::get_new_food_pos(std::move(tmp_list)) };
@@ -68,27 +68,62 @@ bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPat
 }
 
 WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound), parent_world(world), food(nullptr){
-    this->createFood(); // @caution - food can't be 0,0 handle that
 
+    this->createFood();
+
+    this->expansion_flag.store(true);
+    std::thread(&WorldPlot::auto_expansion, this).detach();
 }
 
-void WorldPlot::start_auto_expansion(){
+void WorldPlot::auto_expansion(){
     // @assert - Making sure the world_plot expands on a different thread, so that it doesn't hinder the world thread (it may well be changed later, read the note in world.cpp where this function is called)
     if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
         throw std::logic_error("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
     }
-    this->auto_expand();
+
+    while (this->expansion_flag.load())
+    {
+        this->_expand_once();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds( static_cast<int>( statics::UNIT_TIME * 1000) ));
+    }
 }
 
-WorldPlot::dimen_t WorldPlot::getFreeSpace() const{ // returns num of boxes empty
-    // @todo - return num of boxes empty
-
-    return dimen_t{};
+void WorldPlot::pause_auto_expansion()
+{
+    this->expansion_flag.store(false);
 }
 
+void WorldPlot::resume_auto_expansion()
+{
+    this->expansion_flag.store(true);
 
-void WorldPlot::auto_expand(){   //expands one unit on each side
-    this->__temp.free_space_ratio = this->getFreeSpace()/this->getOrder();
+        // we `start` it again on another thread (with previous expansion metadata still in __temp object)
+    std::thread(&WorldPlot::auto_expansion, this).detach();
+}
+
+    // not actually number of nodes empty, but a utility function for WorldPlot::expand_once()
+WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
+    dimen_t min_x{ std::numeric_limits<dimen_t>::max() },
+        max_x{ std::numeric_limits<dimen_t>::min() },
+        min_y{ std::numeric_limits<dimen_t>::max() },
+        max_y{ std::numeric_limits<dimen_t>::min() };
+
+    for (auto& snake : this->parent_world->snakes)
+    {
+        min_x = std::min(snake.getHead().point_coord.mX, min_x);
+        max_x = std::max(snake.getHead().point_coord.mX, max_x);
+        min_y = std::min(snake.getHead().point_coord.mX, min_y);
+        max_y = std::max(snake.getHead().point_coord.mX, max_y);
+    }
+
+    return (this->getOrder() * this->getOrder()) - ( (max_x - min_x)*(max_y - min_y) );
+}
+
+    // @note - This method may decide NOT to grow this time too
+void WorldPlot::_expand_once(){   // `may` expands one unit on each side
+
+    this->__temp.free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
     if( __temp.time_since_speed_updated >= 10 ){
         --__temp.expansion_speed;
         __temp.time_since_speed_updated = 0;
@@ -98,8 +133,11 @@ void WorldPlot::auto_expand(){   //expands one unit on each side
     }
 
     if ( this->__temp.free_space_ratio > statics::max_free_space ){
+
         // @log - world doesn't need to auto_expand since reached max_free_space
+
         return;
+
     }else if ( this->__temp.free_space_ratio < statics::min_free_space )
     {
         ++__temp.time_since_speed_updated;

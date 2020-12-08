@@ -1,8 +1,9 @@
 #pragma once
 
 #include "graphMat/direction.hpp"
-#include "world_plot.hpp"
 #include "entity.hpp"
+
+class WorldPlot;	// forward-decl
 
 class Path_Finder
 {
