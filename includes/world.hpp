@@ -38,7 +38,7 @@ public:
 	int _init_SnakeLength = 2;
 	//------                ------//
 
-	const dimen_t& get_curr_bound() const;
+	const dimen_t get_curr_bound() const;
 	bool isCellEmpty( const Graph_Box<_box>* ) const;
 
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //

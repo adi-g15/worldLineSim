@@ -20,6 +20,13 @@ directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coor
 		path.data.insert(path.data.end(), std::abs(start.point_coord.mY - end.mY), Direction::UTTAR);
 	}
 
+	if (end.mZ < start.point_coord.mZ) {
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mZ - end.mZ), Direction::ADHARASTHA);	// downwards
+	}
+	else {
+		path.data.insert(path.data.end(), std::abs(start.point_coord.mZ - end.mZ), Direction::URDHWA);	// upwards
+	}
+
 	return std::move(path);
 }
 
@@ -61,7 +68,7 @@ directionalPath&& Path_Finder::shortest_path(const Entity_Point& start, Graph_Bo
 	return std::move(path);
 }
 
-inline directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, bool shortest) const
+directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, bool shortest) const
 {
 	directionalPath path;
 	if (shortest) {
@@ -83,7 +90,7 @@ inline directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, 
 	return std::move(path);
 }
 
-inline Path_Finder::Path_Finder(WorldPlot* fun_space)
+Path_Finder::Path_Finder(WorldPlot* fun_space): plot(fun_space)
 {
 }
 

@@ -82,7 +82,7 @@ World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this), path_fin
 
 }
 
-const World::dimen_t& World::get_curr_bound() const{
+const World::dimen_t World::get_curr_bound() const{
     return this->_curr_BOUND;
 }
 

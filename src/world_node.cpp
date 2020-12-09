@@ -11,7 +11,7 @@ void World_Node::captureState(){
         if (entity.getPrimaryPos()) {}
         else break;
 
-        latest_state.curr_pos.push_back(entity.getPrimaryPos().value());
+        latest_state.curr_pos.push_back(entity.getPrimaryPos()->get().point_coord);
     }
 
     this->states.push_back(latest_state);
@@ -60,7 +60,7 @@ void World_Node::handle_pause(State that_state){    // the time of pause to be d
 
 void World_Node::start_simulation(){    // causes the world to start running
 
-    WorldPlot
+    return; // world_node won't actually simulate the world, let the world do it (this is in opposite of what i earlier though though, think MORE)
 
     for( auto&& snake : this->world->snakes ){
         this->world->entity_threads.push_back(
@@ -73,7 +73,7 @@ void World_Node::start_simulation(){    // causes the world to start running
 
     // this loop `just waits AND ensures the world_plot has food avaialable`, (since the entities are on there own threads)
     while( this->world->_shared_concurrent_data.is_world_running() ){
-        if( this->world->world_plot.get_food() == nullptr ) this->world->world_plot.createFood(); //though this if block should NEVER be reached, since ateFood() also creates new Food
+        //if( this->world->world_plot.get_food() == nullptr ) this->world->world_plot.createFood(); //though this if block should NEVER be reached, since ateFood() also creates new Food
         this->captureState();   // can PAUSE then capture, for i am preferring some wrong coords in state, rather than stopping and starting threads again and again
 
         //pause for a unit time

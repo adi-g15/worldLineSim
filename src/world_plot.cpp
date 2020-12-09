@@ -59,15 +59,13 @@ inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const
 bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const{
     const Graph_Box<_box> *temp{ origin };
 
-    for ( uint32_t i = 0; i<path.size(); ++i ){
-        temp = temp->get_adj_box(path[i]);
-        if( ! temp->getData().entities.empty() )    return false;
-    }
-
-    return true;
+    return ! std::any_of(path.begin(), path.end(), [&](const Direction& dir) {
+        temp = temp->get_adj_box(dir);
+        return temp->getData().hasEntities();
+    });
 }
 
-WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound), parent_world(world), food(nullptr){
+WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
 
     this->createFood();
 
@@ -174,38 +172,49 @@ coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)
     /**
      * @note -> Here the new food position is DEPENDENT on the entity positions
      *          I would better like to have everything as independent as can can be, so that it really simulats a free `world` (free just in sense of independent processes)
-     *          This current strategy is only for a performance perspective, so that the new food is created near to all the entities, and just anywhere, so that the path finding algorithms benefits from this 
-     *      
+     *          This current strategy is only for a performance perspective, so that the new food is created near to all the entities, and just anywhere, so that the path finding algorithms benefits from this
+     *
      *          @ I may later change it back to independently randomness, even if it costs some performance overhead
      */
 
     using statics::dimen_t;
 
-    dimen_t min_x, min_y, max_x, max_y;
-    min_x = std::numeric_limits<dimen_t>::max();
-    min_y = std::numeric_limits<dimen_t>::max();
-    max_x = std::numeric_limits<dimen_t>::min();
-    max_y = std::numeric_limits<dimen_t>::min();
+    dimen_t
+        min_x{ std::numeric_limits<dimen_t>::max() },
+        max_x{ std::numeric_limits<dimen_t>::min() },
+        min_y{ std::numeric_limits<dimen_t>::max() },
+        max_y{ std::numeric_limits<dimen_t>::min() },
+        min_z{ std::numeric_limits<dimen_t>::max() },
+        max_z{ std::numeric_limits<dimen_t>::min() };
 
     for (const auto& pos : entity_positions) {
         min_x = std::min(pos.mX, min_x);
         min_y = std::min(pos.mY, min_y);
+        min_z = std::min(pos.mZ, min_z);
 
         max_x = std::max(pos.mX, max_x);
         max_y = std::max(pos.mY, max_y);
+        max_z = std::max(pos.mZ, max_z);
     }
 
+    // adding padding of difference between mins and maxs
     min_x -= max_x - min_x;
     min_y -= max_y - min_y;
+    min_z -= max_z - min_z;
 
     max_x += max_x - min_x;
     max_y += max_y - min_y;
+    max_z += max_z - min_z;
 
-    return { util::Random::random(min_x, max_x), util::Random::random(min_y, max_y) };
+    return { 
+        static_cast<dimen_t>(util::Random::random(min_x, max_x)),
+        static_cast<dimen_t>(util::Random::random(min_y, max_y)),
+        static_cast<dimen_t>(util::Random::random(min_z, max_z))
+    };
 }
 
 void Food::reset(Food&& food)
 {
-    this->box = food.box;
+    this->box = std::move(food.box);
     this->coordinate = std::move(food.coordinate);
 }

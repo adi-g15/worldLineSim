@@ -194,10 +194,9 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
             }
 
             prev_box = prev_box->get_adj_box(rand_direction);
-            this->body.push_back(rand_direction);
+            this->body.body.push_back(rand_direction);
         }
 
-        this->length = init_len;
     } while ( !isSnakeBodyOK() );
 }
 

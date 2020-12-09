@@ -16,7 +16,8 @@ private:
 	static coord&& get_new_food_pos(std::vector<coord>&& entity_pos);
 	void reset(Food&& food);
 
-	Food() = default;
+	Food() = default;	// CAUTION -> box may be nullptr
+	Food(const Graph_Box<_box>* b, const coord& c) : box(b), coordinate(c) {}
 	Food(Food&) = default;
 	Food(Food&&) = default;
 	friend class WorldPlot;
@@ -55,6 +56,8 @@ class WorldPlot: public Square_Matrix<_box>{
 		dimen_t getCurrentOrder() const;
 
 		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
+
+		bool isPathClear(const Graph_Box<_box>* origin, const directionalPath& path) const;
 
 		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;

@@ -10,13 +10,13 @@ namespace util
     struct _coord{
         dimen_t mX, mY, mZ;
 
-        inline void operator+=(const _coord<dimen_t>& to_add) const {
+        inline void operator+=(const _coord<dimen_t>& to_add) {
             this->mX += to_add.mX;
             this->mY += to_add.mY;
             this->mZ += to_add.mZ;
         }
 
-        inline void operator+=(const std::array<dimen_t,3>& to_add) const {
+        inline void operator+=(const std::array<dimen_t,3>& to_add) {
             this->mX += to_add[0];
             this->mY += to_add[1];
             this->mZ += to_add[2];

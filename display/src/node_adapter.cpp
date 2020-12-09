@@ -12,7 +12,7 @@ node_adapter::node_adapter(DispMngr dispMngr, World_Node_Ptr world_node, int hei
     dispMngr(dispMngr),
     window(dispMngr->main_area, height, width, y_corner, x_corner)
 {
-    if( ! node )    throw std::invalid_argument("A non-null world pointer is required")
+    if (!node)    throw std::invalid_argument("A non-null world pointer is required");
 
     this->node_id = node->getId();
 
@@ -42,5 +42,6 @@ void node_adapter::update(){	// updates the content on the window, with updated 
 
     // @todo - Handle the display here
 
-    std::call_once( this->dispMngr->disp_once_flag, &Display::updateScreen, this->dispMngr );
+    dispMngr->updateScreen();
+    //std::call_once( this->dispMngr->disp_once_flag, &Display::updateScreen, this->dispMngr );
 }
