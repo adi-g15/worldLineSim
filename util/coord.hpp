@@ -49,7 +49,7 @@ namespace util
                     os << ' ';
             }else if(coord.mY > -10)
                 os << ' ';
-            os << coord.mY;
+            os << coord.mY << ',';
 
             if (coord.mZ >= 0) {
                 os << ' ';

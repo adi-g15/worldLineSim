@@ -117,7 +117,7 @@ const World_Ptr World_Node::get_world() const{
 }
 
 const dimen_t World_Node::get_world_dimen() const{
-    return this->world->get_curr_bound();
+    return this->world->getWorldDimen();
 }
 
 // @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
@@ -127,7 +127,10 @@ World_Node::World_Node( World_Tree* tree ) : continued_world(false), adapter(tre
 
 World_Node::World_Node() : continued_world(false), adapter(nullptr)
 {
+    this->left_node = this->right_node = this->parent_node = nullptr;
+    this->tree = nullptr;
     this->world = new World();
+    this->world_id = world->_id;
 }
 
 World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued) : /*world(old_world, t), */continued_world(is_continued), adapter(tree->access_disp_manager()->newNodeAdapter(this)){

@@ -13,9 +13,10 @@ void WorldPlot::createFood(){
     }
 
     coord new_coord{ Food::get_new_food_pos(std::move(tmp_list)) };
+    this->_range_check_coord(new_coord);    // check whether the coord in in the world currently
     auto* box_node = this->return_nearby_empty_box( new_coord );
 
-    bool flag;
+    bool flag{ false }; // doesn't matter much how it's initialised
     while ( ! box_node )
     {
         flag ? new_coord.mX -= 2: new_coord.mY -= 2;    // @caution - tries out only the bottom left nodes in linear manner
@@ -24,6 +25,47 @@ void WorldPlot::createFood(){
     }
 
     this->food.reset({ box_node, new_coord });
+}
+
+void WorldPlot::_rand_once_createFood()
+{
+    coord new_coord{
+        /*the tmp_list being sent is about the half of each dimension, so by curret get_new_food_pos logic, it will use the WHOLE dimensions (initially small, on smaller order of 10 or 100), and randomly select a point within the boundaries*/
+        Food::get_new_food_pos({
+            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
+            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
+            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
+        })
+    };
+
+    this->_range_check_coord(new_coord);    // check whether the coord in in the world currently or not
+    auto* box_node = this->return_nearby_empty_box(new_coord);
+
+    bool flag{ false }; // doesn't matter much how it's initialised
+    while (!box_node)
+    {
+        flag ? new_coord.mX -= 2 : new_coord.mY -= 2;    // @caution - tries out only the bottom left nodes in linear manner
+        box_node = this->return_nearby_empty_box(new_coord);
+        flag = !flag;
+    }
+
+    this->food.reset({ box_node, new_coord });
+}
+
+void WorldPlot::_range_check_coord(coord& coordinate) const
+{
+    coordinate.mX %= this->getCurrentOrder() / 2;
+    coordinate.mY %= this->getCurrentOrder() / 2;
+    coordinate.mZ %= this->getCurrentOrder() / 2;
+}
+
+bool WorldPlot::_is_in_range_coord(coord& coordinate) const
+{
+    return (
+        std::abs(coordinate.mX) <= this->getCurrentOrder()/2
+        && std::abs(coordinate.mY) <= this->getCurrentOrder()/2
+        && std::abs(coordinate.mZ) <= this->getCurrentOrder()/2
+        );
 }
 
 inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const coord& box_coord) const
@@ -46,7 +88,7 @@ inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const
         });
         for (graph_box_type* node : surrounding_nodes)
         {
-            if (!node && !node->getData().hasEntities()) {
+            if ( node && !node->getData().hasEntities()) {
                 box = node;
                 return box;
             }
@@ -56,8 +98,8 @@ inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const
     }
 }
 
-bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPath& path ) const{
-    const Graph_Box<_box> *temp{ origin };
+bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const directionalPath& path ) const{
+    const graph_box_type *temp{ origin };
 
     return ! std::any_of(path.begin(), path.end(), [&](const Direction& dir) {
         temp = temp->get_adj_box(dir);
@@ -65,12 +107,14 @@ bool WorldPlot::isPathClear( const Graph_Box<_box>* origin, const directionalPat
     });
 }
 
-WorldPlot::WorldPlot(const World_Ptr world): Square_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
+WorldPlot::WorldPlot(const World_Ptr world): Cube_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
 
-    this->createFood();
+    // @bug - DONT call createFood from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
+    // CALLING THE OVERLOADED CREATEFOOD() that doesn't depend on the position of entities in the world, since it's not sure if the entities have got their head coords or not
+    this->_rand_once_createFood();
 
     this->expansion_flag.store(true);
-    std::thread(&WorldPlot::auto_expansion, this).detach();
+    //std::thread(&WorldPlot::auto_expansion, this).detach();
 }
 
 void WorldPlot::auto_expansion(){
@@ -146,7 +190,7 @@ void WorldPlot::_expand_once(){   // `may` expands one unit on each side
 }
 
 void WorldPlot::__expand_n_units(int8_t n){    //to be used when there's rate
-    this->resize(this->getOrder() + n);
+    this->resizeOrder(this->getOrder() + n);
 }
 
 int32_t WorldPlot::getCurrentOrder() const{  //size
@@ -178,6 +222,8 @@ coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)
      */
 
     using statics::dimen_t;
+
+    if (entity_positions.empty())  throw std::logic_error("Food::get_new_food_pos only returns the position of food, if there are snakes there in the world, in current case, the passed vector of entity_positions was empty !");
 
     dimen_t
         min_x{ std::numeric_limits<dimen_t>::max() },

@@ -38,7 +38,6 @@ public:
 	int _init_SnakeLength = 2;
 	//------                ------//
 
-	const dimen_t get_curr_bound() const;
 	bool isCellEmpty( const Graph_Box<_box>* ) const;
 
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
@@ -61,6 +60,8 @@ public:
 	//wil be required to join these threads, in stopSimulation();
 	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
 	std::vector< Snake > snakes;	// accessed by World_Plot::createFood()
+	
+	udimen_t getWorldDimen() const;
 
 	const Graph_Box<_box>* get_box(const coord& pos) const{
 		return this->world_plot.get_box(pos);
@@ -77,8 +78,8 @@ private:
 
 	// std::pair<uint16_t, uint16_t> _WorldDimens; //current dimensions of this world
 	// std::pair<uint16_t, uint16_t> _curr_BOUNDS; //current `reserved` dimensions of this world
-	udimen_t _WorldDimen; //current `order` of this world
-	udimen_t _curr_BOUND; //current `reserved` `order` of this world
+
+	//udimen_t _curr_BOUND; //current `reserved` `order` of this world
 
 	WorldPlot world_plot;    // @todo - Will be 3D in future
 	Path_Finder path_finder;

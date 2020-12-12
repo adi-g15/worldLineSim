@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphMat/graph__square_mat_decl.hpp"
+#include "graphMat/cube_mat.hpp"
 #include "declarations.hpp"
 #include "forward_decl.hpp"
 #include "path_finder.hpp"
@@ -25,10 +25,10 @@ private:
 };
 
 // @future - If it lives on its own thread, put a auto expansion logic, that sleeps for 1 time unit, and then calls auto_expand()
-class WorldPlot: public Square_Matrix<_box>{
+class WorldPlot: public Cube_Matrix<_box>{
 	typedef int32_t dimen_t;
 	typedef World* World_Ptr;
-	typedef Graph_Box<_box> graph_box_type;
+	typedef Graph_Box_3D<_box> graph_box_type;
 
 	const World_Ptr parent_world;
 	Path_Finder path_finder;
@@ -41,7 +41,7 @@ class WorldPlot: public Square_Matrix<_box>{
 	dimen_t getFreeSpace() const;
 	void _expand_once();
 	void __expand_n_units(int8_t n);    //to be used when there's rate
-	const Graph_Box<_box>* get_box(const coord& position) const{
+	const graph_box_type* get_box(const coord& position) const{
 		// @todo - Return the graph_box with that coordinate
 
 		return &(this->origin);    // @debug - just for now
@@ -53,11 +53,14 @@ class WorldPlot: public Square_Matrix<_box>{
 			return this->food;
 		}
 		void createFood();
+		void _rand_once_createFood();	// randomly creates food, only for the initial moments where the entities may not be in existence currently fully
+		void _range_check_coord(coord&) const;
+		bool _is_in_range_coord(coord&) const;
 		dimen_t getCurrentOrder() const;
 
 		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
 
-		bool isPathClear(const Graph_Box<_box>* origin, const directionalPath& path) const;
+		bool isPathClear(const graph_box_type* origin, const directionalPath& path) const;
 
 		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;

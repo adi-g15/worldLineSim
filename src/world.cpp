@@ -51,6 +51,11 @@ bool World::isCellEmpty(const Graph_Box<_box>* c) const{
     return c->getData().entities.empty();
 }
 
+World::udimen_t World::getWorldDimen() const
+{
+    return this->world_plot.getCurrentOrder();
+}
+
 bool World::_RangeCheck(const coord_type& c) const{
     return this->world_plot.getCurrentOrder() > c.mX || this->world_plot.getCurrentOrder() > c.mY;
 }
@@ -80,10 +85,6 @@ World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this), path_fin
         Snake{this, util::Random::random<uint16_t>(2, 5)}
     );
 
-}
-
-const World::dimen_t World::get_curr_bound() const{
-    return this->_curr_BOUND;
 }
 
 void World::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const{

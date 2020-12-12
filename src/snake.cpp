@@ -159,16 +159,16 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
     THOUGH, isCellEmpty() will return false, but the actual problem is
     "The next move this new snake moves, will cause the new snake to `collide` with the older one, thereby ending its life in starting itself"
 */
-
+// @note - Entities shoud start existence from the start (constructor) itself... though be sure to handle the case when the food is still being created, since the current logic creates the Entities JUST AFTER the snakes, since the createFood logic currently needs the positions of snakes too
 Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SNAKE), parent_world(world){
     if (!world) {
         throw std::invalid_argument("World Pointer to Snake Type must be not null");
     }
 
     coord head_pos = {
-        util::Random::random<dimen_t>(parent_world->get_curr_bound()),
-        util::Random::random<dimen_t>(parent_world->get_curr_bound()),
-        util::Random::random<dimen_t>(parent_world->get_curr_bound())
+        util::Random::random<dimen_t>(parent_world->getWorldDimen()),
+        util::Random::random<dimen_t>(parent_world->getWorldDimen()),
+        util::Random::random<dimen_t>(parent_world->getWorldDimen())
     };
 
     this->head = { parent_world->get_box(head_pos), head_pos };

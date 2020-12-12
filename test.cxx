@@ -33,34 +33,48 @@
 #include <queue>
 #include <algorithm>
 #include <numeric>
-#include "world_node.hpp"
+#include <concepts>
+//#include "world_node.hpp"
+//#include <graphMat/graph__square_mat.hpp>
 
 using namespace std::chrono_literals;
 
-std::random_device util::Random::device;
-std::mt19937 util::Random::generator(util::Random::device()) ;
-id_type _ID::_curr_ID = util::Random::random(100000);   // @note - Maybe temporarily, so that ids dont' just start with 0,1,2 and so on
+//std::random_device util::Random::device;
+//std::mt19937 util::Random::generator(util::Random::device()) ;
+//id_type _ID::_curr_ID = util::Random::random(100000);   // @note - Maybe temporarily, so that ids dont' just start with 0,1,2 and so on
+//
+//class test
+//{
+//	World_Node* new_world;
+//public:
+//	void emulate() {
+////		new_world = new World_Node();
+//	}
+//};
 
-class test
+//int main() {
+	//std::thread(&test::emulate, test()).join();
+
+
+	//Square_Matrix<int> temp_graph(8);
+	//temp_graph.displayMat();
+
+	//std::cin.ignore();
+//}
+
+#include <type_traits>
+
+auto func2(char) -> int (*)()
 {
-	World_Node* new_world;
-public:
-	void emulate() {
-		//new_world = new World_Node();
-	}
-};
+    return nullptr;
+}
 
-int main() {
-	std::thread(&test::emulate, test()).detach();
-
-	std::vector<int> v(20);
-	std::iota(v.rbegin(), v.rend(), 0);
-	std::shuffle(v.rbegin(), v.rend(), util::Random::generator);
-
-	for (auto& i : v)
-	{
-		std::cout << i << ' ';
-	}
-
-	std::cout << std::endl;
+int main()
+{
+    auto s= func2('c');
+    //static_assert(std::is_invocable<int>::value, "Type should be invocable");
+    static_assert(std::is_invocable<int()>::value);
+    static_assert(std::is_invocable_r<int, int()>::value);
+    static_assert(std::is_invocable_r<void, void(int), int>::value);
+    static_assert(std::is_invocable_r<int(*)(), decltype(func2), char>::value);
 }
