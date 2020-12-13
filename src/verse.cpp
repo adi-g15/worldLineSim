@@ -1,7 +1,7 @@
 #include "verse.hpp"
 #include "world_tree.hpp"
 #include "display/display.hpp"
-#include "graphMat/graph__square_mat.hpp"
+#include "graphMat/cube_mat.hpp"
 
 #include <iostream>	// @debug
 #include <memory>

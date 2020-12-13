@@ -9,7 +9,7 @@
 /*MUST ALWAYS BE ON A SINGLE THREAD AT MAX, SINCE TEMPORARY VARIABLES ARE USED AS MEMBER OF THIS CLASS*/
 
 struct Food {
-	const Graph_Box<_box>* box;   // @future - food may have different points/nutitional values too
+	const Graph_Box_3D<_box>* box;   // @future - food may have different points/nutitional values too
 	coord coordinate;	// food and entities will be having coordinates
 
 private:
@@ -17,7 +17,7 @@ private:
 	void reset(Food&& food);
 
 	Food() = default;	// CAUTION -> box may be nullptr
-	Food(const Graph_Box<_box>* b, const coord& c) : box(b), coordinate(c) {}
+	Food(const Graph_Box_3D<_box>* b, const coord& c) : box(b), coordinate(c) {}
 	Food(Food&) = default;
 	Food(Food&&) = default;
 	friend class WorldPlot;

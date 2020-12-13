@@ -38,7 +38,7 @@ public:
 	int _init_SnakeLength = 2;
 	//------                ------//
 
-	bool isCellEmpty( const Graph_Box<_box>* ) const;
+	bool isCellEmpty( const Graph_Box_3D<_box>* ) const;
 
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
 	void getShortestPathToFood( const Entity_Point& origin, directionalPath& ) const;
@@ -63,7 +63,7 @@ public:
 	
 	udimen_t getWorldDimen() const;
 
-	const Graph_Box<_box>* get_box(const coord& pos) const{
+	const Graph_Box_3D<_box>* get_box(const coord& pos) const{
 		return this->world_plot.get_box(pos);
 	}
 

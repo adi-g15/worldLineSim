@@ -4,7 +4,7 @@
 #include "declarations.hpp"
 #include "entity.hpp"
 #include "graphMat/direction.hpp"
-#include "graphMat/graph_box.hpp"
+#include "graphMat/3d_graph_box.hpp"
 
 #include <vector>
 #include <memory>

@@ -41,7 +41,7 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
     // this->createFood();
 }
 
-bool World::isCellEmpty(const Graph_Box<_box>* c) const{
+bool World::isCellEmpty(const Graph_Box_3D<_box>* c) const{
 
     if (!c) {
         throw std::invalid_argument("Graph_Box passed to isCellEmpty() MUST not be null");

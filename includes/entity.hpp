@@ -10,7 +10,7 @@
 #include "declarations.hpp"
 #include "id_creator.hpp"
 #include "util/coord.hpp"
-#include "graphMat/graph_box.hpp"   // for Graph_Box
+#include "graphMat/3d_graph_box.hpp"   // for Graph_Box
 
 typedef util::_coord<int32_t> coord;
 typedef void (*Action_Ptr)(void);
@@ -29,11 +29,11 @@ enum class entity_Types: uint8_t {
 };
 
 struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
-    const Graph_Box<_box>* graph_box;
+    const Graph_Box_3D<_box>* graph_box;
 
     coord point_coord;
 
-    void reset(Graph_Box<_box>* new_box, coord& new_coord) {
+    void reset(Graph_Box_3D<_box>* new_box, coord& new_coord) {
         this->graph_box = new_box;
         this->point_coord = new_coord;
     }
