@@ -30,12 +30,12 @@ namespace util{
             // @future - Later use this generator too
 
             // @fix_me - Fix later-> won't work when (num-min) < 0
-            return static_cast<T>((((num-min)%max) + num ));
+            //return static_cast<T>((((num-min)%max) + num ));
+            return static_cast<T>((num%(max-min)) + min );
         }
 
-        // @note - Not initialised in code anywhere
-        static std::random_device device;
-        static std::mt19937 generator;
+        inline static std::random_device device;
+        inline static std::mt19937 generator{ device() };
 
     };
 }

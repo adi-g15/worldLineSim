@@ -40,7 +40,7 @@ link_libraries(Threads::Threads)
 target_link_libraries(display PUBLIC ${CURSES_LIBRARY}/pdcurses.lib)
 
 set(TEST_CPP "src/world.cpp"  "src/world_node.cpp"  "src/world_plot.cpp"  "src/snake.cpp" "src/path_finder.cpp")
-add_executable(test "test.cxx"  ${SOURCES1})
+add_executable(test "test.cxx"  ${SOURCES})
 target_link_libraries(test PRIVATE display)
 
 # define a macro here "__DEBUG"

@@ -81,6 +81,7 @@ bool Snake::isSnakeBodyOK() const{
  **/
 void Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
 
+    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     this->parent_world->getShortestPathToFood(this->head, this->curr_Path);
 
     this->__temp.last_dir = curr_Path.next_dir();
@@ -139,13 +140,18 @@ const Entity_Point& Snake::getHead() const{
     return this->head;
 }
 
+const Entity_Point& Snake::getTail() const
+{
+    return this->tail;
+}
+
 int Snake::getUniqProp() const{
     return this->getLength();
 }
 
 int Snake::getLength() const
 {
-    return this->body.length() + 1;
+    return static_cast<int>( this->body.length() + 1 );
 }
 
 Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
@@ -183,6 +189,8 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
         );    // @warning- randomly assigning any number from 0 to 3
     }
 
+    this->tail.point_coord = this->head.point_coord;
+    this->tail.graph_box = this->head.graph_box;
     do {
         auto* prev_box = this->head.graph_box;
         for (uint16_t i = 0; i < init_len - 1; i++) {
@@ -195,6 +203,9 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
 
             prev_box = prev_box->get_adj_box(rand_direction);
             this->body.body.push_back(rand_direction);
+
+            this->tail.graph_box = prev_box;
+            _add_dir_to_coord(this->tail.point_coord, rand_direction);
         }
 
     } while ( !isSnakeBodyOK() );
@@ -202,6 +213,7 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SN
 
 void SnakeBody::grow(Direction move_dir)
 {
+    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     body.push_front(
         util::getOppositeDirection(move_dir)
     );
@@ -209,6 +221,7 @@ void SnakeBody::grow(Direction move_dir)
 
 void SnakeBody::move(Direction move_dir)
 {
+    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     this->grow(move_dir);
     this->pop_back();
 }

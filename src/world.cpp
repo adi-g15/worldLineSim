@@ -81,9 +81,12 @@ World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this), path_fin
     // this->_WorldDimen = statics::init_Bound;
 
     this->snakes.reserve(this->_MAX_NumSnakes);
-    this->snakes.push_back( //later when simulated, let all snakes run on a different thread
-        Snake{this, util::Random::random<uint16_t>(2, 5)}
-    );
+    for (auto i = 0; i < this->_MAX_NumSnakes; i++)
+    {
+        this->snakes.push_back( //later when simulated, let all snakes run on a different thread
+            Snake{ this, util::Random::random<uint16_t>(2, 5) }
+        );
+    }
 
 }
 

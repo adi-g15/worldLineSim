@@ -77,7 +77,9 @@
         "future": "cpp",
         "resumable": "cpp",
         "any": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "unordered_set": "cpp",
+        "iomanip": "cpp"
     },
     "workbench.colorCustomizations": {
         "activityBar.background": "#13332D",

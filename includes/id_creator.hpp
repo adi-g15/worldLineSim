@@ -1,10 +1,10 @@
 #pragma once
 
-#include <mutex>
+#include <atomic>
 
 #include "util/random.hpp"
 
-typedef uint16_t id_type;
+typedef std::atomic_ushort id_type;
     // @todo - Ensure this is thread_safe, to concurrently create multiple entities in different worlds IN DIFFERENT VERSES
 class _ID{  // no reuse of IDs, since it's enough
     public:

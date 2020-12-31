@@ -38,7 +38,7 @@ void WorldPlot::_rand_once_createFood()
         })
     };
 
-    this->_range_check_coord(new_coord);    // check whether the coord in in the world currently or not
+    this->_range_check_coord(new_coord);    // check whether the coord in the world currently or not
     auto* box_node = this->return_nearby_empty_box(new_coord);
 
     bool flag{ false }; // doesn't matter much how it's initialised
@@ -211,6 +211,7 @@ directionalPath&& WorldPlot::getShortestPathToFood(const Entity_Point& origin) c
     return this->path_finder.getPath(origin);
 }
 
+// @caution the coords returned, may be out of bound, have a check for that in calling function
 coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)
 {
     /**
@@ -252,6 +253,20 @@ coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)
     max_y += max_y - min_y;
     max_z += max_z - min_z;
 
+    const int DIFFERENCE_THRESHHOLD = 5;    // minimum difference that MUST be between each coordinate, if not, can just lead to loops of entities just circling a small area where food will ALWAYS be concentrated, even infinite loop when diff = 0
+    if (max_x - min_x < DIFFERENCE_THRESHHOLD) {
+        min_x -= DIFFERENCE_THRESHHOLD;
+        max_x += DIFFERENCE_THRESHHOLD;
+    }
+    if (max_y - min_y < DIFFERENCE_THRESHHOLD) {
+        min_y -= DIFFERENCE_THRESHHOLD;
+        max_y += DIFFERENCE_THRESHHOLD;
+    }
+    if (max_z - min_z < DIFFERENCE_THRESHHOLD) {
+        min_z -= DIFFERENCE_THRESHHOLD;
+        max_z += DIFFERENCE_THRESHHOLD;
+    }
+ 
     return { 
         static_cast<dimen_t>(util::Random::random(min_x, max_x)),
         static_cast<dimen_t>(util::Random::random(min_y, max_y)),

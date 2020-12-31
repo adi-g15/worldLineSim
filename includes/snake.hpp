@@ -54,6 +54,7 @@ public:
     int getLength() const;
 
     const Entity_Point& getHead() const;
+    const Entity_Point& getTail() const;
 
     Snake(const World_Ptr);
     Snake(const World_Ptr, uint16_t);
@@ -62,6 +63,7 @@ private:
     // std::vector< coord_type > body;
     SnakeBody body;
     Entity_Point head;
+    Entity_Point tail;
 
     // @note - eating doesn't do ANY movemoent
     bool eatFood(); //returns true if it can eat, else false and no change

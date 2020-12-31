@@ -7,6 +7,7 @@
 
 #include "graphMat/direction.hpp"
 #include "util/coord.hpp"
+#include "util/ranges.hpp"  // for util::contains function
 
 #include "config.hpp"
 
@@ -21,9 +22,25 @@ struct _box{    //Just as extension, to add more variables to the graph_box
     std::list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
 
     public:
-        bool hasEntities() const{    return  ! this->entities.empty(); }
+        bool hasEntities() const { return  !this->entities.empty(); }
+        void addEntity(Entity* entity) {
+            entities.push_back(entity);
+        }
+        void remEntity(Entity* entity) {
+            auto const it = std::find(std::cbegin(entities), std::cend(entities), entity);
+            if ( it == std::cend( entities )) {
+                throw std::logic_error("The box currently doesn't hold any reference to the entity");
+            }
 
-    // bool isEmpty = true;    //maybe removed
+            // COME HERE, UNCOMMENT IT
+            //std::erase(entities, it);
+        }
+
+public:
+    _box() noexcept {}
+    _box(_box&) = delete;
+    _box(_box&&) = delete;
+        // bool isEmpty = true;    //maybe removed
 };
 
 enum class Event{  //for logging puposes
