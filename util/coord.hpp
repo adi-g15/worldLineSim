@@ -8,6 +8,7 @@ namespace util
 {
     template<typename dimen_t = int32_t> // @assert - dimen_t must be integral type
     struct _coord{
+        static typename type = dimen_t;
         dimen_t mX, mY, mZ;
 
         inline void operator+=(const _coord<dimen_t>& to_add) {

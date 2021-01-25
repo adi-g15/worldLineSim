@@ -1,6 +1,7 @@
 #pragma once
 
 typedef uint64_t _timePoint;
+typedef _timePoint _timeDiff;
 namespace statics
 {
     typedef int32_t dimen_t;
@@ -16,7 +17,6 @@ namespace statics
     static constexpr _timePoint BIG_BANG_TIME = 0;    //can be time::now() later too
     static constexpr float UNIT_TIME = 1.0f;    //in terms of human world seconds
 
-    // static constexpr int8_t init_expansion_speed{ 1 };   // @future - allow negative growths too
-    static constexpr uint8_t init_expansion_speed{ 1 };
+    static constexpr uint8_t init_expansion_speed{ 1 }; // @future - allow negative growths too
 
 } // namespace statics

@@ -68,6 +68,9 @@ bool WorldPlot::_is_in_range_coord(coord& coordinate) const
         );
 }
 
+/**
+* @note - Returns the exact position itself, instead of neighbours, if already empty
+*/
 inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const coord& box_coord) const
 {
     const graph_box_type* box = this->operator[](box_coord);
@@ -117,13 +120,16 @@ WorldPlot::WorldPlot(const World_Ptr world): Cube_Matrix(statics::init_Bound), p
     //std::thread(&WorldPlot::auto_expansion, this).detach();
 }
 
+/**
+* @note - Call this function on a different thread, this function itself, isn't responsible for creating any new threads
+*/
 void WorldPlot::auto_expansion(){
     // @assert - Making sure the world_plot expands on a different thread, so that it doesn't hinder the world thread (it may well be changed later, read the note in world.cpp where this function is called)
     if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
         throw std::logic_error("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
     }
 
-    while (this->expansion_flag.load())
+    while (this->__expansion_state.expansion_flag.load())
     {
         this->_expand_once();
 
@@ -131,16 +137,13 @@ void WorldPlot::auto_expansion(){
     }
 }
 
-void WorldPlot::pause_auto_expansion()
-{
-    this->expansion_flag.store(false);
-}
-
 void WorldPlot::resume_auto_expansion()
 {
-    this->expansion_flag.store(true);
+    if (this->__expansion_state.expansion_flag.load()) return;    // if already expanding, then return
 
-        // we `start` it again on another thread (with previous expansion metadata still in __temp object)
+    this->__expansion_state.expansion_flag.store(true);
+
+        // we `start` it again on another thread (with previous expansion metadata still in __expansion_state object)
     std::thread(&WorldPlot::auto_expansion, this).detach();
 }
 
@@ -165,28 +168,28 @@ WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
     // @note - This method may decide NOT to grow this time too
 void WorldPlot::_expand_once(){   // `may` expands one unit on each side
 
-    this->__temp.free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
-    if( __temp.time_since_speed_updated >= 10 ){
-        --__temp.expansion_speed;
-        __temp.time_since_speed_updated = 0;
+    this->__expansion_state.free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
+    if( __expansion_state.time_since_speed_updated >= 10 ){
+        --__expansion_state.expansion_speed;
+        __expansion_state.time_since_speed_updated = 0;
 
             // @future [Oct22] - The below does the speed resetting part, change it to allow negative expansions
-        if(__temp.expansion_speed <= 0) __temp.expansion_speed = statics::init_expansion_speed;
+        if(__expansion_state.expansion_speed <= 0) __expansion_state.expansion_speed = statics::init_expansion_speed;
     }
 
-    if ( this->__temp.free_space_ratio > statics::max_free_space ){
+    if ( this->__expansion_state.free_space_ratio > statics::max_free_space ){
 
         // @log - world doesn't need to auto_expand since reached max_free_space
 
         return;
 
-    }else if ( this->__temp.free_space_ratio < statics::min_free_space )
+    }else if ( this->__expansion_state.free_space_ratio < statics::min_free_space )
     {
-        ++__temp.time_since_speed_updated;
-        ++__temp.expansion_speed;   // @log increasing the expansion speed
+        ++__expansion_state.time_since_speed_updated;
+        ++__expansion_state.expansion_speed;   // @log increasing the expansion speed
     }
 
-    this->__expand_n_units(static_cast<int>(__temp.expansion_speed));
+    this->__expand_n_units(static_cast<int>(__expansion_state.expansion_speed));
 }
 
 void WorldPlot::__expand_n_units(int8_t n){    //to be used when there's rate
