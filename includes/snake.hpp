@@ -44,8 +44,7 @@ public:
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()
-    std::optional<std::reference_wrapper<const Entity_Point>> getPrimaryPos() const override;
-    std::optional<std::reference_wrapper<Entity_Point>> getPrimaryPos() override;
+    std::optional<Entity_Point> getPrimaryPos() const override;
 
     bool isSnakeBodyOK() const;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities

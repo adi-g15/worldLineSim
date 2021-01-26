@@ -1,5 +1,4 @@
 #include "world_plot.hpp"
-#include "graphMat/graph_mat.hpp"   // for the definitions
 #include "world.hpp"
 
 void WorldPlot::createFood(){
@@ -9,7 +8,7 @@ void WorldPlot::createFood(){
 
     std::vector<coord> tmp_list;
     for (const auto& en : this->parent_world->snakes) {
-        tmp_list.push_back(en.getPrimaryPos().value().get().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
+        tmp_list.push_back(en.getPrimaryPos().value().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
     }
 
     coord new_coord{ Food::get_new_food_pos(std::move(tmp_list)) };
@@ -32,9 +31,9 @@ void WorldPlot::_rand_once_createFood()
     coord new_coord{
         /*the tmp_list being sent is about the half of each dimension, so by curret get_new_food_pos logic, it will use the WHOLE dimensions (initially small, on smaller order of 10 or 100), and randomly select a point within the boundaries*/
         Food::get_new_food_pos({
-            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
-            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
-            {this->getCurrentOrder() / 2, this->getCurrentOrder() / 2, this->getCurrentOrder() / 2},
+            {this->getOrder() / 2, this->getOrder() / 2, this->getOrder() / 2},
+            {this->getOrder() / 2, this->getOrder() / 2, this->getOrder() / 2},
+            {this->getOrder() / 2, this->getOrder() / 2, this->getOrder() / 2},
         })
     };
 
@@ -54,17 +53,17 @@ void WorldPlot::_rand_once_createFood()
 
 void WorldPlot::_range_check_coord(coord& coordinate) const
 {
-    coordinate.mX %= this->getCurrentOrder() / 2;
-    coordinate.mY %= this->getCurrentOrder() / 2;
-    coordinate.mZ %= this->getCurrentOrder() / 2;
+    coordinate.mX %= this->getOrder() / 2;
+    coordinate.mY %= this->getOrder() / 2;
+    coordinate.mZ %= this->getOrder() / 2;
 }
 
 bool WorldPlot::_is_in_range_coord(coord& coordinate) const
 {
     return (
-        std::abs(coordinate.mX) <= this->getCurrentOrder()/2
-        && std::abs(coordinate.mY) <= this->getCurrentOrder()/2
-        && std::abs(coordinate.mZ) <= this->getCurrentOrder()/2
+        std::abs(coordinate.mX) <= this->getOrder()/2
+        && std::abs(coordinate.mY) <= this->getOrder()/2
+        && std::abs(coordinate.mZ) <= this->getOrder()/2
         );
 }
 
@@ -116,35 +115,22 @@ WorldPlot::WorldPlot(const World_Ptr world): Cube_Matrix(statics::init_Bound), p
     // CALLING THE OVERLOADED CREATEFOOD() that doesn't depend on the position of entities in the world, since it's not sure if the entities have got their head coords or not
     this->_rand_once_createFood();
 
-    this->expansion_flag.store(true);
-    //std::thread(&WorldPlot::auto_expansion, this).detach();
+    this->resume_auto_expansion();
 }
 
 /**
 * @note - Call this function on a different thread, this function itself, isn't responsible for creating any new threads
 */
 void WorldPlot::auto_expansion(){
-    // @assert - Making sure the world_plot expands on a different thread, so that it doesn't hinder the world thread (it may well be changed later, read the note in world.cpp where this function is called)
-    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
-        throw std::logic_error("World Plots should be on a different thread than the world thread, so that they don't block the world thread itself");
-    }
+        //"World Plots should be on a different thread than the world thread, so that they don't block the world thread itself"
+    assert(std::this_thread::get_id() != this->parent_world->_shared_concurrent_data.get_world_thread_id());
 
     while (this->__expansion_state.expansion_flag.load())
     {
-        this->_expand_once();
+        this->expand_once();
 
         std::this_thread::sleep_for(std::chrono::milliseconds( static_cast<int>( statics::UNIT_TIME * 1000) ));
     }
-}
-
-void WorldPlot::resume_auto_expansion()
-{
-    if (this->__expansion_state.expansion_flag.load()) return;    // if already expanding, then return
-
-    this->__expansion_state.expansion_flag.store(true);
-
-        // we `start` it again on another thread (with previous expansion metadata still in __expansion_state object)
-    std::thread(&WorldPlot::auto_expansion, this).detach();
 }
 
     // not actually number of nodes empty, but a utility function for WorldPlot::expand_once()
@@ -165,38 +151,42 @@ WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
     return (this->getOrder() * this->getOrder()) - ( (max_x - min_x)*(max_y - min_y) );
 }
 
-    // @note - This method may decide NOT to grow this time too
-void WorldPlot::_expand_once(){   // `may` expands one unit on each side
+// @note - The function decides how much to grow, and may decide to not grow at all "for this call"
+void WorldPlot::expand_once(){   // `may` expands one unit on each side
 
-    this->__expansion_state.free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
-    if( __expansion_state.time_since_speed_updated >= 10 ){
-        --__expansion_state.expansion_speed;
-        __expansion_state.time_since_speed_updated = 0;
+    constexpr float decrease_rate = 0.90f;	// 90% of previous expansion speed
 
-            // @future [Oct22] - The below does the speed resetting part, change it to allow negative expansions
-        if(__expansion_state.expansion_speed <= 0) __expansion_state.expansion_speed = statics::init_expansion_speed;
+    this->free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
+
+    // @future [Oct22] - The below does the speed resetting part, change it to allow negative expansions
+    if (this->__expansion_state.time_since_speed_updated % 10 == 0) {
+        this->__expansion_state.curr_expansion_speed = this->__expansion_state.expansion_speed;
+        this->__expansion_state.time_since_speed_updated = 0;
     }
 
-    if ( this->__expansion_state.free_space_ratio > statics::max_free_space ){
-
+    if ( this->free_space_ratio > statics::max_free_space ){
         // @log - world doesn't need to auto_expand since reached max_free_space
-
         return;
 
-    }else if ( this->__expansion_state.free_space_ratio < statics::min_free_space )
+    }else if ( this->free_space_ratio < statics::min_free_space )
     {
-        ++__expansion_state.time_since_speed_updated;
-        ++__expansion_state.expansion_speed;   // @log increasing the expansion speed
+        this->__expansion_state.curr_expansion_speed *= 2;   // @log temporarily doubling the expansion speed
+    }
+    else {
+        this->__expansion_state.curr_expansion_speed *= decrease_rate;
     }
 
-    this->__expand_n_units(static_cast<int>(__expansion_state.expansion_speed));
+    this->__expansion_state.increase_units += this->__expansion_state.curr_expansion_speed;
+
+    const int int_part{ static_cast<int>(__expansion_state.increase_units) };
+    this->expand_n_unit(int_part);
+
+    this->__expansion_state.increase_units -= int_part;
+
+    ++__expansion_state.time_since_speed_updated;
 }
 
-void WorldPlot::__expand_n_units(int8_t n){    //to be used when there's rate
-    this->resizeOrder(this->getOrder() + n);
-}
-
-int32_t WorldPlot::getCurrentOrder() const{  //size
+inline auto WorldPlot::getCurrentOrder() const noexcept {
     return this->getOrder();
 }
 
@@ -215,7 +205,7 @@ directionalPath&& WorldPlot::getShortestPathToFood(const Entity_Point& origin) c
 }
 
 // @caution the coords returned, may be out of bound, have a check for that in calling function
-coord&& Food::get_new_food_pos(std::vector<coord>&& entity_positions)
+coord Food::get_new_food_pos(const std::vector<coord>& entity_positions)
 {
     /**
      * @note -> Here the new food position is DEPENDENT on the entity positions

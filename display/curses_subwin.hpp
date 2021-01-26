@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "curses.h"
-#include "util/coord.hpp"
+#include "graphMat/util/coord.hpp"
 
 #include <memory>
 #include <string>	// for std::to_string

@@ -11,7 +11,7 @@ void World_Node::captureState(){
         if (entity.getPrimaryPos()) {}
         else break;
 
-        latest_state.curr_pos.push_back(entity.getPrimaryPos()->get().point_coord);
+        latest_state.curr_pos.push_back(entity.getPrimaryPos().value().point_coord);    // snakes will always have a primary position
     }
 
     this->states.push_back(latest_state);

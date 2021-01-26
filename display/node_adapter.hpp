@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include "forward_decl.hpp"
-#include "util/coord.hpp"
+#include "graphMat/util/coord.hpp"
 #include "display/curses_subwin.hpp"
 
 class node_adapter{

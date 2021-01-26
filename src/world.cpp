@@ -41,7 +41,7 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
     // this->createFood();
 }
 
-bool World::isCellEmpty(const Graph_Box_3D<_box>* c) const{
+bool World::isCellEmpty(const Graph_Box_3D<Box>* c) const{
 
     if (!c) {
         throw std::invalid_argument("Graph_Box passed to isCellEmpty() MUST not be null");
@@ -53,11 +53,11 @@ bool World::isCellEmpty(const Graph_Box_3D<_box>* c) const{
 
 World::udimen_t World::getWorldDimen() const
 {
-    return this->world_plot.getCurrentOrder();
+    return this->world_plot.getOrder();
 }
 
 bool World::_RangeCheck(const coord_type& c) const{
-    return this->world_plot.getCurrentOrder() > c.mX || this->world_plot.getCurrentOrder() > c.mY;
+    return this->world_plot.getOrder() > c.mX || this->world_plot.getOrder() > c.mY;
 }
 
 World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this), path_finder(&world_plot){

@@ -41,7 +41,7 @@ directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const 
 	return std::move(path);
 }
 
-bool Path_Finder::is_path_clean(const Graph_Box_3D<_box>* start, const directionalPath& path) const
+bool Path_Finder::is_path_clean(const Graph_Box_3D<Box>* start, const directionalPath& path) const
 {
 	auto* tmp{ start };	// we don't check for the start position, it already has an entity_point, ie. Hum khud ! :D
 
@@ -61,7 +61,7 @@ directionalPath&& Path_Finder::shortest_path(const Entity_Point& start) const //
 	return std::move(path);
 }
 
-directionalPath&& Path_Finder::shortest_path(const Entity_Point& start, Graph_Box_3D<_box>& end) const
+directionalPath&& Path_Finder::shortest_path(const Entity_Point& start, Graph_Box_3D<Box>& end) const
 {
 	directionalPath path;
 	// @todo @not_priority

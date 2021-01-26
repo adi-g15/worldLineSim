@@ -8,16 +8,18 @@
 
 /*MUST ALWAYS BE ON A SINGLE THREAD AT MAX, SINCE TEMPORARY VARIABLES ARE USED AS MEMBER OF THIS CLASS*/
 
+using Graph_Box = Graph_Box_3D<Box>;
+
 struct Food {
-	const Graph_Box_3D<_box>* box;   // @future - food may have different points/nutitional values too
+	const Graph_Box* box;   // @future - food may have different points/nutitional values too
 	coord coordinate;	// food and entities will be having coordinates
 
 private:
-	static coord&& get_new_food_pos(std::vector<coord>&& entity_pos);
+	static coord get_new_food_pos(const std::vector<coord>& entity_pos);
 	void reset(Food&& food);
 
 	Food() = default;	// CAUTION -> box may be nullptr
-	Food(const Graph_Box_3D<_box>* b, const coord& c) : box(b), coordinate(c) {}
+	Food(const Graph_Box* b, const coord& c) : box(b), coordinate(c) {}
 	Food(Food&) = default;
 	Food(Food&&) = default;
 	friend class WorldPlot;
@@ -25,22 +27,22 @@ private:
 };
 
 // @future - If it lives on its own thread, put a auto expansion logic, that sleeps for 1 time unit, and then calls auto_expand()
-class WorldPlot: public Cube_Matrix<_box>{
+class WorldPlot: public Cube_Matrix<Box>{
 	typedef int32_t dimen_t;
 	typedef World* World_Ptr;
-	typedef Graph_Box_3D<_box> graph_box_type;
+	typedef Graph_Box graph_box_type;
 
 	const World_Ptr parent_world;
 	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too
 
-	//std::atomic_bool expansion_flag;
-	void auto_expansion() override;	 //keeps expanding TILL expansion_flag is TRUE
-	void resume_auto_expansion() override;	// using pause implemented in graphMat
+	auto getCurrentOrder() const noexcept;
+
+	float free_space_ratio{100.0f};
+	void auto_expansion();	 //keeps expanding TILL expansion_flag is TRUE
+	void expand_once();
 
 	dimen_t getFreeSpace() const;
-	void _expand_once();
-	void __expand_n_units(int8_t n);    //to be used when there's rate
 	const graph_box_type* get_box(const coord& position) const{
 		// @todo - Return the graph_box with that coordinate
 
@@ -56,7 +58,6 @@ class WorldPlot: public Cube_Matrix<_box>{
 		void _rand_once_createFood();	// randomly creates food, only for the initial moments where the entities may not be in existence currently fully
 		void _range_check_coord(coord&) const;
 		bool _is_in_range_coord(coord&) const;
-		dimen_t getCurrentOrder() const;
 
 		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
 
@@ -64,15 +65,6 @@ class WorldPlot: public Cube_Matrix<_box>{
 
 		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;
-
-		//struct {
-		//	float expansion_speed{ statics::init_expansion_speed }; //initially it will auto_expand statics::init_expansion_speed unit at time, each side
-		//	float free_space_ratio{100.0f};
-		//	float increase_units;	// units to increase in each direction, in call to expand_once()
-
-		//	_timeDiff time_since_speed_updated{0}; //after 10 time units, the __expansion_state.expansion_speed will be decremented/reset, so as to not unecessary keep increasing storage
-		//} __expansion_state;   //temporary vars
-
 
 	// @note - The world_plot starts AUTO EXPANSION, from constructor itself
 	WorldPlot(const World_Ptr);

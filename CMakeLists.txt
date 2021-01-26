@@ -13,7 +13,6 @@ file(GLOB DISP_SOURCES "display/src/*.cpp")
 add_library(display STATIC ${DISP_SOURCES})
 
 add_compile_definitions(GRAPH_MAT_NO_COORD)
-add_executable(graph_test "graphMat/test.cxx")
 add_executable(simulator main.cpp ${SOURCES})
 target_link_libraries(simulator PRIVATE display)
 
@@ -38,9 +37,5 @@ find_package(Curses REQUIRED)
 
 link_libraries(Threads::Threads)
 target_link_libraries(display PUBLIC ${CURSES_LIBRARY}/pdcurses.lib)
-
-set(TEST_CPP "src/world.cpp"  "src/world_node.cpp"  "src/world_plot.cpp"  "src/snake.cpp" "src/path_finder.cpp")
-add_executable(test "test.cxx"  ${SOURCES})
-target_link_libraries(test PRIVATE display)
 
 # define a macro here "__DEBUG"

@@ -9,7 +9,7 @@
 
 #include "declarations.hpp"
 #include "id_creator.hpp"
-#include "util/coord.hpp"
+#include "graphMat/util/coord.hpp"
 #include "graphMat/3d_graph_box.hpp"   // for Graph_Box
 
 typedef util::_coord<int32_t> coord;
@@ -29,21 +29,17 @@ enum class entity_Types: uint8_t {
 };
 
 struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
-    const Graph_Box_3D<_box>* graph_box;
+    const Graph_Box_3D<Box>* graph_box;
 
     coord point_coord;
 
-    void reset(Graph_Box_3D<_box>* new_box, coord& new_coord) {
+    void reset(Graph_Box_3D<Box>* new_box, coord& new_coord) {
         this->graph_box = new_box;
         this->point_coord = new_coord;
     }
 };
 
-// In our case, each entity will have atleast one id, and can have 2 ids, if their simulatoon is running (the second ID being the thread::id they are running on)
-
-// Meant to be inherited from; Also since some member functions are pure virtuals, so you can't have an object of Entity either
 class Entity: public _ID{
-//    using statics::dimen_t;
     typedef statics::dimen_t dimen_t;
 protected:
     entity_Types type;
@@ -51,13 +47,8 @@ protected:
     // std::vector<void (*)()> supported_Operations;
     // std::vector<void()> supported_Operations;   //same as above
 public:
-    id_type getEntityId() const{
-        return this->_id;
-    }
-
     // @warning -> Check for any additional copy being created due to use of std::reference_wrapper::get() over the places in code
-    virtual std::optional<std::reference_wrapper<const Entity_Point>> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
-    virtual std::optional<std::reference_wrapper<Entity_Point>> getPrimaryPos() = 0;
+    virtual std::optional<Entity_Point> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 

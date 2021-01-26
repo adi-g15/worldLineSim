@@ -15,13 +15,9 @@ void Snake::_Action2(){
     this->moveForward();
 }
 
-std::optional<std::reference_wrapper<const Entity_Point>> Snake::getPrimaryPos() const{
-    return std::cref( getHead() );
-}
-
-std::optional<std::reference_wrapper<Entity_Point>> Snake::getPrimaryPos()
+std::optional<Entity_Point> Snake::getPrimaryPos() const
 {
-    return std::ref( this->head );
+    return this->head;
 }
 
 void Snake::simulateExistence(){

@@ -3,10 +3,11 @@
 #include <ostream>
 #include <utility>
 #include <cstdint>
-#include <list>
+#include <cassert>
+#include <forward_list>
 
 #include "graphMat/direction.hpp"
-#include "util/coord.hpp"
+#include "graphMat/util/coord.hpp"
 #include "util/ranges.hpp"  // for util::contains function
 
 #include "config.hpp"
@@ -14,33 +15,27 @@
 typedef util::_coord<int32_t> coord;
 class Entity;   // forward decl
 
-struct _box{    //Just as extension, to add more variables to the graph_box
-    // since this will be the `data` content of the graph_box, so, it will be accessed by, this->data->varNameHere
-        // only for INTERNAL USE, for path finding
+struct Box{    //Just as extension, to add more variables to the graph_box
 //    Direction __dir_came_from;  //stores the direction from which this node was reached
 
-    std::list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
-
-    public:
-        bool hasEntities() const { return  !this->entities.empty(); }
-        void addEntity(Entity* entity) {
-            entities.push_back(entity);
-        }
-        void remEntity(Entity* entity) {
-            auto const it = std::find(std::cbegin(entities), std::cend(entities), entity);
-            if ( it == std::cend( entities )) {
-                throw std::logic_error("The box currently doesn't hold any reference to the entity");
-            }
-
-            // COME HERE, UNCOMMENT IT
-            //std::erase(entities, it);
-        }
+    std::forward_list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
 
 public:
-    _box() noexcept {}
-    _box(_box&) = delete;
-    _box(_box&&) = delete;
-        // bool isEmpty = true;    //maybe removed
+    bool hasEntities() const { return  !this->entities.empty(); }
+    inline void addEntity(Entity* entity) noexcept {
+        entities.push_front(entity);
+    }
+    inline void remEntity(Entity* entity) noexcept {   // noexcept gaurantee, if not found then no action
+        entities.remove(entity);
+
+#ifdef DEBUG
+        assert(std::find(std::cbegin(entities), std::cend(entities), entity) != entities.cend());
+        "The box currently doesn't hold any reference to the entity"
+#endif // DEBUG
+    }
+
+    Box() noexcept {}
+    // bool isEmpty() const noexcept {return entities.empty();}    //maybe removed
 };
 
 enum class Event{  //for logging puposes
