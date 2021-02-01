@@ -1,3 +1,9 @@
 [submodule "graphMat"]
 	path = graphMat
-	url = https://github.com/AdityaGupta150/graphMat
+	url = https://github.com/adi-g15/graphMat
+[submodule "ext\\graphMat"]
+	path = ext\\graphMat
+	url = https://github.com/adi-g15/graphMat
+[submodule "ext\\glfwpp"]
+	path = ext\\glfwpp
+	url = https://github.com/janekb04/glfwpp

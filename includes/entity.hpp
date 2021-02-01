@@ -9,7 +9,6 @@
 
 #include "declarations.hpp"
 #include "id_creator.hpp"
-#include "graphMat/util/coord.hpp"
 #include "graphMat/3d_graph_box.hpp"   // for Graph_Box
 
 typedef void (*Action_Ptr)(void);

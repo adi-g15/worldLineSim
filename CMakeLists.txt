@@ -1,16 +1,21 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(World-Line-Simulator VERSION 0.271)
+project(WorldLineSim
+    DESCRIPTION "WorldLine Simulator"
+    LANGUAGES CXX
+    VERSION 0.271
+    )
 
-set(CMAKE_CXX_STANDARD 20)
+# Set c++ standard to C+20
+set(CMAKE_CXX_STANDARD 17)
 
-
-#set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
+if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfwpp/include")
+    message(FATAL_ERROR "The GLFW dependency (or it's wrapper glfwpp) are missing!! "
+            "You might not have cloned the repo with --recursive "
+            "You will need to clone the dependencies too, use \`git submodule --init --recursive\`"
+        )
+endif()
 
 file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
-# later distribute display into a library, and link to it
-file(GLOB DISP_SOURCES "display/src/*.cpp")
-
-add_library(display STATIC ${DISP_SOURCES})
 
 add_compile_definitions(GRAPH_MAT_NO_COORD)
 add_executable(simulator main.cpp ${SOURCES})
@@ -18,24 +23,30 @@ target_link_libraries(simulator PRIVATE display)
 
 include_directories(includes)
 include_directories(.)
-
-#add_library()
+include_directories(ext/graphMat/includes/)
+include_directories(ext/glfwpp/include/)
 
 set(DEBUG_MODE true)
 
-# Edit the 3 lines, according to your build of curses (ncurse or pdcurses)
-set(CURSES_INCLUDE_PATH "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/include")
-set(CURSES_LIBRARY "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/lib")
-#target_include_directories(simulator PRIVATE curses/includes)
-# Edit the previous 3 lines, according to your build of curses (ncurse or pdcurses)
-
-include_directories(${CURSES_INCLUDE_PATH})
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-find_package(Curses REQUIRED)
 
 link_libraries(Threads::Threads)
-target_link_libraries(display PUBLIC ${CURSES_LIBRARY}/pdcurses.lib)
 
+add_subdirectory(ext/glfwpp)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
+target_link_directories(simulator PRIVATE GLFWPP)
+
+# set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
+# later distribute display into a library, and link to it
+# file(GLOB DISP_SOURCES "display/src/*.cpp")
+# add_library(display STATIC ${DISP_SOURCES})
+# Edit the 3 lines, according to your build of curses (ncurse or pdcurses)
+# set(CURSES_INCLUDE_PATH "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/include")
+# set(CURSES_LIBRARY "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/lib")
+#target_include_directories(simulator PRIVATE curses/includes)
+# Edit the previous 3 lines, according to your build of curses (ncurse or pdcurses)
 # define a macro here "__DEBUG"
+# include_directories(${CURSES_INCLUDE_PATH})
+# find_package(Curses REQUIRED)
+# target_link_libraries(display PUBLIC ${CURSES_LIBRARY}/pdcurses.lib)
