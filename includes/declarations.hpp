@@ -18,15 +18,19 @@ class Entity;   // forward decl
 struct Box{    //Just as extension, to add more variables to the graph_box
 //    Direction __dir_came_from;  //stores the direction from which this node was reached
 
-    std::forward_list<const Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
+    const Entity* entity{nullptr};
+    //std::forward_list<const Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
 
 public:
-    bool hasEntities() const noexcept { return  !this->entities.empty(); }
-    inline void addEntity(const Entity* entity) {  // made const, so that can add remove entities even through const getter in worldPlot
-        entities.emplace_front(entity);
+    bool hasEntities() const noexcept { return  this->entity != nullptr; }
+    //inline void addEntity(const Entity* entity) {
+    inline void addEntity(const Entity* entity) {
+        if(entity == nullptr) this->entity = entity;
+        //entities.emplace_front(entity);
     }
     inline void remEntity(const Entity* entity) noexcept {   // noexcept gaurantee, if not found then no action
-        entities.remove(entity);
+        //entities.remove(entity);
+        if (this->entity == entity)  this->entity = nullptr;
 
 #ifdef DEBUG
         assert(std::find(std::cbegin(entities), std::cend(entities), entity) != entities.cend());
