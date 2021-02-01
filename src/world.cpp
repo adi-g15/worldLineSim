@@ -19,6 +19,12 @@
 #include <algorithm>
 #include <chrono>
 
+// inlining this function gives Unresolved External Symbol to call to this EXACT function in World_Node's constructor
+_timePoint World::getCurrentTime() const noexcept
+{
+    return this->world_plot.currentTime;
+}
+
 const coord& World::getFoodCoord()
 {
     return world_plot.get_food().coordinate;
@@ -41,16 +47,6 @@ void World::ateFood(const Snake*){ //which snake ate it, log it, then randomize 
     // this->createFood();
 }
 
-bool World::isCellEmpty(const Graph_Box_3D<Box>* c) const{
-
-    if (!c) {
-        throw std::invalid_argument("Graph_Box passed to isCellEmpty() MUST not be null");
-    }
-    // @todo -> Don't need this, remove it later, since with current graph matrix
-    // return this->world_plot.isEmpty(c);
-    return c->getData().entities.empty();
-}
-
 World::udimen_t World::getWorldDimen() const
 {
     return this->world_plot.getOrder();
@@ -60,7 +56,7 @@ bool World::_RangeCheck(const coord_type& c) const{
     return this->world_plot.getOrder() > c.mX || this->world_plot.getOrder() > c.mY;
 }
 
-World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(this), path_finder(&world_plot){
+World::World(const World_Ptr world, _timePoint t) : world_plot(this, t), path_finder(&world_plot){
     // @todo
 
     for( auto i = 0; i < this->_MAX_NumSnakes; i++ ){
@@ -74,20 +70,45 @@ World::World(const World_Ptr world, _timePoint t) : currentTime(t), world_plot(t
 
 }
 
-World::World() : currentTime(statics::BIG_BANG_TIME), world_plot(this), path_finder(&world_plot){
+// also starts the simulations for each snake executing
+World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TIME), path_finder(&world_plot){
     // @todo
 
-    // @todo - Initialise the world_plot here, or get it on another thread (not really required, can be on the same thread as of the world)
-    // this->_WorldDimen = statics::init_Bound;
-
-    this->snakes.reserve(this->_MAX_NumSnakes);
+    this->entities.reserve(this->_MAX_NumSnakes);
     for (auto i = 0; i < this->_MAX_NumSnakes; i++)
     {
-        this->snakes.push_back( //later when simulated, let all snakes run on a different thread
-            Snake{ this, util::Random::random<uint16_t>(2, 5) }
+        this->entities.push_back( //later when simulated, let all entities run on a different thread
+            new Snake(this, util::Random::random<uint16_t>(2, 5))
         );
     }
 
+    // DEBUG - Disabled existence for now
+    //for (auto&& snake : this->snakes) {
+    //    std::thread(&Snake::simulateExistence, snake).detach();
+    //}
+
+    // COME HERE - Decide how is time incremented
+    //while (this->simulationRunning)
+    //{
+    //    ++this->currentTime;
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
+    //}
+}
+
+World::~World()
+{
+    this->_shared_concurrent_data.reset_world_running();
+    for (auto& entity : entities)
+    {
+        delete entity;
+    }
+    this->entities.clear();
+    // the next loop isn't actually required, but can still be used
+    //for (auto& snake_thread : entity_threads)
+    //{
+    //    if (snake_thread.joinable()) snake_thread.join();
+    //}
+    this->world_plot.pause_auto_expansion();
 }
 
 void World::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const{

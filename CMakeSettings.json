@@ -10,7 +10,8 @@
             "cmakeCommandArgs": "",
             "buildCommandArgs": "",
             "ctestCommandArgs": "",
-            "variables": []
+            "variables": [],
+            "intelliSenseMode": "windows-msvc-x64",
         },
         {
             "name": "x64-Release",

@@ -8,7 +8,7 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 #pragma once
 
 #include "log.hpp"
-#include "snake.hpp"
+#include "Entities/snake.hpp"
 #include "world_plot.hpp"
 
 #include <vector>
@@ -24,7 +24,9 @@ class World: public _ID{
 
 	typedef std::make_unsigned_t<int32_t> udimen_t;
 public:
-	_timePoint currentTime;
+	WorldPlot world_plot;
+
+	_timePoint getCurrentTime() const noexcept;
 
 	// @note - the below two functions are complementary to the other
 	// @note2 - ateFood() is expected NEVER to fail, based on the food_mutex, hence returns void
@@ -38,8 +40,6 @@ public:
 	int _init_SnakeLength = 2;
 	//------                ------//
 
-	bool isCellEmpty( const Graph_Box_3D<Box>* ) const;
-
 	// --Just abstracted access to private worldPlot member function, no logic in these of their own-- //
 	void getShortestPathToFood( const Entity_Point& origin, directionalPath& ) const;
 	// x-Just abstracted access to private worldPlot member function, no logic in these of their own-x //
@@ -47,21 +47,25 @@ public:
 	struct {
 		// @CAUTION - Ensure this access is thread safe
 		// this will only be SET IN CONSTRUCTOR AND STOP_SIMULATION, for GET, use the method
-			bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
+			std::atomic_bool _world_runnning{true}; //world will keep moving forward (ie. entities will keep existing and acting)
 		public:
-			auto is_world_running() const{ return _world_runnning; }
+			auto is_world_running() const{ return _world_runnning.load(); }
 			auto reset_world_running(){
 				// @caution - Lock the mutex here
 				this->_world_runnning = false;
 			}
-			auto get_world_thread_id() const{ return std::this_thread::get_id(); }
+			//auto get_world_thread_id() const{ return std::this_thread::get_id(); }
 	} _shared_concurrent_data;
 
 	//wil be required to join these threads, in stopSimulation();
 	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
-	std::vector< Snake > snakes;	// accessed by World_Plot::createFood()
-	
+	std::vector< Entity* > entities;	// accessed by World_Plot::createFood()
+
 	udimen_t getWorldDimen() const;
+
+	Graph_Box_3D<Box>* get_box(const coord& pos) {
+		return this->world_plot.get_box(pos);
+	}
 
 	const Graph_Box_3D<Box>* get_box(const coord& pos) const{
 		return this->world_plot.get_box(pos);
@@ -81,7 +85,6 @@ private:
 
 	//udimen_t _curr_BOUND; //current `reserved` `order` of this world
 
-	WorldPlot world_plot;    // @todo - Will be 3D in future
 	Path_Finder path_finder;
 
 	// bool _CheckBounds();    //for checking `need` to increase size
@@ -91,6 +94,7 @@ private:
 	void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
 		// @todo - This is the constructor that creates the new world just after big bang
 	World();
+	~World();
 
 	// friend class Verse;  // doesn't need to be a friend, since World_Node is the one that needs that private constructor
 	friend class World_Node;

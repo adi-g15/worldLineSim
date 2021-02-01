@@ -9,19 +9,26 @@
 #include <vector>
 #include <memory>
 #include <cstdint>
+#include <condition_variable>
+
+class Snake;    // forward-declaration for use in SnakeBody
 
 // @note - `directionalPath` is alias for a `std::vector`, while `SnakeBody` is an alias for a `std::list`
 struct SnakeBody {
    // @order -> body.front() is the first direction from the body_head
     std::list<Direction> body; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
+    Snake* const snake_ptr;
 
     auto pop_back() { body.pop_back(); }
     void grow(Direction move_dir);
     void move(Direction move_dir);  // push front opposite direction to this
 
     auto length() const { return body.size(); }
+    void removeAndClearBody();
     const auto begin() const { return body.begin(); }
     const auto end() const { return body.end(); }
+
+    SnakeBody(Snake*);
 };
 
 class Snake: public Entity{
@@ -31,7 +38,8 @@ class Snake: public Entity{
     typedef std::make_unsigned_t<dimen_t> udimen_t;
 
     mutable struct {
-        std::array<int, 5> bucket;  // a temporary bucket for use in Snake::hasRoundTrips
+            // size 10 since 10 directions
+        std::array<int, 10> bucket;  // a temporary bucket for use in Snake::hasRoundTrips
         Direction last_dir; // used in move_Forward()
     }__temp;
 
@@ -47,20 +55,25 @@ public:
     std::optional<Entity_Point> getPrimaryPos() const override;
 
     bool isSnakeBodyOK() const;
-    void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
 
-    int getUniqProp() const override;
+    bool isSimulating{false};
+    std::condition_variable sim_convar;
+    void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
+    void pauseExistence();  // just `pauses` any further movement, it still will be on board
+
+    int getUniqProp() const;
     int getLength() const;
 
     const Entity_Point& getHead() const;
     const Entity_Point& getTail() const;
 
-    Snake(const World_Ptr);
+    explicit Snake(const World_Ptr);
     Snake(const World_Ptr, uint16_t);
+    ~Snake();
 private:
 
-    // std::vector< coord_type > body;
     SnakeBody body;
+
     Entity_Point head;
     Entity_Point tail;
 
@@ -72,4 +85,6 @@ private:
 
     // HELPER FuNCTIonS
     void _add_dir_to_coord(coord&, Direction) const;
+
+    friend struct SnakeBody;
 };

@@ -11,7 +11,7 @@
 using Graph_Box = Graph_Box_3D<Box>;
 
 struct Food {
-	const Graph_Box* box;   // @future - food may have different points/nutitional values too
+	const Graph_Box* box{ nullptr };   // @future - food may have different points/nutitional values too
 	coord coordinate;	// food and entities will be having coordinates
 
 private:
@@ -32,21 +32,24 @@ class WorldPlot: public Cube_Matrix<Box>{
 	typedef World* World_Ptr;
 	typedef Graph_Box graph_box_type;
 
+	_timePoint currentTime;	// ONLY updated when the world is auto expanding, since that is part of our simulation
+
 	const World_Ptr parent_world;
 	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too
 
-	auto getCurrentOrder() const noexcept;
-
 	float free_space_ratio{100.0f};
 	void auto_expansion();	 //keeps expanding TILL expansion_flag is TRUE
 	void expand_once();
+	void resume_auto_expansion();
+	void pause_auto_expansion();
 
 	dimen_t getFreeSpace() const;
+	graph_box_type* get_box(const coord& position) {
+		return this->operator[](position);
+	}
 	const graph_box_type* get_box(const coord& position) const{
-		// @todo - Return the graph_box with that coordinate
-
-		return &(this->origin);    // @debug - just for now
+		return this->operator[](position);
 	}
 	directionalPath&& getShortestPathToFood(const Entity_Point& origin) const;
 
@@ -54,10 +57,11 @@ class WorldPlot: public Cube_Matrix<Box>{
 		const auto& get_food() const{
 			return this->food;
 		}
+		coord getRandomCoord() const noexcept;
 		void createFood();
 		void _rand_once_createFood();	// randomly creates food, only for the initial moments where the entities may not be in existence currently fully
-		void _range_check_coord(coord&) const;
-		bool _is_in_range_coord(coord&) const;
+		void _fit_coord_in_range(coord&) const noexcept;
+		bool _is_in_range_coord(const coord&) const noexcept;
 
 		const graph_box_type* return_nearby_empty_box(const coord& box_coord) const;
 
@@ -67,7 +71,8 @@ class WorldPlot: public Cube_Matrix<Box>{
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;
 
 	// @note - The world_plot starts AUTO EXPANSION, from constructor itself
-	WorldPlot(const World_Ptr);
+	WorldPlot(const World_Ptr, _timePoint start_time);
+
 
 	friend class World;
 	friend class Path_Finder;	// it will be a friend of world_plot too, so as to control its ability to auto expand

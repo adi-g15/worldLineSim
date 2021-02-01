@@ -1,5 +1,6 @@
 #include "world_plot.hpp"
 #include "world.hpp"
+#include "graphMat/iterators.hpp"
 
 void WorldPlot::createFood(){
     // Resets the current food; This function should only be called after World::eatFood()
@@ -7,12 +8,13 @@ void WorldPlot::createFood(){
     // @note - I may want to pause the entities to pause for the moment, since further movements may cause the return_box_if_empty function to cause problems, but i will keep moving for now, likely won't change
 
     std::vector<coord> tmp_list;
-    for (const auto& en : this->parent_world->snakes) {
-        tmp_list.push_back(en.getPrimaryPos().value().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
+    for (const auto& en : this->parent_world->entities) {
+        if(en->type == entity_Types::SNAKE)
+            tmp_list.push_back(en->getPrimaryPos().value().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
     }
 
     coord new_coord{ Food::get_new_food_pos(std::move(tmp_list)) };
-    this->_range_check_coord(new_coord);    // check whether the coord in in the world currently
+    this->_fit_coord_in_range(new_coord);    // check whether the coord in in the world currently
     auto* box_node = this->return_nearby_empty_box( new_coord );
 
     bool flag{ false }; // doesn't matter much how it's initialised
@@ -26,6 +28,7 @@ void WorldPlot::createFood(){
     this->food.reset({ box_node, new_coord });
 }
 
+// COME HERE
 void WorldPlot::_rand_once_createFood()
 {
     coord new_coord{
@@ -37,7 +40,7 @@ void WorldPlot::_rand_once_createFood()
         })
     };
 
-    this->_range_check_coord(new_coord);    // check whether the coord in the world currently or not
+    this->_fit_coord_in_range(new_coord);    // being sure that coordinate is in range
     auto* box_node = this->return_nearby_empty_box(new_coord);
 
     bool flag{ false }; // doesn't matter much how it's initialised
@@ -51,20 +54,18 @@ void WorldPlot::_rand_once_createFood()
     this->food.reset({ box_node, new_coord });
 }
 
-void WorldPlot::_range_check_coord(coord& coordinate) const
+void WorldPlot::_fit_coord_in_range(coord& coordinate) const noexcept
 {
     coordinate.mX %= this->getOrder() / 2;
     coordinate.mY %= this->getOrder() / 2;
     coordinate.mZ %= this->getOrder() / 2;
 }
 
-bool WorldPlot::_is_in_range_coord(coord& coordinate) const
+bool WorldPlot::_is_in_range_coord(const coord& coordinate) const noexcept
 {
-    return (
-        std::abs(coordinate.mX) <= this->getOrder()/2
-        && std::abs(coordinate.mY) <= this->getOrder()/2
-        && std::abs(coordinate.mZ) <= this->getOrder()/2
-        );
+    return (coordinate.mX >= this->min_x && coordinate.mX <= this->max_x) &&
+        (coordinate.mY >= this->min_y && coordinate.mY <= this->max_y) &&
+        (coordinate.mZ >= this->min_z && coordinate.mZ <= this->max_z);
 }
 
 /**
@@ -72,32 +73,34 @@ bool WorldPlot::_is_in_range_coord(coord& coordinate) const
 */
 inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const coord& box_coord) const
 {
-    const graph_box_type* box = this->operator[](box_coord);
+    graphMat::NeighbourIterator<Box, true> iter( this->operator[](box_coord) );
 
-    if (!box->getData().hasEntities())   return box;
-    else
-    {
-        // max 9 surrounding blocks will be considered, else return a null pointer
-        std::initializer_list<graph_box_type*> surrounding_nodes({
-            box->get_adj_box(Direction::NAIRUTYA),
-            box->LEFT,
-            box->get_adj_box(Direction::VAYAVYA),
-            box->UP,
-            box->get_adj_box(Direction::ISHANYA),
-            box->RIGHT,
-            box->get_adj_box(Direction::AGNEYA),
-            box->DOWN
-        });
-        for (graph_box_type* node : surrounding_nodes)
-        {
-            if ( node && !node->getData().hasEntities()) {
-                box = node;
-                return box;
-            }
-        }
-
-        return nullptr;
+    for (; iter.center_box != nullptr; ++iter) {
+        if ( ! iter->getData().hasEntities())
+            return iter.curr_box;
     }
+
+    // this will be much more efficient if the matrix used uses `caching` of last accessed nodes
+    constexpr std::array<std::array<coord::type, 3>, 10> increments_to_neighbour_boxes = {
+        std::array{ -2, 0, 0 },
+        {2, 0, 0 },
+        {0, -2, 0 },
+        {0, 2, 0 },
+        {-2, -2, 0 },
+        {-2, 2, 0 },
+        {2, 2, 0 },
+        {2, -2, 0 },
+        {0,0,2 },
+        {0,0,-2 }
+    };
+    for (auto& increment_coord : increments_to_neighbour_boxes) // we will try looking at neighbours of neighbouring boxes (not direct neighbours, since that would repeat for many already visited nodes)
+    {
+        const auto retVal = this->return_nearby_empty_box(box_coord + increment_coord);
+
+        if (retVal != nullptr) return retVal;
+    }
+
+    return nullptr;
 }
 
 bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const directionalPath& path ) const{
@@ -109,7 +112,7 @@ bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const dire
     });
 }
 
-WorldPlot::WorldPlot(const World_Ptr world): Cube_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
+WorldPlot::WorldPlot(const World_Ptr world, _timePoint start_time): Cube_Matrix(statics::init_Bound), parent_world(world), currentTime(start_time), path_finder(this) {
 
     // @bug - DONT call createFood from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
     // CALLING THE OVERLOADED CREATEFOOD() that doesn't depend on the position of entities in the world, since it's not sure if the entities have got their head coords or not
@@ -118,18 +121,47 @@ WorldPlot::WorldPlot(const World_Ptr world): Cube_Matrix(statics::init_Bound), p
     this->resume_auto_expansion();
 }
 
+void WorldPlot::resume_auto_expansion() {
+    if (this->__expansion_state.expansion_flag.load()) return;    // if already expanding, then return
+
+    this->__expansion_state.reset_initializer();
+    this->__expansion_state.expansion_flag.store(true);
+
+    // we `start` it again on another thread (with previous expansion metadata still in __expansion_state object)
+    std::thread(&WorldPlot::auto_expansion, this).detach();
+}
+
 /**
 * @note - Call this function on a different thread, this function itself, isn't responsible for creating any new threads
 */
 void WorldPlot::auto_expansion(){
         //"World Plots should be on a different thread than the world thread, so that they don't block the world thread itself"
-    assert(std::this_thread::get_id() != this->parent_world->_shared_concurrent_data.get_world_thread_id());
+    //assert(std::this_thread::get_id() != this->parent_world->_shared_concurrent_data.get_world_thread_id());
 
-    while (this->__expansion_state.expansion_flag.load())
+    while (this->__expansion_state.expansion_flag)
     {
+        std::clog << "Expanding...\n";
         this->expand_once();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds( static_cast<int>( statics::UNIT_TIME * 1000) ));
+        // sleep for 1 unit time
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
+        ++this->currentTime;
+    }
+
+    this->auto_expansion_convar.notify_one();
+    std::clog << "Stopped AutoExpansion" << std::endl;
+}
+
+void WorldPlot::pause_auto_expansion()
+{
+    // return if not expanding, or "shouldn't" be auto expanding now
+    if (!this->__expansion_state.expansion_flag)	return;
+
+    std::unique_lock<std::mutex> lock(this->m);
+    this->__expansion_state.expansion_flag.store(false);
+    while (this->__expansion_state.expansion_flag)	// to prevent infinite blocking
+    {
+        this->auto_expansion_convar.wait_for(lock, std::chrono::milliseconds(300));
     }
 }
 
@@ -140,12 +172,14 @@ WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
         min_y{ std::numeric_limits<dimen_t>::max() },
         max_y{ std::numeric_limits<dimen_t>::min() };
 
-    for (auto& snake : this->parent_world->snakes)
+    for (auto& snake : this->parent_world->entities)
     {
-        min_x = std::min(snake.getHead().point_coord.mX, min_x);
-        max_x = std::max(snake.getHead().point_coord.mX, max_x);
-        min_y = std::min(snake.getHead().point_coord.mX, min_y);
-        max_y = std::max(snake.getHead().point_coord.mX, max_y);
+        if (snake->type != entity_Types::SNAKE)  continue;
+
+        min_x = std::min(static_cast<Snake*>(snake)->getHead().point_coord.mX, min_x);
+        max_x = std::max(static_cast<Snake*>(snake)->getHead().point_coord.mX, max_x);
+        min_y = std::min(static_cast<Snake*>(snake)->getHead().point_coord.mX, min_y);
+        max_y = std::max(static_cast<Snake*>(snake)->getHead().point_coord.mX, max_y);
     }
 
     return (this->getOrder() * this->getOrder()) - ( (max_x - min_x)*(max_y - min_y) );
@@ -186,8 +220,13 @@ void WorldPlot::expand_once(){   // `may` expands one unit on each side
     ++__expansion_state.time_since_speed_updated;
 }
 
-inline auto WorldPlot::getCurrentOrder() const noexcept {
-    return this->getOrder();
+coord WorldPlot::getRandomCoord() const noexcept
+{
+    return {
+        std::clamp(rand() % this->total_abs.mX, this->min_x, this->max_x),
+        std::clamp(rand() % this->total_abs.mY, this->min_y, this->max_y),
+        std::clamp(rand() % this->total_abs.mZ, this->min_z, this->max_z)
+    };
 }
 
 void WorldPlot::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const {

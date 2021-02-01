@@ -9,7 +9,7 @@
 #include "display/curses_subwin.hpp"
 
 class node_adapter{
-	typedef util::_coord<int> coordinate;	// on a screen so won't need anything bigger than an int
+	typedef util::_coord3D<int> coordinate;	// on a screen so won't need anything bigger than an int
 	typedef std::shared_ptr<Display> DispMngr;
 	typedef World_Node* World_Node_Ptr;
 // private:

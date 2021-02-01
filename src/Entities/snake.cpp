@@ -1,4 +1,4 @@
-#include "snake.hpp"
+#include "Entities/snake.hpp"
 #include "world.hpp"
 #include "declarations.hpp"
 #include "util/random.hpp"
@@ -20,19 +20,40 @@ std::optional<Entity_Point> Snake::getPrimaryPos() const
     return this->head;
 }
 
-void Snake::simulateExistence(){
+void Snake::simulateExistence() {
     // @future -> Can add more logic here, when more interaction options between entities are added
 
     // a one time check, before an entity starts existing
-    if( std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id() ){
-        throw std::logic_error( "Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)" );
-    }
+#ifdef DEBUG
+    assert(std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id());
 
-    while ( this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
+    //"Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)");
+#endif // DEBUG
+
+    // instead of using convar, we could have used promise::set_value_at_thread_exit()
+    this->isSimulating = true;  // ysa
+    while (this->isSimulating && this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
+        //std::clog << "Moving " << this->_id << '\n';
         this->moveForward();
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }
+    this->isSimulating = false;
+    //std::clog << "Stopped " << this->_id << '\n';
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(10) );
+    this->sim_convar.notify_one();
+}
+
+void Snake::pauseExistence() {
+    if (!this->isSimulating) return;
+
+    std::mutex m;   // @note @me - Correct it later (I think it shouldn't be how it works ?)
+    std::unique_lock<std::mutex> lock(m);
+
+    this->isSimulating = false;
+    this->sim_convar.wait_for(lock, std::chrono::milliseconds(80));
+        // this is to prevent infinite loop or waiting, since the next line can cause blocking if the notify_one is earlier than wait()
 }
 
 bool Snake::eatFood(){  //can only eat, if AT the position
@@ -47,16 +68,26 @@ bool Snake::eatFood(){  //can only eat, if AT the position
 
 bool Snake::hasRoundTrips() const{
         // since array calls the initializer for its object type, so it is `value initialised IN THIS CASE`, ie 0
-    std::array<int, 5>& temp_bucket{ this->__temp.bucket };
-    std::fill(temp_bucket.begin(), temp_bucket.end(), 0); // in case bucket has been used earlier
+    auto& temp_bucket = this->__temp.bucket;
+    std::fill(temp_bucket.begin(), temp_bucket.end(), 0); // ensuring all of the array are zero
 
     for (auto& dir : this->body)
     {
-        temp_bucket[static_cast<uint8_t>(dir)] += static_cast<uint8_t>(dir) > 4 ? -1 : 1;
-        // @warning - `dir` should be static cast only to the type given as the type of values of enum class Direction
+        temp_bucket[static_cast<uint8_t>(dir)]++;
     }
 
-    return std::all_of(temp_bucket.begin(), temp_bucket.end(), [](int i) {return i == 0;});
+    for (auto i = 0; i < temp_bucket.size(); ++i)
+    {
+        auto& num_curr = temp_bucket[i];
+        auto& num_curr_oposite = temp_bucket[static_cast<uint8_t>(static_cast<Direction>(num_curr))];
+        if (num_curr != num_curr_oposite) {
+            return false;
+        }
+
+        num_curr = num_curr_oposite = 0;
+    }
+
+    return true;
 }
 
 bool Snake::isPathValid() const{    // checks that `no two adjacent` directions should be opposites
@@ -162,49 +193,55 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
     "The next move this new snake moves, will cause the new snake to `collide` with the older one, thereby ending its life in starting itself"
 */
 // @note - Entities shoud start existence from the start (constructor) itself... though be sure to handle the case when the food is still being created, since the current logic creates the Entities JUST AFTER the snakes, since the createFood logic currently needs the positions of snakes too
-Snake::Snake(const World_Ptr world, uint16_t init_len) : Entity(entity_Types::SNAKE), parent_world(world){
-    if (!world) {
-        throw std::invalid_argument("World Pointer to Snake Type must be not null");
-    }
+Snake::Snake(const World_Ptr world, uint16_t init_len) :
+    Entity(entity_Types::SNAKE),
+    parent_world(world),
+    body(this),
+    head(nullptr, world->world_plot.getRandomCoord()),
+    tail(head)
+{
+    this->head.graph_box = this->parent_world->get_box(head.point_coord);
+    assert(head.graph_box != nullptr);
 
-    coord head_pos = {
-        util::Random::random<dimen_t>(parent_world->getWorldDimen()),
-        util::Random::random<dimen_t>(parent_world->getWorldDimen()),
-        util::Random::random<dimen_t>(parent_world->getWorldDimen())
-    };
+    this->tail = this->head;
 
-    this->head = { parent_world->get_box(head_pos), head_pos };
+    // @note @future - To optimise path finding later, better modify this to only chose dimensions within some distance from 0,0,0
 
     Direction rand_direction;
-    while( !this->parent_world->isCellEmpty(this->head.graph_box) ){  // loop until you chose an empty box as the head
-        rand_direction = statics::directions[util::Random::random(statics::directions.size())];
-        this->_add_dir_to_coord(this->head.point_coord, rand_direction);
-        this->head.reset(
-            this->head.graph_box->get_adj_box(rand_direction),
-            head.point_coord    /*modified above using _add_dir_to_coord() */
-        );    // @warning- randomly assigning any number from 0 to 3
-    }
-
     this->tail.point_coord = this->head.point_coord;
     this->tail.graph_box = this->head.graph_box;
     do {
+        this->body.removeAndClearBody(); // we are repeating this over and over again, till we have okay body, that's why we are doing this
         auto* prev_box = this->head.graph_box;
-        for (uint16_t i = 0; i < init_len - 1; i++) {
+        for (auto i = 0; i < init_len - 1; i++) {
             rand_direction = statics::directions[util::Random::random(statics::directions.size())];
 
-            while (!prev_box->getData().hasEntities()) {
+            while ( prev_box && prev_box->getData().hasEntities()) { // to chose a entity free box
                 prev_box = prev_box->get_adj_box(rand_direction);
                 rand_direction = statics::directions[util::Random::random(4)];
             }
 
+            if (!prev_box) {
+                std::cerr << "Not enough space could be traversed to allocate snake to that area";
+                return;
+            }
             prev_box = prev_box->get_adj_box(rand_direction);
+            prev_box->getDataRef().addEntity(this);
             this->body.body.push_back(rand_direction);
+            std::clog << "Added unit to snake's body: " << this->_id << '\n';
 
             this->tail.graph_box = prev_box;
             _add_dir_to_coord(this->tail.point_coord, rand_direction);
+
+            if (!this->isSnakeBodyOK())  break;
         }
 
     } while ( !isSnakeBodyOK() );
+}
+
+Snake::~Snake()
+{
+    this->pauseExistence();
 }
 
 void SnakeBody::grow(Direction move_dir)
@@ -221,3 +258,20 @@ void SnakeBody::move(Direction move_dir)
     this->grow(move_dir);
     this->pop_back();
 }
+
+    // doesn't remove the head
+void SnakeBody::removeAndClearBody() {
+    auto tmp_box = this->snake_ptr->head.graph_box;
+
+    for (auto& dir : this->body)
+    {
+        tmp_box = tmp_box->get_adj_box(dir);
+        tmp_box->getDataRef().remEntity(snake_ptr);
+    }
+
+    snake_ptr->tail = snake_ptr->head;
+
+    return body.clear();
+}
+
+SnakeBody::SnakeBody(Snake* snake_ptr) : snake_ptr(snake_ptr) {}

@@ -61,14 +61,23 @@ std::shared_ptr<node_adapter> Display::newNodeAdapter(World_Node* node){
 		// here what we want is to `horizonatlly center` the node_adapter inside this big_box
 	x_corner = bigBox_coord_x + ( (main_area->getmax_x()+1)/4 - adapters_width ) / 2;
 
-	std::shared_ptr<node_adapter> adapter{ new node_adapter(this->shared_from_this(), node, this->adapters_height, this->adapters_width, y_corner, x_corner) };
-	queue.push(adapter->node);
-	queue.adapters.push_back(adapter);
+	std::shared_ptr<node_adapter> adapter{ 
+		new node_adapter(
+			this->shared_from_this(), 
+			node, 
+			this->adapters_height, 
+			this->adapters_width,
+			y_corner,
+			x_corner
+		)
+	};
+
+	queue.push(adapter->node, adapter);
 
 	adapter->update();	// get it on screen
 	this->main_area->refresh();
 
-	return std::move(adapter);
+	return adapter;
 }
 
 void Display::helpScreen(){

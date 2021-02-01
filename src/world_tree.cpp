@@ -12,17 +12,41 @@ const std::shared_ptr<Display> World_Tree::access_disp_manager() const{
     return this->parent_verse->disp_manager();
 }
 
-bool World_Tree::initTree(std::promise<bool>& creation_promise){    //should be called after Verse::big_bang(), to initiate a world, and set it as the root node
-    
+bool World_Tree::initTree(std::promise<void>& creation_promise){
+    if (this->root != nullptr)   return true;   // already initialised
 
-    // @todo - Create a new world_node (root) here, and initialise the tree
+    this->root = new World_Node(this, nullptr, statics::BIG_BANG_TIME);
+    this->num_nodes = 1;
+    this->_fast_access_data.__latest_world_node = this->root;
 
-    // @future @todo - Set value for the creation_promise, after the world has been `asynchronously created`
-
+    creation_promise.set_value();
     return true;    // @debug
 }
 
-World_Tree::World_Tree(std::shared_ptr<Display> displayManager) : root(nullptr), num_nodes(0){
+// @note - Blocks until the tree is destructed
+void World_Tree::destructTree()
+{
+    std::stack<World_Node_Ptr> st;
+    World_Node_Ptr temp;
+
+    if (root) st.push(root);
+
+    while (!st.empty()) {
+        temp = st.top();
+
+        if (temp->left_node)	st.push(temp->left_node);
+        if (temp->right_node)	st.push(temp->right_node);
+
+        delete st.top();
+        st.pop();
+    }
+}
+
+World_Tree::World_Tree(Verse* parent_verse, std::shared_ptr<Display> displayManager) : 
+    parent_verse(parent_verse),
+    root(nullptr), 
+    num_nodes(0)
+{
     if( !displayManager ){
         throw std::logic_error("Expected a display Manager, that is incharge of the display of the verse");
     }
@@ -31,18 +55,5 @@ World_Tree::World_Tree(std::shared_ptr<Display> displayManager) : root(nullptr),
 }
 
 World_Tree::~World_Tree(){
-    std::stack<World_Node_Ptr> st;
-    World_Node_Ptr temp;
-
-    if(root) st.push(root);
-
-    while( !st.empty() ){
-        temp = st.top();
-
-        if( temp->left_node )	st.push( temp->left_node );
-        if( temp->right_node )	st.push( temp->right_node );
-
-        delete st.top();
-        st.pop();
-    }
+    this->destructTree();
 }

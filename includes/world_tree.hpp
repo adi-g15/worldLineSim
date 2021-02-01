@@ -20,14 +20,13 @@ class World_Tree{
 	// typedef _tree_node<World>* World_Node_Ptr;
 private:
 	std::shared_ptr<Display> displayManager;    // the displayManager for the verse
-	const Verse* parent_verse;
+	const Verse const* parent_verse;
 	World_Node_Ptr root;
-	// std::vector<Tree_Node_Ptr> all_nodes;    //vector of pointers to all nodes, this maybe additional storage, but gives ease destructing, and to know number of nodes
-	int16_t num_nodes;
+	int16_t num_nodes{0};
 
  	struct {
 	// private:
-	// 	World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
+	 	World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
 
 	// public:
 	// 	std::mutex tree_mutex;
@@ -38,8 +37,9 @@ private:
 public:
 	const std::shared_ptr<Display> access_disp_manager() const;
 
-	bool initTree(std::promise<bool>& creation_promise);
+	bool initTree(std::promise<void>& creation_promise);
+	void destructTree();
 
-	World_Tree(std::shared_ptr<Display> displayManager);
+	World_Tree(Verse*, std::shared_ptr<Display> displayManager);
 	~World_Tree();
 };

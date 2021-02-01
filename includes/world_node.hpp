@@ -30,12 +30,6 @@ public:
 	const dimen_t get_world_dimen() const;
 
 	// @note - Simulation -> The constructors themselves will AUTOMATICALLY start the simulation just before constructor finishes, by calling start_simultaion()
-	// @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
-	World_Node( World_Tree* tree );
-
-	World_Node();
-		// @DEBUG -> REMOVE IT LATER
-
 	World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued = false);
 
 	~World_Node();
@@ -71,7 +65,7 @@ private:
 	// actual on screen handling of pause to be done by verse, as well as the display, and then calling return_state(), then asking user to modify it, and then that modified state should be passed to this handle_pause()
 	void handle_pause(State that_state);
 
-	void start_simulation();
+	void start_logging();
 	void stop_WorldSimulation();
 
 	/**This will pause the threads for the time being, and update the time, and states vector, then create a new node with the same World* pointer and the world_id */

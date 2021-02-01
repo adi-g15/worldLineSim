@@ -12,9 +12,11 @@
 	// The world tree will mostly work almost same as array
 class Verse{
 public:
-	std::promise<bool> big_bang();    // brambha, the creator
+	std::promise<void> creation_promise;	// shouldn't be required now, but still letting it remain for now
+
+	std::future<void> big_bang();    // brambha, the creator
 	void render_screen();    // vishnu, the carer
-	std::promise<bool> kaal_day(std::string_view origin); // mahesh, the destroyer
+	void kaal_day(std::string_view origin); // mahesh, the destroyer
 	 // @don't try to destruct the origin, since that will just be kind of a deadlock like situation, both trying to stop the other
 
 	const std::shared_ptr<Display> disp_manager() const{

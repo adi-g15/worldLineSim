@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 #set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
 # later distribute display into a library, and link to it
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 

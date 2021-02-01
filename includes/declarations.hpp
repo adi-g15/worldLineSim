@@ -12,20 +12,20 @@
 
 #include "config.hpp"
 
-typedef util::_coord<int32_t> coord;
+typedef util::_coord3D<int32_t> coord;
 class Entity;   // forward decl
 
 struct Box{    //Just as extension, to add more variables to the graph_box
 //    Direction __dir_came_from;  //stores the direction from which this node was reached
 
-    std::forward_list<Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
+    std::forward_list<const Entity*> entities;    // @todo - Add any entity to the the box's entities vector which is entered by an entity
 
 public:
-    bool hasEntities() const { return  !this->entities.empty(); }
-    inline void addEntity(Entity* entity) noexcept {
-        entities.push_front(entity);
+    bool hasEntities() const noexcept { return  !this->entities.empty(); }
+    inline void addEntity(const Entity* entity) {  // made const, so that can add remove entities even through const getter in worldPlot
+        entities.emplace_front(entity);
     }
-    inline void remEntity(Entity* entity) noexcept {   // noexcept gaurantee, if not found then no action
+    inline void remEntity(const Entity* entity) noexcept {   // noexcept gaurantee, if not found then no action
         entities.remove(entity);
 
 #ifdef DEBUG

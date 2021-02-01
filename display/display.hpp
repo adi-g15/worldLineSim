@@ -21,18 +21,19 @@ struct _8_node_queue{   // @note - It has been separately defined as a wrapper c
 
 	public:
 	// START - Typical Queue Operations
-		auto front(){
+		auto front() noexcept {
 			return data.front();
 		}
 
-		auto back(){
+		auto back() noexcept {
 			return data.back();
 		}
 
-		auto push(World_Node* node){
-			if(data.size() >= 8)      this->pop();
+		auto push(World_Node* node, std::shared_ptr<node_adapter>& adapter) {
+			if (data.size() >= 8)      this->pop();
 
-			return this->data.push_back(node);
+			this->data.push_back(node);
+			this->adapters.push_back(adapter);
 		}
 
 		void pop(){
@@ -40,7 +41,7 @@ struct _8_node_queue{   // @note - It has been separately defined as a wrapper c
 			this->adapters.pop_front();
 		}
 
-		auto size(){    // sure to be <= 8
+		auto size() noexcept {    // sure to be <= 8
 			return data.size();
 		}
 	// END - Typical Queue Operations

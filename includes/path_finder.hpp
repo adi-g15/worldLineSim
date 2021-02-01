@@ -13,7 +13,7 @@ public:
 	directionalPath&& getPath(const Entity_Point& entity, bool shortest = false) const;	// if shortest is false, the algorithm is free to chose whichever algo givces the path
 
 	directionalPath&& getPath(const Entity_Point& entity, Graph_Box_3D<Box>& final_dest, bool shortest = false) = delete;	/** @not_implemented */
-	directionalPath&& getPath(const Entity_Point& entity, util::_coord<statics::dimen_t>& final_dest, bool shortest = false) = delete;	/** @not_implemented */
+	directionalPath&& getPath(const Entity_Point& entity, util::_coord3D<statics::dimen_t>& final_dest, bool shortest = false) = delete;	/** @not_implemented */
 	bool is_path_clean(const Graph_Box_3D<Box>*, const directionalPath&) const;
 
 	Path_Finder(WorldPlot* fun_space);

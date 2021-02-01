@@ -12,7 +12,6 @@
 #include "graphMat/util/coord.hpp"
 #include "graphMat/3d_graph_box.hpp"   // for Graph_Box
 
-typedef util::_coord<int32_t> coord;
 typedef void (*Action_Ptr)(void);
 
 struct Prop{    // @future - See the @future comment on the Entity::getUniqProp() function
@@ -25,11 +24,12 @@ struct SnakeProp: Prop{
 
 enum class entity_Types: uint8_t {
     SNAKE,
+    ROCK
     // more can be added later, it's made to be expandible, though do see the member declarations as for what ANY entity must have
 };
 
 struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
-    const Graph_Box_3D<Box>* graph_box;
+    Graph_Box_3D<Box>* graph_box;
 
     coord point_coord;
 
@@ -37,23 +37,22 @@ struct Entity_Point {    // a general class, since each object will have at leas
         this->graph_box = new_box;
         this->point_coord = new_coord;
     }
+
+    Entity_Point(Graph_Box_3D<Box>* initial_box, const coord& coordinate) noexcept: graph_box(initial_box), point_coord(coordinate) {}
 };
 
 class Entity: public _ID{
     typedef statics::dimen_t dimen_t;
 protected:
-    entity_Types type;
     std::vector<Action_Ptr> supported_Operations;
     // std::vector<void (*)()> supported_Operations;
     // std::vector<void()> supported_Operations;   //same as above
 public:
+    const entity_Types type;
     // @warning -> Check for any additional copy being created due to use of std::reference_wrapper::get() over the places in code
     virtual std::optional<Entity_Point> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
-
-    // @future -> Since the return type of this is fixed to int, it is restricted currently, but to allow more flexibility, the method return type can be changed to return an object of 'Prop', which is just a wrapper over the data that will be returned (or simply change return type to std::any)
-    virtual int getUniqProp() const = 0;  // each entity will have a unique property, for eg. snake's unique property is its length
 
     virtual void simulateExistence() = 0;   // simulate the work when on a single thread
 
