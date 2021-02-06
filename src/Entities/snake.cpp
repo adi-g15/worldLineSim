@@ -210,7 +210,11 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
     this->tail.point_coord = this->head.point_coord;
     this->tail.graph_box = this->head.graph_box;
     do {
+#ifdef DEBUG
+        if (this->body.length() > 0) std::cout << "Clearing Snake: " << this->_id << '\n';
+#endif // DEBUG
         this->body.removeAndClearBody(); // we are repeating this over and over again, till we have okay body, that's why we are doing this
+
         auto* prev_box = this->head.graph_box;
         for (auto i = 0; i < init_len - 1; i++) {
             // @future @note @me - The earlier implementation used randomly getting directions, then add_dir_to_coord neighbours
@@ -231,7 +235,9 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
 
             prev_box->getDataRef().addEntity(this);
             this->body.body.push_back(iter._getLastTurnedDirection().value());  // getLastTurnedDirection() MUST have a value
+#ifdef DEBUG
             std::clog << "Added unit to snake's body: " << this->_id << '\n';
+#endif
 
             this->tail.graph_box = prev_box;
             this->tail.point_coord += iter._getIncrementCoords();

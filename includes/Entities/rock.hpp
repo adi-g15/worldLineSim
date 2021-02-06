@@ -14,6 +14,7 @@ public:
 
 	std::optional<Entity_Point> getPrimaryPos(void) const override { return this->location; }
 	void simulateExistence() override {}
+	void pauseExistence() override {}
 
 	Rock(World_Ptr);
 	Rock(World_Ptr, const coord&);

@@ -19,6 +19,11 @@
 #include <algorithm>
 #include <chrono>
 
+// Entities
+#include "Entities/snake.hpp"
+#include "Entities/rock.hpp"
+#include "Entities/human.hpp"
+
 // inlining this function gives Unresolved External Symbol to call to this EXACT function in World_Node's constructor
 _timePoint World::getCurrentTime() const noexcept
 {
@@ -77,14 +82,36 @@ World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TI
     this->entities.reserve(this->_MAX_NumSnakes);
     for (auto i = 0; i < this->_MAX_NumSnakes; i++)
     {
-        this->entities.push_back( //later when simulated, let all entities run on a different thread
-            new Snake(this, util::Random::random<uint16_t>(2, 5))
+        this->entities.push_back(
+            new Snake(this, util::Random::random<uint16_t>(5, 10))
+        );
+    }
+    for (auto i = 0; i < 100; i++)
+    {
+        this->entities.push_back(
+            new Rock(this)
+        );
+    }
+    for (auto i = 0; i < 2; i++)
+    {
+        this->entities.push_back(
+            new Human(this)
         );
     }
 
-    // DEBUG - Disabled existence for now
-    //for (auto&& snake : this->snakes) {
-    //    std::thread(&Snake::simulateExistence, snake).detach();
+    //for (auto&& entity : this->entities) {
+    //    switch (entity->type)
+    //    {
+    //    case Entity_Types::SNAKE:
+    //        std::thread(&Snake::simulateExistence, entity).detach();
+    //        break;
+    //    case Entity_Types::ROCK:
+    //        std::thread(&Rock::simulateExistence, entity).detach();
+    //        break;
+    //    case Entity_Types::HUMAN:
+    //        std::thread(&Human::simulateExistence, entity).detach();
+    //        break;
+    //    }
     //}
 
     // COME HERE - Decide how is time incremented

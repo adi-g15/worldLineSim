@@ -140,7 +140,7 @@ void WorldPlot::auto_expansion(){
 
     while (this->__expansion_state.expansion_flag)
     {
-        std::clog << "Expanding...\n";
+        std::clog << "UNIVERSE #" << this->parent_world->_id << " EXPANDING...\n";
         this->expand_once();
 
         // sleep for 1 unit time
@@ -166,23 +166,27 @@ void WorldPlot::pause_auto_expansion()
 }
 
     // not actually number of nodes empty, but a utility function for WorldPlot::expand_once()
-WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
+float WorldPlot::getFreeSpaceRatio() const{
     dimen_t min_x{ std::numeric_limits<dimen_t>::max() },
         max_x{ std::numeric_limits<dimen_t>::min() },
         min_y{ std::numeric_limits<dimen_t>::max() },
-        max_y{ std::numeric_limits<dimen_t>::min() };
+        max_y{ std::numeric_limits<dimen_t>::min() },
+        min_z{ std::numeric_limits<dimen_t>::max() },
+        max_z{ std::numeric_limits<dimen_t>::min() };
 
-    for (auto& snake : this->parent_world->entities)
+    for (auto& entity : this->parent_world->entities)
     {
-        if (snake->type != Entity_Types::SNAKE)  continue;
+        if (entity->type != Entity_Types::SNAKE)  continue;
 
-        min_x = std::min(static_cast<Snake*>(snake)->getHead().point_coord.mX, min_x);
-        max_x = std::max(static_cast<Snake*>(snake)->getHead().point_coord.mX, max_x);
-        min_y = std::min(static_cast<Snake*>(snake)->getHead().point_coord.mX, min_y);
-        max_y = std::max(static_cast<Snake*>(snake)->getHead().point_coord.mX, max_y);
+        min_x = std::min(entity->getPrimaryPos().value().point_coord.mX, min_x);
+        max_x = std::max(entity->getPrimaryPos().value().point_coord.mX, max_x);
+        min_y = std::min(entity->getPrimaryPos().value().point_coord.mY, min_y);
+        max_y = std::max(entity->getPrimaryPos().value().point_coord.mY, max_y);
+        min_z = std::min(entity->getPrimaryPos().value().point_coord.mZ, min_z);
+        max_z = std::max(entity->getPrimaryPos().value().point_coord.mZ, max_z);
     }
 
-    return (this->getOrder() * this->getOrder()) - ( (max_x - min_x)*(max_y - min_y) );
+    return 100.0f - (((static_cast<float>(max_x) - min_x)* (max_y - min_y)* (max_z - min_z))/(this->total_abs.mX * total_abs.mY * total_abs.mZ));
 }
 
 // @note - The function decides how much to grow, and may decide to not grow at all "for this call"
@@ -190,21 +194,23 @@ void WorldPlot::expand_once(){   // `may` expands one unit on each side
 
     constexpr float decrease_rate = 0.90f;	// 90% of previous expansion speed
 
-    this->free_space_ratio = static_cast<float>(this->getFreeSpace())/this->getOrder();
+    const auto free_space_ratio = this->getFreeSpaceRatio();
 
     // @future [Oct22] - The below does the speed resetting part, change it to allow negative expansions
     if (this->__expansion_state.time_since_speed_updated % 10 == 0) {
+        this->__expansion_state.speed_doubled_recently = false;
         this->__expansion_state.curr_expansion_speed = this->__expansion_state.expansion_speed;
         this->__expansion_state.time_since_speed_updated = 0;
     }
 
-    if ( this->free_space_ratio > statics::max_free_space ){
+    if ( free_space_ratio > statics::max_free_space ){
         // @log - world doesn't need to auto_expand since reached max_free_space
         return;
 
-    }else if ( this->free_space_ratio < statics::min_free_space )
+    }else if ( free_space_ratio < statics::min_free_space && !this->__expansion_state.speed_doubled_recently)
     {
         this->__expansion_state.curr_expansion_speed *= 2;   // @log temporarily doubling the expansion speed
+        this->__expansion_state.speed_doubled_recently = true;
     }
     else {
         this->__expansion_state.curr_expansion_speed *= decrease_rate;

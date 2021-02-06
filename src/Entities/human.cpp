@@ -45,6 +45,10 @@ Human::Human(World_Ptr const world):
 	parent_world(world),
 	curr_pos(nullptr, world->world_plot.getRandomCoord())
 {
+#ifdef DEBUG
+	std::cout << "=============================\nHuman aa gaya :D ... Location: [" << this->curr_pos.point_coord << "]\n=============================\n";
+#endif // DEBUG
+
 	this->curr_pos.graph_box = this->parent_world->get_box(curr_pos.point_coord);
 	assert(curr_pos.graph_box != nullptr);	// remove this assert after tests written that getRandomCoord() always returns correct one
 }

@@ -38,13 +38,12 @@ class WorldPlot: public Cube_Matrix<Box>{
 	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too
 
-	float free_space_ratio{100.0f};
 	void auto_expansion();	 //keeps expanding TILL expansion_flag is TRUE
 	void expand_once();
 	void resume_auto_expansion();
 	void pause_auto_expansion();
 
-	dimen_t getFreeSpace() const;
+	float getFreeSpaceRatio() const;
 	graph_box_type* get_box(const coord& position) {
 		return this->operator[](position);
 	}

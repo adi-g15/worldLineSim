@@ -12,7 +12,7 @@ namespace statics
     static constexpr uint16_t init_Bound{ 40, };    //applicable to A NEW WORLD
 
     static constexpr float max_free_space = 1000.0f;    //so that space doesn't just get wasted
-    static constexpr float min_free_space = 100.0f;    //if it falls below this, in a particular worlPlot, the expansion rate will be increased
+    static constexpr float min_free_space = 10.0f;    //if it falls below this, in a particular worlPlot, the expansion rate will be increased
 
     static constexpr _timePoint BIG_BANG_TIME = 0;    //can be time::now() later too
     static constexpr float UNIT_TIME = 1.0f;    //in terms of human world seconds
