@@ -25,17 +25,17 @@ public:
     bool hasEntities() const noexcept { return  this->entity != nullptr; }
     //inline void addEntity(const Entity* entity) {
     inline void addEntity(const Entity* entity) {
-        if(entity == nullptr) this->entity = entity;
+        if(this->entity == nullptr) this->entity = entity;
         //entities.emplace_front(entity);
     }
     inline void remEntity(const Entity* entity) noexcept {   // noexcept gaurantee, if not found then no action
         //entities.remove(entity);
         if (this->entity == entity)  this->entity = nullptr;
 
-#ifdef DEBUG
-        assert(std::find(std::cbegin(entities), std::cend(entities), entity) != entities.cend());
-        "The box currently doesn't hold any reference to the entity"
-#endif // DEBUG
+//#ifdef DEBUG
+//        assert(std::find(std::cbegin(entities), std::cend(entities), entity) != entities.cend());
+//        "The box currently doesn't hold any reference to the entity"
+//#endif // DEBUG
     }
 
     Box() noexcept {}

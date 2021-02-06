@@ -1,11 +1,13 @@
-#include "Entities/snake.hpp"
-#include "world.hpp"
-#include "declarations.hpp"
-#include "util/random.hpp"
+#include <graphMat/iterators.hpp>
+#include <util/random.hpp>
 
 #include <map>
 #include <thread>
 #include <chrono>
+
+#include "Entities/snake.hpp"
+#include "world.hpp"
+#include "declarations.hpp"
 
 void Snake::_Action1(){
     this->eatFood();    // @note - Ignoring returned boolean from eatFood(), if that's required use eatFood() directly, this method is just for the sake for generalisation using Entity
@@ -24,11 +26,7 @@ void Snake::simulateExistence() {
     // @future -> Can add more logic here, when more interaction options between entities are added
 
     // a one time check, before an entity starts existing
-#ifdef DEBUG
-    assert(std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id());
-
-    //"Entities should be on a different thread, than the world. In case, you don't want this behaviour, then pass -DNO_THREAD_ENTITY (To define NO_THREAD_ENTITY)");
-#endif // DEBUG
+    //assert(std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id());
 
     // instead of using convar, we could have used promise::set_value_at_thread_exit()
     this->isSimulating = true;  // ysa
@@ -194,7 +192,7 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
 */
 // @note - Entities shoud start existence from the start (constructor) itself... though be sure to handle the case when the food is still being created, since the current logic creates the Entities JUST AFTER the snakes, since the createFood logic currently needs the positions of snakes too
 Snake::Snake(const World_Ptr world, uint16_t init_len) :
-    Entity(entity_Types::SNAKE),
+    Entity(Entity_Types::SNAKE),
     parent_world(world),
     body(this),
     head(nullptr, world->world_plot.getRandomCoord()),
@@ -203,35 +201,41 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
     this->head.graph_box = this->parent_world->get_box(head.point_coord);
     assert(head.graph_box != nullptr);
 
+    this->head.graph_box->getDataRef().addEntity(this); // head is a part of the entity
+
     this->tail = this->head;
 
     // @note @future - To optimise path finding later, better modify this to only chose dimensions within some distance from 0,0,0
 
-    Direction rand_direction;
     this->tail.point_coord = this->head.point_coord;
     this->tail.graph_box = this->head.graph_box;
     do {
         this->body.removeAndClearBody(); // we are repeating this over and over again, till we have okay body, that's why we are doing this
         auto* prev_box = this->head.graph_box;
         for (auto i = 0; i < init_len - 1; i++) {
-            rand_direction = statics::directions[util::Random::random(statics::directions.size())];
+            // @future @note @me - The earlier implementation used randomly getting directions, then add_dir_to_coord neighbours
 
-            while ( prev_box && prev_box->getData().hasEntities()) { // to chose a entity free box
-                prev_box = prev_box->get_adj_box(rand_direction);
-                rand_direction = statics::directions[util::Random::random(4)];
+            graphMat::NeighbourIterator<Box> iter(prev_box);
+            for (; iter; ++iter)
+            {
+                // 
+                if (!iter->getData().hasEntities()) {
+                    prev_box = iter.curr_box;
+                    break;
+                }
             }
-
-            if (!prev_box) {
+            if (!iter) {
                 std::cerr << "Not enough space could be traversed to allocate snake to that area";
                 return;
             }
-            prev_box = prev_box->get_adj_box(rand_direction);
+
             prev_box->getDataRef().addEntity(this);
-            this->body.body.push_back(rand_direction);
+            this->body.body.push_back(iter._getLastTurnedDirection().value());  // getLastTurnedDirection() MUST have a value
             std::clog << "Added unit to snake's body: " << this->_id << '\n';
 
             this->tail.graph_box = prev_box;
-            _add_dir_to_coord(this->tail.point_coord, rand_direction);
+            this->tail.point_coord += iter._getIncrementCoords();
+            //_add_dir_to_coord(this->tail.point_coord, rand_direction);
 
             if (!this->isSnakeBodyOK())  break;
         }

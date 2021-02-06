@@ -21,9 +21,10 @@ struct SnakeProp: Prop{
     // int data;   // for snake, the unique property (ie. this `data`) will be an int, ie. length
 };
 
-enum class entity_Types: uint8_t {
+enum class Entity_Types {
     SNAKE,
-    ROCK
+    ROCK,
+    HUMAN
     // more can be added later, it's made to be expandible, though do see the member declarations as for what ANY entity must have
 };
 
@@ -43,19 +44,20 @@ struct Entity_Point {    // a general class, since each object will have at leas
 class Entity: public _ID{
     typedef statics::dimen_t dimen_t;
 protected:
-    std::vector<Action_Ptr> supported_Operations;
+    //std::vector<Action_Ptr> supported_Operations;
     // std::vector<void (*)()> supported_Operations;
     // std::vector<void()> supported_Operations;   //same as above
 public:
-    const entity_Types type;
+    const Entity_Types type;
     // @warning -> Check for any additional copy being created due to use of std::reference_wrapper::get() over the places in code
     virtual std::optional<Entity_Point> getPrimaryPos() const = 0;  // optional since NOT mandatory that every entity will be having a entity_point
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 
     virtual void simulateExistence() = 0;   // simulate the work when on a single thread
+    virtual void pauseExistence() = 0;
 
-    Entity(entity_Types type):
+    Entity(Entity_Types type):
         _ID(),
         type(type)
     {

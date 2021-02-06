@@ -14,7 +14,7 @@ class Verse{
 public:
 	std::promise<void> creation_promise;	// shouldn't be required now, but still letting it remain for now
 
-	std::future<void> big_bang();    // brambha, the creator
+	void big_bang();    // brambha, the creator
 	void render_screen();    // vishnu, the carer
 	void kaal_day(std::string_view origin); // mahesh, the destroyer
 	 // @don't try to destruct the origin, since that will just be kind of a deadlock like situation, both trying to stop the other

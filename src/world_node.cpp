@@ -1,7 +1,7 @@
 #include "world.hpp"
 #include "world_node.hpp"
 #include "display/display.hpp"
-#include "display/node_adapter.hpp"
+#include "adapter.hpp"
 
 void World_Node::captureState(){
     this->paused_time = this->world->getCurrentTime();

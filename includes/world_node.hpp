@@ -5,8 +5,7 @@
 #include "id_creator.hpp"
 #include "state.hpp"
 #include "world_tree.hpp"
-
-class node_adapter;	//forward-declaration
+#include "adapter.hpp"
 
 typedef int32_t dimen_t;
 struct StatePlusPlus{
@@ -20,7 +19,7 @@ class World_Node : public _ID{
 
 public:
 	// std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
-	std::shared_ptr<node_adapter> adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
+	std::shared_ptr<DisplayAdapter> adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
 	World_Tree* tree;
 
 	void update_disp();

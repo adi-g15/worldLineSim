@@ -9,21 +9,28 @@
 #include <thread>
 #include <future>
 
+	// Update: Feb 4 -> It no longer returns a promise or a future, display takes over the main thread, and BLOCKS
 	// @note - it should be more like, returning a promise, rather than a future... only logically it should hold that the receiver can poll this object, to know whether the task is completed
-std::future<void> Verse::big_bang(){
-   // init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
+void Verse::big_bang(){
+	this->displayManager->showInitiating();
+	// init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
 		 // creation of the first world, to ever exist in the particular verse
 	this->worldTree->initTree(this->creation_promise);	// WorldTree::init() will create the first node
 
-	this->render_screen();
-
-	return this->creation_promise.get_future(); // @dropped_idea - use a std::condition_variable to return in initTree
+	this->displayManager->startDisplay();
 }
 
 // @note - Blocks until everything is stopped
 void Verse::kaal_day(std::string_view origin){
+	if (origin != "Shiv") {
+		this->displayManager->showExiting();	// show Exit message on the screen, till the displayManger is automatically gets destructed after its destrcutor is called, and that is when everything is removed
+	}
+
 	this->worldTree->destructTree();
 
+	if (origin != "Shiv") {	// if not destructor then show these messages
+		this->displayManager->stopDisplay();
+	}
 	// @future @log - Stop the logger here too
 	// this->logger.stop();
 }
@@ -52,8 +59,6 @@ Verse::Verse(): displayManager(new Display(this)) {
 }
 
 Verse::~Verse(){
-	this->displayManager->showExit();	// show Exit message on the screen, till the displayManger is automatically gets destructed after its destrcutor is called, and that is when everything is removed
-
 	this->kaal_day("Shiv");	// source = "Shiv" means the destructor is the 'origin' (see the declaration of kaal_day)
 
 	// LOGGER << "Verse has been destructed"

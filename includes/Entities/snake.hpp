@@ -7,6 +7,7 @@
 #include "graphMat/3d_graph_box.hpp"
 
 #include <vector>
+#include <list>
 #include <memory>
 #include <cstdint>
 #include <condition_variable>

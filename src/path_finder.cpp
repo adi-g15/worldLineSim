@@ -2,7 +2,7 @@
 #include "world_plot.hpp"
 
 	// @note - basic_rect doesn't check if the path is empty or not
-directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coord& end ) const	// start is a graph box, only to efficiently check if a path is clean or not
+directionalPath Path_Finder::basic_rect( const Entity_Point& start, const coord& end ) const	// start is a graph box, only to efficiently check if a path is clean or not
 {
 	directionalPath path;
 	path.reserve( std::abs( start.point_coord.mX - end.mX ) + std::abs(start.point_coord.mY - end.mY) );
@@ -27,10 +27,10 @@ directionalPath&& Path_Finder::basic_rect( const Entity_Point& start, const coor
 		path.data.insert(path.data.end(), std::abs(start.point_coord.mZ - end.mZ), Direction::URDHWA);	// upwards
 	}
 
-	return std::move(path);
+	return path;
 }
 
-directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const coord& end) const
+directionalPath Path_Finder::rand_basic_rect(const Entity_Point& start, const coord& end) const
 {
 	directionalPath path ( this->basic_rect(start, end) ) ;
 
@@ -38,7 +38,7 @@ directionalPath&& Path_Finder::rand_basic_rect(const Entity_Point& start, const 
 		std::shuffle(path.begin(), path.end(), util::Random::generator);	// logically the start point and end point will stillbe connected
 	}
 
-	return std::move(path);
+	return path;
 }
 
 bool Path_Finder::is_path_clean(const Graph_Box_3D<Box>* start, const directionalPath& path) const
@@ -54,21 +54,21 @@ bool Path_Finder::is_path_clean(const Graph_Box_3D<Box>* start, const directiona
 	return true;
 }
 
-directionalPath&& Path_Finder::shortest_path(const Entity_Point& start) const // end defaults to food position
+directionalPath Path_Finder::shortest_path(const Entity_Point& start) const // end defaults to food position
 {
 	directionalPath path;
 	// @todo @not_priority
-	return std::move(path);
+	return path;
 }
 
-directionalPath&& Path_Finder::shortest_path(const Entity_Point& start, Graph_Box_3D<Box>& end) const
+directionalPath Path_Finder::shortest_path(const Entity_Point& start, Graph_Box_3D<Box>& end) const
 {
 	directionalPath path;
 	// @todo @not_priority
-	return std::move(path);
+	return path;
 }
 
-directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, bool shortest) const
+directionalPath Path_Finder::getPath(const Entity_Point& entity_point, bool shortest) const
 {
 	directionalPath path;
 	if (shortest) {
@@ -87,7 +87,7 @@ directionalPath&& Path_Finder::getPath(const Entity_Point& entity_point, bool sh
 		return this->getPath(entity_point, true);
 	}
 
-	return std::move(path);
+	return path;
 }
 
 Path_Finder::Path_Finder(WorldPlot* fun_space): plot(fun_space)

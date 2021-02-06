@@ -51,7 +51,7 @@ class WorldPlot: public Cube_Matrix<Box>{
 	const graph_box_type* get_box(const coord& position) const{
 		return this->operator[](position);
 	}
-	directionalPath&& getShortestPathToFood(const Entity_Point& origin) const;
+	directionalPath getShortestPathToFood(const Entity_Point& origin) const;
 
 	public:
 		const auto& get_food() const{

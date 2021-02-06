@@ -6,7 +6,6 @@
 #include <future>
 #include <stack>
 
-#include "util/tree.hpp"
 #include "forward_decl.hpp"
 
 /*
@@ -20,7 +19,7 @@ class World_Tree{
 	// typedef _tree_node<World>* World_Node_Ptr;
 private:
 	std::shared_ptr<Display> displayManager;    // the displayManager for the verse
-	const Verse const* parent_verse;
+	Verse const* parent_verse;
 	World_Node_Ptr root;
 	int16_t num_nodes{0};
 
@@ -39,6 +38,12 @@ public:
 
 	bool initTree(std::promise<void>& creation_promise);
 	void destructTree();
+
+	World_Node_Ptr const getRootNode() const {
+		return this->root;
+	}
+
+	friend class Display;
 
 	World_Tree(Verse*, std::shared_ptr<Display> displayManager);
 	~World_Tree();

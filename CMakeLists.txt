@@ -4,8 +4,9 @@ project(WorldLineSim
     LANGUAGES CXX
     VERSION 0.271
     )
+include(CTest)
 
-# Set c++ standard to C+20
+# Later utilise features in C++20
 set(CMAKE_CXX_STANDARD 17)
 
 if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfwpp/include")
@@ -15,27 +16,32 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfwpp/include")
         )
 endif()
 
+include_directories(ext/graphMat/includes/)
+include_directories(ext/utilpp/includes/)
+include_directories(ext/glfwpp/include/)
+
 file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
 
-add_compile_definitions(GRAPH_MAT_NO_COORD)
+#add_compile_definitions(GRAPH_MAT_NO_COORD)
+add_compile_definitions(DEBUG)
 add_executable(simulator main.cpp ${SOURCES})
 target_link_libraries(simulator PRIVATE display)
 
 include_directories(includes)
 include_directories(.)
-include_directories(ext/graphMat/includes/)
-include_directories(ext/glfwpp/include/)
-
-set(DEBUG_MODE true)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-link_libraries(Threads::Threads)
+file(GLOB DISP_SOURCES "display/src/*.cpp")
+add_library(display STATIC ${DISP_SOURCES})
+target_link_libraries(display PRIVATE GLFWPP)
 
 add_subdirectory(ext/glfwpp)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
-target_link_directories(simulator PRIVATE GLFWPP)
+set(NANOGUI_BUILD_EXAMPLES  OFF CACHE BOOL " " FORCE)
+set(GLFWPP_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
+target_link_libraries(simulator PRIVATE Threads::Threads)
+target_link_libraries(simulator PRIVATE display)
 
 # set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
 # later distribute display into a library, and link to it

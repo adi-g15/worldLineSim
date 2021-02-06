@@ -9,7 +9,7 @@ void WorldPlot::createFood(){
 
     std::vector<coord> tmp_list;
     for (const auto& en : this->parent_world->entities) {
-        if(en->type == entity_Types::SNAKE)
+        if(en->type == Entity_Types::SNAKE)
             tmp_list.push_back(en->getPrimaryPos().value().point_coord); // directly used optional<>::value since entities depending on this food will have it, as of now
     }
 
@@ -174,7 +174,7 @@ WorldPlot::dimen_t WorldPlot::getFreeSpace() const{
 
     for (auto& snake : this->parent_world->entities)
     {
-        if (snake->type != entity_Types::SNAKE)  continue;
+        if (snake->type != Entity_Types::SNAKE)  continue;
 
         min_x = std::min(static_cast<Snake*>(snake)->getHead().point_coord.mX, min_x);
         max_x = std::max(static_cast<Snake*>(snake)->getHead().point_coord.mX, max_x);
@@ -237,7 +237,7 @@ void WorldPlot::getShortestPathToFood(const Entity_Point& origin, directionalPat
     else old_path = this->getShortestPathToFood(origin);
 }
 
-directionalPath&& WorldPlot::getShortestPathToFood(const Entity_Point& origin) const{
+inline directionalPath WorldPlot::getShortestPathToFood(const Entity_Point& origin) const{
     // @important @note - snake class expects the path to be like a stack, ie. the first move, will be the last one, which will be popped, then move_on
 
     return this->path_finder.getPath(origin);
