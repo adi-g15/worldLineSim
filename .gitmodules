@@ -1,15 +1,12 @@
-[submodule "graphMat"]
-	path = graphMat
-	url = https://github.com/adi-g15/graphMat
-[submodule "ext\\graphMat"]
-	path = ext\\graphMat
-	url = https://github.com/adi-g15/graphMat
-[submodule "ext\\glfwpp"]
-	path = ext\\glfwpp
+[submodule "ext/glfwpp"]
+	path = ext/glfwpp
 	url = https://github.com/janekb04/glfwpp
-[submodule "ext/utilpp"]
-	path = ext/utilpp
-	url = https://github.com/adi-g15/utilpp
+[submodule "ext/graphMat"]
+	path = ext/graphMat
+	url = https://github.com/adi-g15/graphMat
 [submodule "ext/nanogui"]
 	path = ext/nanogui
 	url = https://github.com/mitsuba-renderer/nanogui.git
+[submodule "ext/utilpp"]
+	path = ext/utilpp
+	url = https://github.com/adi-g15/utilpp

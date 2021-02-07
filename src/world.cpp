@@ -75,10 +75,8 @@ World::World(const World_Ptr world, _timePoint t) : world_plot(this, t), path_fi
 
 }
 
-// also starts the simulations for each snake executing
+// also starts the simulations for all entities
 World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TIME), path_finder(&world_plot){
-    // @todo
-
     this->entities.reserve(this->_MAX_NumSnakes);
     for (auto i = 0; i < this->_MAX_NumSnakes; i++)
     {
@@ -99,20 +97,21 @@ World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TI
         );
     }
 
-    //for (auto&& entity : this->entities) {
-    //    switch (entity->type)
-    //    {
-    //    case Entity_Types::SNAKE:
-    //        std::thread(&Snake::simulateExistence, entity).detach();
-    //        break;
-    //    case Entity_Types::ROCK:
-    //        std::thread(&Rock::simulateExistence, entity).detach();
-    //        break;
-    //    case Entity_Types::HUMAN:
-    //        std::thread(&Human::simulateExistence, entity).detach();
-    //        break;
-    //    }
-    //}
+    for (auto&& entity : this->entities) {
+        std::thread(&Entity::simulateExistence, entity).detach();
+        //switch (entity->type)
+        //{
+        //case Entity_Types::SNAKE:
+        //    std::thread(&Snake::simulateExistence, entity).detach();
+        //    break;
+        //case Entity_Types::ROCK:
+        //    std::thread(&Rock::simulateExistence, entity).detach();
+        //    break;
+        //case Entity_Types::HUMAN:
+        //    std::thread(&Human::simulateExistence, entity).detach();
+        //    break;
+        //}
+    }
 
     // COME HERE - Decide how is time incremented
     //while (this->simulationRunning)

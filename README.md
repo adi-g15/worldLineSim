@@ -1,59 +1,49 @@
 # World Line Simulator
 
-Wait... if you are thinking it's some big rendering project, sorry but it's not,
-it enjoys this condition ->
+Wait... if you are thinking it's some big rendering project, sorry but it's not but it's interesting,
+think of the very basic idea as this ->
 
 _Think about a world, in which 4 snakes keep moving automatically to get food_
 
-And, this project generalises this idea to entities and actions, in different worlds and worldlines, as well theoretically different verses too, other than this ->
-_And... you can go to a particular time in **past**, and change the position of one of the snakes... Baammm, a new world line is created in which this event happened, and the older world had the event not taken place... so there is a high chance, current state(lengths of the snakes) of the world will be different than what had been in the previous world line_
+Now the project offers mcuh more, since you can now have as many entities as memory allows, and can CREATE your own entities too.
 
-That's it, this project does this much mainly (though no limitations on what it may add later).
+This project generalises the idea to entities and actions, in different worlds and worldlines, all independently on different threads, as well theoretically different verses too, other than this ->
+_And... you can go to a particular time in **past**, and change the position of one of the entities... Baammm, a new world line is created in which *this event* happened, and the older world had *this event* had not taken place... so there is a high chance, current state(lengths of the snakes, positions of entities, etc. combined) of the world will be different than what had been in the previous world line_
 
-It also features a constantly growing matrix (the world_plot).
+It also features a constantly growing matrix (the world_plot), using another project [GraphMat3D](https://github.com/adi-g15/graphMat) that was actually a part of this one itself
 
-### Building
-
-**READ THE NOTE AFTER THESE COMMANDS**
+## Building
 
 ```sh
-cd worldLineSim/build   # if doesn't exist, then create
+cd build   # if doesn't exist, then create
 cmake ..
 cmake --build .
 ```
 
-> Now depending on your compiler, you will have a `simulator` or `simulator.exe`, which is the executable after building, you can run it then
+> It WILL build using MSVC compiler
+>
+> the github action is failing, since it's not building on GCC due to SFINAE errors, which work on MSVC though GCC maybe more strict, i am not focusing on that for now
 
-_NOTE_ - 
-  1. Still doesn't use all the functions.
-  2. It has been built without linking(referencing) to all features(functions) just so to know how it works at that particular time
-  3. There maybe commits in the master branch itself, that WON'T BUILD, but i will make sure to either build it, or remove the command area for the time being then
+## Creating your own Custom ENTITIES (for example, horses)
 
-### NOTE - 
-1. Currently all commits are on the master branch itself, and not on a separate dev branch, since i prefer to keep track of all my 'initial
- work on master itself (this thing will change once the initial idea is done)
-2. Initially the focus is that _internally_ the simulation happens, but maybe the display won't be very great now (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
+* Inherit from the Entity class (Interface actually), override/implement the `startSimulation` and `pauseSimulation` virtual member functions, and others that are pure virtuals, and need to be overloaded in Entity class
 
-## Flags used in code
+* In `World` constructors, make sure your push your new entities to the entities vector with `entities.push_back(new Horse(this));`
 
-Various flags (inside comments), have been used to convey some messages to the developer ->
-* `@todo` - These comments show that particular thing is to be done
-* `@future` - These are tasks to be done, AFTER the basic idea is done, say for example, an improvement to the begaviour or algorithm
-* `@note` - Some information about the code given to a user, or a simple note to let you know how it might behave
-* `@warning` - A caution note to the reader (generally telling that you should call other function for cleaning the resources used (pointers, thread etc.))
-* `@debug` - These signify the part of code that is only there for debugging purposes, and should be removed later for actual accepted behaviour
-* `@me` - Notes to myself
-* `@deprecated` - Portions of codes, or functions that won't be used (likely not used in the code), and will be removed with the following commits
+> Constructor - An entities constructor takes in the World*, so that it has access to the worldplot (consider it the space fabric here, just a matrix), for eg, calling world->getRandomCoord() to get a position in the world
+> See the constructor of other entity, for eg. Human, Rock, Snake for reference
 
-Other than these, usual single line comments, are 'low-priority comments' more general than these
+## Current State (Logs)
 
-And, multi line comments are generally for briefly telling about some struct or class
+> Note: Currently the focus is that _internally_ the simulation happens, but maybe the display won't be very great now, so it just logs on console (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
 
-# Class Chart
+![Current State](https://github.com/adi-g15/Sources/blob/main/worldLineSim_state.png?raw=true "This is a part of the logging")
+
+## Class Chart
 
 > Made with draw.io
 
-![Class Chart](https://raw.githubusercontent.com/AdityaGupta150/Sources/main/worldLineSim.png "WorldLine Sim")
+![Class Chart](https://github.com/adi-g15/Sources/blob/main/worldLineSim.png?raw=true "WorldLine Sim")
 
 ## Future Ideas
 

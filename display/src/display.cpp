@@ -17,6 +17,8 @@ void Display::displayCurrentState() const {
 }
 
 void Display::startDisplay() {
+	this->start_input_daemon();
+
 	std::clog << '[' << (high_resolution_clock::now() - loggingStart).count() << ']' << " Display Started...\n";
 
 	while (!shouldStop)

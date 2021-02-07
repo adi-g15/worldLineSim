@@ -13,6 +13,10 @@ void Human::simulateExistence()
 
 	while (this->should_wander)
 	{
+#ifdef DEBUG
+		std::clog << "Human Moving #" << this->_id << " from " << this->curr_pos.point_coord;
+#endif // DEBUG
+
 		graphMat::NeighbourIterator<Box> iter(this->curr_pos.graph_box);
 
 		for (; iter ; ++iter)
@@ -28,9 +32,13 @@ void Human::simulateExistence()
 				}
 
 				this->curr_pos.point_coord += increment_coord;
+				break;
 			}
 		}
 
+#ifdef DEBUG
+		std::clog << " to " << this->curr_pos.point_coord << '\n';
+#endif // DEBUG
 		std::this_thread::sleep_for(std::chrono::seconds( static_cast<int>( statics::UNIT_TIME * TIME_DIFF_PER_MOVE )));
 	}
 }

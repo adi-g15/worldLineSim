@@ -25,14 +25,14 @@ std::optional<Entity_Point> Snake::getPrimaryPos() const
 void Snake::simulateExistence() {
     // @future -> Can add more logic here, when more interaction options between entities are added
 
-    // a one time check, before an entity starts existing
-    //assert(std::this_thread::get_id() == this->parent_world->_shared_concurrent_data.get_world_thread_id());
-
     // instead of using convar, we could have used promise::set_value_at_thread_exit()
     this->isSimulating = true;  // ysa
     while (this->isSimulating && this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
-        //std::clog << "Moving " << this->_id << '\n';
-        this->moveForward();
+#ifdef DEBUG
+        std::clog << "Moving Snake #" << this->_id << '\n';
+#endif // DEBUG
+
+        //this->moveForward();
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }
