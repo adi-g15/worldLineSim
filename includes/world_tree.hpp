@@ -36,7 +36,7 @@ private:
 public:
 	const std::shared_ptr<Display> access_disp_manager() const;
 
-	bool initTree(std::promise<void>& creation_promise);
+	bool initTree();
 	void destructTree();
 
 	World_Node_Ptr const getRootNode() const {

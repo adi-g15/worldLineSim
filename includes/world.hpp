@@ -91,6 +91,8 @@ private:
 
 	bool _RangeCheck(const coord_type&) const;    //for checking if a coordinate is valid
 
+	void capture_state();
+
 	void runNextUnitTime();   //resumes the world, the nextTime period happens in this time
 		// @todo - This is the constructor that creates the new world just after big bang
 	World();

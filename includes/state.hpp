@@ -16,11 +16,9 @@ struct State    // @idea Can later have food location in state too... not doind 
 
     private:
     State(
-        // const std::vector < coord >& pos,
         _timePoint t
     ): state_time(t){}
 
     friend class World_Node;
     friend struct Log;
-
 };

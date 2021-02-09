@@ -13,9 +13,7 @@ void Human::simulateExistence()
 
 	while (this->should_wander)
 	{
-#ifdef DEBUG
-		std::clog << "Human Moving #" << this->_id << " from " << this->curr_pos.point_coord;
-#endif // DEBUG
+		LOGGER::log_it(this->parent_world->_id, Event::Entity_Move/*, "Human Moving #%d from ", this->_id, this->curr_pos.point_coord*/);
 
 		graphMat::NeighbourIterator<Box> iter(this->curr_pos.graph_box);
 
@@ -36,9 +34,6 @@ void Human::simulateExistence()
 			}
 		}
 
-#ifdef DEBUG
-		std::clog << " to " << this->curr_pos.point_coord << '\n';
-#endif // DEBUG
 		std::this_thread::sleep_for(std::chrono::seconds( static_cast<int>( statics::UNIT_TIME * TIME_DIFF_PER_MOVE )));
 	}
 }
@@ -53,9 +48,7 @@ Human::Human(World_Ptr const world):
 	parent_world(world),
 	curr_pos(nullptr, world->world_plot.getRandomCoord())
 {
-#ifdef DEBUG
-	std::cout << "=============================\nHuman aa gaya :D ... Location: [" << this->curr_pos.point_coord << "]\n=============================\n";
-#endif // DEBUG
+	LOGGER::log_it(this->parent_world->_id, Event::Entity_Created/*, "Human aa gaya :D ... Location: ", this->curr_pos.point_coord*/);
 
 	this->curr_pos.graph_box = this->parent_world->get_box(curr_pos.point_coord);
 	assert(curr_pos.graph_box != nullptr);	// remove this assert after tests written that getRandomCoord() always returns correct one

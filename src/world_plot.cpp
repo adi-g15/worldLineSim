@@ -1,11 +1,11 @@
 #include "world_plot.hpp"
 #include "world.hpp"
+#include "logger.hpp"
 #include "graphMat/iterators.hpp"
 
 void WorldPlot::createFood(){
     // Resets the current food; This function should only be called after World::eatFood()
-
-    // @note - I may want to pause the entities to pause for the moment, since further movements may cause the return_box_if_empty function to cause problems, but i will keep moving for now, likely won't change
+    this->food.reset({ nullptr, {0,0,0} });
 
     std::vector<coord> tmp_list;
     for (const auto& en : this->parent_world->entities) {
@@ -106,16 +106,14 @@ inline const WorldPlot::graph_box_type* WorldPlot::return_nearby_empty_box(const
 bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const directionalPath& path ) const{
     const graph_box_type *temp{ origin };
 
-    return ! std::any_of(path.begin(), path.end(), [&](const Direction& dir) {
+    return std::none_of(path.begin(), path.end(), [&](const Direction& dir) {
         temp = temp->get_adj_box(dir);
         return temp->getData().hasEntities();
     });
 }
 
 WorldPlot::WorldPlot(const World_Ptr world, _timePoint start_time): Cube_Matrix(statics::init_Bound), parent_world(world), currentTime(start_time), path_finder(this) {
-
-    // @bug - DONT call createFood from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
-    // CALLING THE OVERLOADED CREATEFOOD() that doesn't depend on the position of entities in the world, since it's not sure if the entities have got their head coords or not
+    // @node - DONT call createFood() from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
     this->_rand_once_createFood();
 
     this->resume_auto_expansion();
@@ -140,7 +138,7 @@ void WorldPlot::auto_expansion(){
 
     while (this->__expansion_state.expansion_flag)
     {
-        std::clog << "UNIVERSE #" << this->parent_world->_id << " EXPANDING...\n";
+        LOGGER::log_it(this->parent_world->_id, Event::World_Expanding);
         this->expand_once();
 
         // sleep for 1 unit time
@@ -149,7 +147,7 @@ void WorldPlot::auto_expansion(){
     }
 
     this->auto_expansion_convar.notify_one();
-    std::clog << "Stopped AutoExpansion" << std::endl;
+    LOGGER::log_it(this->parent_world->_id, Event::World_Stopped_Expanding);
 }
 
 void WorldPlot::pause_auto_expansion()
@@ -236,7 +234,7 @@ coord WorldPlot::getRandomCoord() const noexcept
 }
 
 void WorldPlot::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const {
-    if (path_finder.is_path_clean(origin.graph_box, old_path)) {
+    if ( !old_path.empty() && path_finder.is_path_clean(origin.graph_box, old_path)) {
         return;
     }
 
@@ -246,7 +244,7 @@ void WorldPlot::getShortestPathToFood(const Entity_Point& origin, directionalPat
 inline directionalPath WorldPlot::getShortestPathToFood(const Entity_Point& origin) const{
     // @important @note - snake class expects the path to be like a stack, ie. the first move, will be the last one, which will be popped, then move_on
 
-    return this->path_finder.getPath(origin);
+    return this->path_finder.getPath(origin);   // by default, doesn't return the `shortest path`
 }
 
 // @caution the coords returned, may be out of bound, have a check for that in calling function

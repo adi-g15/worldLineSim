@@ -2,19 +2,27 @@
 
 #include "adapter.hpp"
 #include <chrono>
-#include <string_view>
+
+#include <string>
+#include <map>
+
+#include <nanogui/nanogui.h>
 
 class Verse;	// forward-decl
 
-class Display {
+class Display: public nanogui::Screen {
 	bool shouldStop{false};	// apart from this the shouldWindowClose() will be considered too
 	Verse* parent_verse;
 	std::chrono::high_resolution_clock::time_point loggingStart;
 	const std::array<const std::string_view, 3> commands{ "help", "pause", "test" };
-
+	std::map<std::string, std::function<void(void)>> shortcut_map;
 public:
-	void start_input_daemon(){}
-	void showInitiating();
+
+	nanogui::Window* help_window;
+	nanogui::Window* multiverse_window;
+	nanogui::Window* legend_window;
+
+	void start_input_daemon();
 	void startDisplay();
 	void displayCurrentState() const;
 	void showExiting();
@@ -24,7 +32,6 @@ public:
 	std::shared_ptr<DisplayAdapter> newNodeAdapter(World_Node* node);
 
 
-	void helpScreen();
 	void updateScreen();
 
 
@@ -35,4 +42,5 @@ public:
 
 	void showExit();
 	Display(Verse*);
+	~Display();
 };

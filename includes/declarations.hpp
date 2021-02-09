@@ -42,13 +42,39 @@ public:
     // bool isEmpty() const noexcept {return entities.empty();}    //maybe removed
 };
 
-enum class Event{  //for logging puposes
-    ENTITY_BIRTH,
-    ENTITY_DEATH,
-    ENTITY_MOVE,
-    ENTITY_GROW,
-    NEW_WORLD,
-    WORLD_PAUSE,
-    // WORLD_RESUME,   //won't be used now
-        //BIG_BANG happens only once, so not must to include
+enum Event{  //for logging puposes
+    // entity events
+    Entity_Created = 0,
+    Entity_Destroyed,
+    Entity_Move,
+    Entity_Grow,
+
+    // world events
+    World_Created,
+    World_Destroyed,
+    World_Stopped_Expanding,
+    World_Expanding,
+    World_Paused,
+    World_Resume,   //won't be used now
+
+    // verse events
+    DESTRUCTION_START,
+
+    // graphMat
+    //GraphMat_Allocation
 };
+
+namespace logger {
+    constexpr std::array<int, 8> verbosity_levels{  // in order of declarations in Event
+        0,
+        0,
+        2,
+        1,
+
+        -1,
+        -1,
+        -1,
+
+        -2
+    };
+}

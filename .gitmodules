@@ -1,6 +1,3 @@
-[submodule "ext/glfwpp"]
-	path = ext/glfwpp
-	url = https://github.com/janekb04/glfwpp
 [submodule "ext/graphMat"]
 	path = ext/graphMat
 	url = https://github.com/adi-g15/graphMat

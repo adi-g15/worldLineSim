@@ -126,7 +126,7 @@ World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t,
     // dispMngr->addNode(this);	// adds this node, as well as initialise this->_display_data
 
     this->adapter = tree->access_disp_manager()->newNodeAdapter(this);
-    this->start_logging();
+    std::thread( &World_Node::start_logging, this ).detach();
 }
 
 World_Node::~World_Node(){

@@ -28,16 +28,13 @@ void Snake::simulateExistence() {
     // instead of using convar, we could have used promise::set_value_at_thread_exit()
     this->isSimulating = true;  // ysa
     while (this->isSimulating && this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
-#ifdef DEBUG
-        std::clog << "Moving Snake #" << this->_id << '\n';
-#endif // DEBUG
+        LOGGER::log_it(this->parent_world->_id, Event::Entity_Move/*, Moving Snake #", this->_id*/);
 
         //this->moveForward();
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }
     this->isSimulating = false;
-    //std::clog << "Stopped " << this->_id << '\n';
 
     std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     this->sim_convar.notify_one();
@@ -54,14 +51,11 @@ void Snake::pauseExistence() {
         // this is to prevent infinite loop or waiting, since the next line can cause blocking if the notify_one is earlier than wait()
 }
 
-bool Snake::eatFood(){  //can only eat, if AT the position
+bool Snake::eatFood(){  // @note - The body.grow() needs to be called in caller function
     if (!parent_world->lockFood(this))   return false;   // couldn't eat, food is locked
 
-    if( head.point_coord == parent_world->getFoodCoord()){
-        this->parent_world->ateFood(this);
-        return true;
-    }
-    return false;
+    this->parent_world->ateFood(this);
+    return true;
 }
 
 bool Snake::hasRoundTrips() const{
@@ -107,7 +101,15 @@ bool Snake::isSnakeBodyOK() const{
 void Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
 
     // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
+    if (this->parent_world->world_plot.get_food().box == nullptr)    return;
+
     this->parent_world->getShortestPathToFood(this->head, this->curr_Path);
+
+    if (this->curr_Path.empty()) {   // if path was empty, ie. we are at the food position
+        if(this->eatFood()) body.grow(__temp.last_dir);
+
+        return;
+    }
 
     this->__temp.last_dir = curr_Path.next_dir();
     curr_Path.pop();
@@ -115,13 +117,8 @@ void Snake::moveForward(){  // this will also be on the snake's thread, and not 
     this->head.graph_box = this->head.graph_box->get_adj_box(__temp.last_dir);
     this->_add_dir_to_coord( this->head.point_coord, __temp.last_dir);
 
+    body.move(__temp.last_dir);
 
-    if (this->curr_Path.empty() && this->eatFood()) {
-        body.grow(__temp.last_dir);
-    }
-    else {
-        body.move( __temp.last_dir );
-    }
 }
 
 void Snake::_add_dir_to_coord(coord& c, Direction dir) const
@@ -229,21 +226,16 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
                 }
             }
             if (!iter) {
-                std::cerr << "Not enough space could be traversed to allocate snake to that area";
-                return;
+                LOGGER::log_it_verb(5, "Not enough space could be traversed to allocate snake to that area");
             }
 
             prev_box->getDataRef().addEntity(this);
             this->body.body.push_back(iter._getLastTurnedDirection().value());  // getLastTurnedDirection() MUST have a value
-#ifdef DEBUG
-            std::clog << "Added unit to snake's body: " << this->_id << '\n';
-#endif
+
+            LOGGER::log_it_verb(6, "Added unit to snake's body: %d", this->_id);
 
             this->tail.graph_box = prev_box;
             this->tail.point_coord += iter._getIncrementCoords();
-            //_add_dir_to_coord(this->tail.point_coord, rand_direction);
-
-            if (!this->isSnakeBodyOK())  break;
         }
 
     } while ( !isSnakeBodyOK() );

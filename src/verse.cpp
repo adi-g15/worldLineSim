@@ -12,10 +12,9 @@
 	// Update: Feb 4 -> It no longer returns a promise or a future, display takes over the main thread, and BLOCKS
 	// @note - it should be more like, returning a promise, rather than a future... only logically it should hold that the receiver can poll this object, to know whether the task is completed
 void Verse::big_bang(){
-	this->displayManager->showInitiating();
 	// init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
 		 // creation of the first world, to ever exist in the particular verse
-	this->worldTree->initTree(this->creation_promise);	// WorldTree::init() will create the first node
+	this->worldTree->initTree(/*this->creation_promise*/);	// WorldTree::init() will create the first node
 
 	this->displayManager->startDisplay();
 }
@@ -54,7 +53,7 @@ void Verse::render_screen(){
 
 }
 
-Verse::Verse(): displayManager(new Display(this)) {
+Verse::Verse(): displayManager(new Display(this)), _ID() {
 	worldTree.reset(new World_Tree(this, this->displayManager));
 }
 

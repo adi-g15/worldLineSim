@@ -4,7 +4,7 @@
 
 struct Log
 {
-    State currState;
+    const State currState;
 
     Log(State state): currState(state){}
 };

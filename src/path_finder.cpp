@@ -1,6 +1,9 @@
 #include "path_finder.hpp"
 #include "world_plot.hpp"
 
+#include <algorithm>	// for std::shuffle
+#include <util/random.hpp>
+
 	// @note - basic_rect doesn't check if the path is empty or not
 directionalPath Path_Finder::basic_rect( const Entity_Point& start, const coord& end ) const	// start is a graph box, only to efficiently check if a path is clean or not
 {
@@ -78,13 +81,13 @@ directionalPath Path_Finder::getPath(const Entity_Point& entity_point, bool shor
 	{
 		path = this->basic_rect(entity_point, this->plot->food.coordinate);
 	}
-	if (!is_path_clean(entity_point.graph_box, path)) {
-		if ( ! shortest ) {	// that is the basic rect path was used, and it can cause problems at times, so now dcall shortest paths to find a new path
+
+	while (!is_path_clean(entity_point.graph_box, path)) {
+		if ( shortest ) {	// that is the basic rect path was used, and it can cause problems at times, so now dcall shortest paths to find a new path
 			return this->getPath(entity_point, true);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(400));	// check for a new path after 400ms	(This behaviour may change as more path finder methods are added)
-		return this->getPath(entity_point, true);
+		std::shuffle(path.begin(), path.end(), util::Random::generator);
 	}
 
 	return path;

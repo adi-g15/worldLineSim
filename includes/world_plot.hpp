@@ -6,8 +6,6 @@
 #include "path_finder.hpp"
 #include <atomic>	// For std::atomic_bool (actually not mandatory, some extra loops are okay in auto_expand)
 
-/*MUST ALWAYS BE ON A SINGLE THREAD AT MAX, SINCE TEMPORARY VARIABLES ARE USED AS MEMBER OF THIS CLASS*/
-
 using Graph_Box = Graph_Box_3D<Box>;
 
 struct Food {
@@ -71,7 +69,6 @@ class WorldPlot: public Cube_Matrix<Box>{
 
 	// @note - The world_plot starts AUTO EXPANSION, from constructor itself
 	WorldPlot(const World_Ptr, _timePoint start_time);
-
 
 	friend class World;
 	friend class Path_Finder;	// it will be a friend of world_plot too, so as to control its ability to auto expand

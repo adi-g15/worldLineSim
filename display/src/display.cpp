@@ -5,15 +5,35 @@
 #include "verse.hpp"
 #include "world_tree.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif // _WIN32
+
+
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <future>
+
+using namespace nanogui;
 
 using std::chrono::high_resolution_clock;
-void Display::showInitiating() {
-	std::clog << '[' << (high_resolution_clock::now() - loggingStart).count() << ']' << " Initiating...\n";
-}
-
 void Display::displayCurrentState() const {
 	std::clog << "Total " << this->parent_verse->worldTree->num_nodes << " nodes in the world tree\n";
+}
+
+void Display::start_input_daemon()
+{
+	std::thread([&]() mutable {
+		thread_local std::string entered_command;
+		do {
+			//std::future<void> cmd_future = std::async(std::launch::async, [&]() mutable { std::getline(std::cin, entered_command); });
+			//cmd_future.wait();
+			std::getline(std::cin, entered_command);
+
+			std::clog << "\n\n\nGot command: \"" << entered_command << "\"\n\n" << std::endl;
+		} while (this->enabled());
+	}).detach();
 }
 
 void Display::startDisplay() {
@@ -21,12 +41,73 @@ void Display::startDisplay() {
 
 	std::clog << '[' << (high_resolution_clock::now() - loggingStart).count() << ']' << " Display Started...\n";
 
-	while (!shouldStop)
-	{
-		displayCurrentState();	// only for console logging
+	//FormHelper* gui = new FormHelper(display_screen);
+	//gui->add_group("Multiverse");
+	//gui->add_group("Legend");
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));	// 60 Hz
-	}
+	ref<TextBox> header = new TextBox(this, "WorldLine Simulation v0.271");
+	header->set_editable(false);
+
+	multiverse_window = new Window(this, "MultiVerse");
+	multiverse_window->set_position({ 0 + 5, this->height() / 10 + 5 });	// it is (y,x)
+	multiverse_window->set_layout(new GridLayout());
+	multiverse_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
+	multiverse_window->set_width(static_cast<int>(0.80f * this->width()) - 5);
+
+
+	for (auto i = 0; i < this->parent_verse->worldTree->num_nodes; ++i)
+		new Window(multiverse_window, "Universe #" + std::to_string(i));
+
+
+	legend_window = new Window(this, "Legend");
+	legend_window->set_layout(new GroupLayout());
+	legend_window->set_position({
+		static_cast<int>(0.80f * this->width()) - 5 + 5 + 5,	// 80% if width +- margins 
+		multiverse_window->position().y(),
+		});
+	legend_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
+	legend_window->set_width(static_cast<int>(0.20f * this->width()) - 5);
+
+	new Label(legend_window, "All worlds continue on diff. threads, w/o blocking the display, or the verse");
+	new Label(legend_window, "After chosing a particular world");
+	new Label(legend_window, "Commands");
+
+	auto command_area = new TextArea(legend_window);
+	/*
+	-   N - Namaste World(New)");
+	-   P - Pause");
+	-   R - Resume");
+	-   T - Time Travel !!");
+	-   L - Logs (of World)");
+	-   V - Logs (of Verse)"
+	*/
+
+	this->set_visible(true);
+	this->perform_layout();
+
+	std::thread([&]() mutable {
+		while (this->enabled())
+		{
+			header->set_height(0.10f * this->height());
+			header->set_width(this->width());
+
+			multiverse_window->set_position({ 0 + 5, this->height() / 10 + 5 });	// it is (y,x)
+			multiverse_window->set_layout(new GridLayout());
+			multiverse_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
+			multiverse_window->set_width(static_cast<int>(0.80f * this->width()) - 5);
+
+			legend_window->set_position({
+				static_cast<int>(0.80f * this->width()) - 5 + 5 + 5,	// 80% if width +- margins 
+				multiverse_window->position().y(),
+				});
+			legend_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
+			legend_window->set_width(static_cast<int>(0.20f * this->width()) - 5);
+
+			std::this_thread::sleep_for( std::chrono::milliseconds(1000 / 40) );	// 40Hz
+		}
+		}).detach();
+
+	nanogui::mainloop(1000/60.0f);	// Refresh every 1000/60 seconds, ie. 60Hz
 }
 
 void Display::showExiting() {
@@ -99,9 +180,8 @@ std::shared_ptr<DisplayAdapter> Display::newNodeAdapter(World_Node* node){
 	return nullptr;
 }
 
-void Display::helpScreen(){
+/*void Display::helpScreen(){
 	//using namespace std::chrono_literals;
-
 	//this->curses_init();	// @note - single_term itself manages if curses is already initialised
 
 	//this->resumeRendering();
@@ -179,8 +259,7 @@ void Display::helpScreen(){
 	//}
 
 	//this->optionScreen();
-
-}
+}*/
 
 void Display::updateScreen(){
 	//using namespace std::chrono_literals;
@@ -324,5 +403,37 @@ void Display::render(){
 Display::Display(Verse* parent) :
 	//title("WorldLine Simulator v0.271", "Created by Aditya Gupta and Steins; Gate"),
 	parent_verse(parent),
-	loggingStart(std::chrono::high_resolution_clock::now())
-{}
+	loggingStart(std::chrono::high_resolution_clock::now()),
+	Screen({ 800,1000 }, "WorldLine Simulator v0.271"/*, false, true */)
+{
+	this->shortcut_map = {
+		{":help", [&]() mutable {
+			this->help_window->set_visible(true);
+			this->legend_window->set_visible(false);
+			this->multiverse_window->set_visible(false);
+		}},
+		{":about", [&]() mutable {
+			// @future - No plan to add this now
+		}},
+		{":web", [&]() mutable {
+			//nanogui::ImageView* 
+		}},
+		{":pause", [&]() mutable {
+			
+		}}
+	};
+
+	this->inc_ref();
+
+//#ifdef _WIN32
+//	MessageBoxA(nullptr, "Hi message", NULL, MB_ICONERROR | MB_OK);
+//	return;
+//#endif // _WIN32
+
+	Color background_col = { 20,20,23, 255 };
+	this->set_background(background_col);
+}
+
+Display::~Display() {
+	nanogui::shutdown();
+}

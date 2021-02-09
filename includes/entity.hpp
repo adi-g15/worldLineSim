@@ -10,10 +10,7 @@
 #include "declarations.hpp"
 #include "id_creator.hpp"
 #include "graphMat/3d_graph_box.hpp"   // for Graph_Box
-
-#ifdef DEBUG
-#include <iostream>
-#endif // DEBUG
+#include "logger.hpp"
 
 typedef void (*Action_Ptr)(void);
 
@@ -65,9 +62,6 @@ public:
         _ID(),
         type(type)
     {
-#ifdef DEBUG
-        std::cout << "New Entity; ID:" << this->_id << '\n';
-#endif
         // supported_Operations.push_back( &foo );  //works, void(void) in global scope
         // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work
         // supported_Operations.push_back( &Entity::_Action1 ); //doesn't work

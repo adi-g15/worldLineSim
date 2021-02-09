@@ -3,8 +3,6 @@
 #include "log.hpp"
 #include "declarations.hpp"
 
-#include <mutex>
-
 // UPDATE: 3rd Feb - Will be using the console for logging
 
 /*
@@ -13,23 +11,20 @@ though later on a logger object can be local member to each object of `Verse` cl
 since that would allow something like a `Multiverse`, in each of which only one world will be active,
 but each Verse's current World will all keep working
 */
-class LOGGER{  //actual logger class that logs the data to a file, or some stream
-    static std::mutex _screen_mutex;
+class LOGGER{
+    //static inline std::ostream& log_stream = std::clog;
 
     public:
-        //@log - Or have it take multiple
-        static void log_it(uint16_t world_id, Event event, Log& log_obj){
-            std::scoped_lock s(_screen_mutex);
-            // @todo
-
-        }
-
-        static void startLogger(){
-            // @note - Will likely create a new window and store
-            // _logger_screen = newterm();
-            // logger_screen_mutex
-            // @todo
-
-        }
-
+        template<typename... Args>
+        static void log_it_verb(int8_t verbosity_level, const char* msg, Args... args);  // ONLY call this for low verbosity
+        static void log_it(uint16_t world_id, Event event/*, Log& log_obj*/);
+        static void start_logger(int, char**);
 };
+
+template<typename ...Args>
+inline void LOGGER::log_it_verb(int8_t verbosity_level, const char* msg, Args ...args)
+{
+    //loguru::log(verbosity_level, stderr, 10, msg);
+
+    return;
+}

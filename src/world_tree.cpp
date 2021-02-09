@@ -12,14 +12,13 @@ const std::shared_ptr<Display> World_Tree::access_disp_manager() const{
     return this->parent_verse->disp_manager();
 }
 
-bool World_Tree::initTree(std::promise<void>& creation_promise){
+bool World_Tree::initTree(){
     if (this->root != nullptr)   return true;   // already initialised
 
     this->root = new World_Node(this, nullptr, statics::BIG_BANG_TIME);
     this->num_nodes = 1;
     this->_fast_access_data.__latest_world_node = this->root;
 
-    creation_promise.set_value();
     return true;    // @debug
 }
 

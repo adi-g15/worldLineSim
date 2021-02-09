@@ -10,7 +10,7 @@
 #include <future>
 
 	// The world tree will mostly work almost same as array
-class Verse{
+class Verse: public _ID{
 public:
 	std::promise<void> creation_promise;	// shouldn't be required now, but still letting it remain for now
 

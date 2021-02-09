@@ -9,22 +9,26 @@ include(CTest)
 # Later utilise features in C++20
 set(CMAKE_CXX_STANDARD 17)
 
-if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfwpp/include")
-    message(FATAL_ERROR "The GLFW dependency (or it's wrapper glfwpp) are missing!! "
+if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/include")
+    message(FATAL_ERROR "The nanogui dependency is missing!! "
             "You might not have cloned the repo with --recursive "
             "You will need to clone the dependencies too, use \`git submodule --init --recursive\`"
         )
 endif()
 
+add_subdirectory(ext/loguru)
+add_subdirectory(ext/nanogui)
+
 include_directories(ext/graphMat/includes/)
 include_directories(ext/utilpp/includes/)
-include_directories(ext/glfwpp/include/)
+include_directories(ext/loguru/)
 
 file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
 
 #add_compile_definitions(GRAPH_MAT_NO_COORD)
 add_compile_definitions(DEBUG)
 add_executable(simulator main.cpp ${SOURCES})
+target_link_libraries(simulator PRIVATE loguru)
 target_link_libraries(simulator PRIVATE display)
 
 include_directories(includes)
@@ -35,11 +39,13 @@ find_package(Threads REQUIRED)
 
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 add_library(display STATIC ${DISP_SOURCES})
-target_link_libraries(display PRIVATE GLFWPP)
+include_directories(ext/nanogui/include)
+target_link_libraries(display PRIVATE nanogui)
 
-add_subdirectory(ext/glfwpp)
 set(NANOGUI_BUILD_EXAMPLES  OFF CACHE BOOL " " FORCE)
-set(GLFWPP_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
+set(NANOGUI_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
+
 target_link_libraries(simulator PRIVATE Threads::Threads)
 target_link_libraries(simulator PRIVATE display)
 
