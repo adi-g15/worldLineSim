@@ -116,7 +116,7 @@ bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const dire
     });
 }
 
-WorldPlot::WorldPlot(const World_Ptr world, _timePoint start_time): Cube_Matrix(statics::init_Bound), parent_world(world), currentTime(start_time), path_finder(this) {
+WorldPlot::WorldPlot(const World_Ptr world, _timePoint start_time): Cube_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
     // @node - DONT call createFood() from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
     this->_rand_once_createFood();
 
@@ -147,7 +147,6 @@ void WorldPlot::auto_expansion(){
 
         // sleep for 1 unit time
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
-        ++this->currentTime;
     }
 
     this->auto_expansion_convar.notify_one();

@@ -1,11 +1,13 @@
 # World Line Simulator
 
+As of now, it simulates a simple 3D multiverse
+
 Wait... if you are thinking it's some big rendering project, sorry but it's not but it's interesting,
 think of the very basic idea as this ->
 
 _Think about a world, in which 4 snakes keep moving automatically to get food_
 
-Now the project offers mcuh more, since you can now have as many entities as memory allows, and can CREATE your own entities too.
+Now the project offers much more, since you can now have as many entities as memory allows, and can CREATE your own entities too.
 
 This project generalises the idea to entities and actions, in different worlds and worldlines, all independently on different threads, as well theoretically different verses too, other than this ->
 _And... you can go to a particular time in **past**, and change the position of one of the entities... Baammm, a new world line is created in which *this event* happened, and the older world had *this event* had not taken place... so there is a high chance, current state(lengths of the snakes, positions of entities, etc. combined) of the world will be different than what had been in the previous world line_
@@ -37,13 +39,13 @@ cmake --build .
 
 > Note: Currently the focus is that _internally_ the simulation happens, but maybe the display won't be very great now, so it just logs on console (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
 
-![Current State](https://github.com/adi-g15/Sources/blob/main/worldLineSim_state.png?raw=true "This is a part of the logging")
+![Current State](https://raw.githubusercontent.com/adi-g15/Sources/main/worldLineSim_state.png?token=AI4LBINZKQFMNVC5BRCO7S3AFU3KO "This is a part of the logging")
 
 ## Class Chart
 
 > Made with draw.io
 
-![Class Chart](https://github.com/adi-g15/Sources/blob/main/worldLineSim.png?raw=true "WorldLine Sim")
+![Class Chart](https://raw.githubusercontent.com/adi-g15/Sources/main/worldLineSim.png?token=AI4LBIN5MOCOAM4ODLI3NCLAFU3TS "WorldLine Sim")
 
 ## Future Ideas
 

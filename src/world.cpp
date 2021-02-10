@@ -26,11 +26,6 @@
 //#include "Entities/Custom/rabin.hpp"
 //#include "Entities/Custom/cheems_vidhayak.hpp"
 
-_timePoint World::getCurrentTime() const noexcept
-{
-    return this->world_plot.currentTime;
-}
-
 const coord& World::getFoodCoord()
 {
     return world_plot.get_food().coordinate;

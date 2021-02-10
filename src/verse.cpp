@@ -12,11 +12,15 @@
 	// Update: Feb 4 -> It no longer returns a promise or a future, display takes over the main thread, and BLOCKS
 	// @note - it should be more like, returning a promise, rather than a future... only logically it should hold that the receiver can poll this object, to know whether the task is completed
 void Verse::big_bang(){
-	// init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
-		 // creation of the first world, to ever exist in the particular verse
 	this->multiverse_forest.back().initTree(/*this->creation_promise*/);	// WorldTree::init() will create the first node
 
 	this->displayManager->startDisplay();
+}
+
+void Verse::add_world_tree()
+{
+	this->multiverse_forest.emplace_back(this, this->displayManager);
+	this->multiverse_forest.back().initTree();
 }
 
 // @note - Blocks until everything is stopped
@@ -33,27 +37,6 @@ void Verse::kaal_day(std::string_view origin){
 	if (origin != "Shiv") {	// if not destructor then show these messages
 		this->displayManager->stopDisplay();
 	}
-	// @future @log - Stop the logger here too
-	// this->logger.stop();
-}
-
-void Verse::render_screen(){
-	// this->displayManager->render();	// @note - Or may use disp::printScreen() too, and let the node_adapters trigger UI updates themselves from different threads
-
-	// earlier this was active //this->displayManager->printScreen();
-	// this->displayManager->newNodeAdapter(nullptr);
-
-	// std::cout << "Back here" << std::endl;	// @debug
-	// Display::get_async_input().wait();	// @debug
-
-	// displayManager->main_area->refresh();
-	// std::cout << "Back Again" << std::endl;	// @debug
-	// Display::get_async_input().wait();	// @debug
-
-	// wrefresh(stdscr);
-	// std::cout << "Back Again2" << std::endl;	// @debug
-	// Display::get_async_input().wait();	// @debug
-
 }
 
 Verse::Verse(): displayManager(new Display(this)), _ID() {

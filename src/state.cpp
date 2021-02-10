@@ -1,14 +1,13 @@
 #include "state.hpp"
 #include "world.hpp"
+#include "world_node.hpp"
 
-State::State(World* world):
-	state_time(world->getCurrentTime()),
-	universe_order(world->getWorldDimen())
+State::State(World_Node* world_node):
+	state_time(world_node->getCurrentTime()),
+	universe_order(world_node->get_world()->getWorldDimen())
 {
-	//this->entity_states.reserve(world->entities.size());
-	//for (const auto&& entity : world->entities) {
-	//	if (entity->getPrimaryPos().has_value()) {
-	//		this->entity_states.push_back(entity->getPrimaryPos().value().point_coord);    // snakes will always have a primary position
-	//	}
-	//}
+	entity_states.reserve(world_node->get_world()->entities.size());
+	for (const auto& entity : world_node->get_world()->entities) {
+		entity_states.push_back(entity->_get_current_state());
+	}
 }

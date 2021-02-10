@@ -23,13 +23,12 @@ public:
 	Adapter_Ptr adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
 	World_Tree* tree;
 
-	void update_disp() {}
-	void stop_display() {}
-
 	/**This will pause the threads for the time being, and update the time, and states vector, then create a new node with the same World* pointer and the world_id */
 	void pauseWorld();
 
 	const World_Ptr get_world() const;
+
+	const _timePoint getCurrentTime() const;
 
 	const dimen_t get_world_order() const;
 	const coord& World_Node::get_exact_dimen() const;
@@ -42,6 +41,7 @@ public:
 private:
 
 	bool continued_world{ false };    // stores whether this node just inherited the world pointer from parrent instead of a new world being formed. @note - This is to not delete the same emmory location multiple times, so when the switch is made to smat pointers, do remove it and use the smart pointers that automatically handle the memory for you
+	_timePoint current_time;
 
 	World_Ptr world;
 	id_type world_id;   /* @note - this->_id and this->world_id    are not the same for world_node, since world_id can be same, also prefer world_node's _id*/
@@ -54,7 +54,7 @@ private:
 	World_Node_Ptr left_node, right_node;   // each node will have at max two childs
 	std::mutex node_mutex;  // @note - Try to have this need removed, by managing edge cases where itis need buyt may not be actually needed
 
-	void captureState();
+	void capture_state();
 
 	const StatePlusPlus return_data();
 
@@ -70,7 +70,7 @@ private:
 	// actual on screen handling of pause to be done by verse, as well as the display, and then calling return_state(), then asking user to modify it, and then that modified state should be passed to this handle_pause()
 	void handle_pause(State that_state);
 
-	void start_logging();
+	void start_state_management();
 	void stop_WorldSimulation();
 
 	friend class World_Tree;

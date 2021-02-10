@@ -48,11 +48,39 @@ void Display::startDisplay() {
 	legend_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
 	legend_window->set_width(static_cast<int>(0.20f * this->width()) - 5);
 
-	new Label(legend_window, "All worlds continue on diff. threads, w/o blocking the display, or the verse");
-	new Label(legend_window, "After chosing a particular world");
-	new Label(legend_window, "Commands");
+	const std::string message1 = "All worlds continue on diff. threads, w/o blocking the display, or the verse";
+	const std::string message2 = "After chosing a particular world";
 
-	auto command_area = new TextArea(legend_window);
+	auto legend_width = legend_window->width();
+	{	// this emulates `wrapping` the message to correct width in legend_window
+		int i = 0;
+		while (i < message1.size())
+		{
+			new Label(legend_window, message1.substr(i, (legend_width - 1)/4));
+			i += (legend_width - 1) / 4;
+		}
+		new Label(legend_window, "");
+		i = 0;
+		while (i < message2.size())
+		{
+			new Label(legend_window, message2.substr(i, (legend_width - 1) / 4));
+			i += (legend_width - 1) / 4;
+		}
+		new Label(legend_window, "");
+	}
+
+	auto command_area = new Widget(legend_window);
+	command_area->set_layout(new GroupLayout());
+
+	new Label(legend_window, "Namaste/New WorldTree");
+	ref<Button> newWorldTree = new Button(legend_window, "New", FA_ATLAS);
+	newWorldTree->set_callback(
+		[&]() mutable {
+			this->parent_verse->add_world_tree();
+		}
+	);
+	//newWorldTree->set_background_color({5,5,5,255});
+	newWorldTree->set_width((8 * legend_width)/10);
 	/*
 	-   N - Namaste World(New)");
 	-   P - Pause");
@@ -65,7 +93,7 @@ void Display::startDisplay() {
 	this->set_visible(true);
 	this->perform_layout();
 
-	std::thread([&]() mutable {
+	std::thread([&, legend_width, newWorldTree]() mutable {
 		while (this->enabled())
 		{
 			header->set_height(0.10f * this->height());
@@ -83,16 +111,27 @@ void Display::startDisplay() {
 			legend_window->set_height(static_cast<int>(0.90f * this->height()) - 10);
 			legend_window->set_width(static_cast<int>(0.20f * this->width()) - 5);
 
+			legend_width = legend_window->width();
+			newWorldTree->set_width((8 * legend_width) / 10);
+
 			std::this_thread::sleep_for( std::chrono::milliseconds(1000 / 40) );	// 40Hz
 		}
 		}).detach();
 
+		// @future - I am basically using multiple threads for things that could have been done on single thread, like this mainloop and the above updation logic, in future change to glfw or similar for more control (likely won't do so though, maybe doing some other project)
 	nanogui::mainloop(1000/60.0f);	// Refresh every 1000/60 seconds, ie. 60Hz
 }
 
 ref<NodeAdapter> Display::add_node_adapter(World_Node* node)
 {
-	return new NodeAdapter(this, node);
+	auto adapter = new NodeAdapter(this, node);
+
+	//this->multiverse_window->request_focus();
+	multiverse_window->center();
+	this->redraw();
+	this->perform_layout();
+
+	return adapter;
 }
 
 void Display::showExiting() {

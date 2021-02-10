@@ -32,8 +32,6 @@ public:
 	typedef Graph_Box graph_box_type;
 
 private:
-	_timePoint currentTime;	// ONLY updated when the world is auto expanding, since that is part of our simulation
-
 	const World_Ptr parent_world;
 	Path_Finder path_finder;
 	Food food;   // @future - food may have different points/nutitional values too

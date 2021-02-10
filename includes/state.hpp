@@ -4,6 +4,8 @@
 #include "graphMat/direction.hpp"
 #include <vector>
 
+class World_Node;   // forward-decl
+
 /*
 The state should only be created when asked for, for on most cases, when world paused
 */
@@ -16,6 +18,6 @@ struct State    // @idea Can later have food location in state too... not doind 
     const _timePoint state_time;
     const statics::dimen_t universe_order;
 
-    State(World*);
+    State(World_Node*);
 
 };

@@ -25,8 +25,6 @@ class World: public _ID{
 public:
 	WorldPlot world_plot;
 
-	_timePoint getCurrentTime() const noexcept;
-
 	// @note - the below two functions are complementary to the other
 	// @note2 - ateFood() is expected NEVER to fail, based on the food_mutex, hence returns void
 	std::mutex food_mutex;	// locks JUST AFTER Snake::eatFood() starts and BEFORE World::ateFood(Snake*)

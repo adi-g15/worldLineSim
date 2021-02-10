@@ -24,21 +24,18 @@ NodeAdapter::NodeAdapter(DisplayScreen dispScr, World_Node_Ptr world_node) :
     layout->set_col_alignment({ Alignment::Maximum, Alignment::Fill });
     data_area->set_layout(layout);
 
-    this->num = 45;
+    new Label(data_area, "Dimensions: ");
+    this->dimension = new Widget(data_area);
+    dimension->set_layout(new GridLayout(Orientation::Horizontal, 3));
+    new IntBox<statics::dimen_t>(dimension);
+    new IntBox<statics::dimen_t>(dimension);
+    new IntBox<statics::dimen_t>(dimension);
+
+    new Label(data_area, "Time: ");
+    this->time = new FloatBox<_timePoint>(data_area);
+
     new Label(data_area, "Entities: ");
     this->num_entity = new IntBox<int>(data_area);
-
-    //new Label(this, node->get_time());
-    //window.printf("Dimen - (%, %)", this->node->get_world_order(), this->node->get_world_order());
-    //// window.printf("Dimen - (, )");
-
-    //for (int i = 0; i < 4; i++)
-    //{
-    //    window.newline();
-    //    // window.printf("E - (, ), ");	// snake number/id, head_coord.x, head_coord.y, points of snake
-    //    window.printf("E% - (%, %), %", i+1);	// snake number/id, head_coord.x, head_coord.y, points of snake
-    //}
-
 
     ref<Widget> button_group = new Widget(this);
     button_group->set_layout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
@@ -83,5 +80,11 @@ NodeAdapter::NodeAdapter(DisplayScreen dispScr, World_Node_Ptr world_node) :
 
 void NodeAdapter::update(){	// updates the content on the window, with updated content from the world_naode that is linked
     this->num_entity->set_value(this->node->world->entities.size());
+    this->time->set_value(this->node->current_time);
+    const auto& dimensions = this->dimension->children();
+    const auto& curr_dimen = this->node->get_exact_dimen();
 
+    static_cast<IntBox<statics::dimen_t>*>(dimensions[0])->set_value( curr_dimen.mX );
+    static_cast<IntBox<statics::dimen_t>*>(dimensions[1])->set_value( curr_dimen.mY );
+    static_cast<IntBox<statics::dimen_t>*>(dimensions[2])->set_value( curr_dimen.mZ );
 }

@@ -15,6 +15,8 @@ public:
 	using Window_Ptr = nanogui::Window*;
 	using Adapter_Ptr = nanogui::ref<NodeAdapter>;
 
+	Verse* parent_verse;
+
 	void start_input_daemon();
 	void startDisplay();
 	void showExiting();
@@ -28,7 +30,6 @@ public:
 
 private:
 	bool shouldStop{ false };	// apart from this the shouldWindowClose() will be considered too
-	Verse* parent_verse;
 	const std::array<const std::string, 3> commands{ "help", "pause", "test" };
 	std::map<std::string, std::function<void(void)>> shortcut_map;
 
