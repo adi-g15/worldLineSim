@@ -8,6 +8,7 @@ include(CTest)
 
 # Later utilise features in C++20
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/include")
     message(FATAL_ERROR "The nanogui dependency is missing!! "

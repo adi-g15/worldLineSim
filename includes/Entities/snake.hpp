@@ -1,6 +1,5 @@
 #pragma once
 
-#include "forward_decl.hpp"
 #include "declarations.hpp"
 #include "entity.hpp"
 #include "graphMat/direction.hpp"

@@ -7,6 +7,7 @@
 #include <optional>
 #include <functional>   // for std::reference_wrapper
 
+#include "forward_decl.hpp"
 #include "declarations.hpp"
 #include "id_creator.hpp"
 #include "graphMat/3d_graph_box.hpp"   // for Graph_Box
