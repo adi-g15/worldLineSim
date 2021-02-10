@@ -3,7 +3,7 @@
 
 // As of now, human justs keeps moving randomly
 
-#include "../entity.hpp"
+#include "entity.hpp"
 
 class Human : public Entity {
 	Entity_Point curr_pos;
