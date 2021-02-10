@@ -16,6 +16,13 @@ public:
 	void simulateExistence() override {}
 	void pauseExistence() override {}
 
+	EntityState _get_current_state() const override;
+
 	Rock(World_Ptr);
 	Rock(World_Ptr, const coord&);
+};
+
+struct RockState : public EntityState {
+	const coord location;
+	RockState(const Rock*);
 };

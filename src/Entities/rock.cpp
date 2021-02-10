@@ -10,3 +10,13 @@ Rock::Rock(World_Ptr world, const coord& location): Entity(Entity_Types::ROCK), 
 
 	this->location.graph_box->getDataRef().addEntity(this);
 }
+
+EntityState Rock::_get_current_state() const
+{
+	return RockState(this);
+}
+
+RockState::RockState(const Rock* rock):
+	EntityState(Entity_Types::ROCK),
+	location(rock->location.point_coord)
+{}

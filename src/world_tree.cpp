@@ -8,7 +8,11 @@ NOTE - This time, i will first complete World_Tree class from start, and then wh
 */
 // it will actuall ystore dynamiucally allocated objects, not just there pointers
 // template<typename node_data_type = World>  // @for_now - For now only, we are giving it this default templated version
-const std::shared_ptr<Display> World_Tree::access_disp_manager() const{
+const Display* World_Tree::access_disp_manager() const{
+    return this->parent_verse->disp_manager();
+}
+
+Display* World_Tree::access_disp_manager() {
     return this->parent_verse->disp_manager();
 }
 
@@ -41,7 +45,7 @@ void World_Tree::destructTree()
     }
 }
 
-World_Tree::World_Tree(Verse* parent_verse, std::shared_ptr<Display> displayManager) : 
+World_Tree::World_Tree(Verse* parent_verse, Display_Ptr displayManager) :
     parent_verse(parent_verse),
     root(nullptr), 
     num_nodes(0)

@@ -4,17 +4,7 @@
 #include "adapter.hpp"
 
 void World_Node::captureState(){
-    this->paused_time = this->world->getCurrentTime();
-    State latest_state(this->paused_time);
-
-    for( auto&& entity : world->entities ){
-        if (entity->getPrimaryPos()) {}
-        else break;
-
-        latest_state.curr_pos.push_back(entity->getPrimaryPos().value().point_coord);    // snakes will always have a primary position
-    }
-
-    this->states.push_back(latest_state);
+    this->states.push_back(State(this->world));
 }
 
 const StatePlusPlus World_Node::return_data(){
@@ -83,22 +73,16 @@ void World_Node::pauseWorld(){
     // @todo @most_important
 }
 
-void World_Node::stop_display(){   // invalidates the WINDOW* pointer held by this
-    this->adapter.reset();
-}
-
-void World_Node::update_disp(){
-    if( ! this->adapter ){
-        this->adapter->update();
-    }
-}
-
 const World_Ptr World_Node::get_world() const{
     return this->world;
 }
 
-const dimen_t World_Node::get_world_dimen() const{
+inline const dimen_t World_Node::get_world_order() const{
     return this->world->getWorldDimen();
+}
+
+inline const coord& World_Node::get_exact_dimen() const {
+    return this->world->get_dimensions();
 }
 
 // @note - Be sure you have ALL respective arguments as taken by the World class constructor, since the node itself will need them to construct a new world
@@ -122,10 +106,7 @@ World_Node::World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t,
     this->tree = tree;
     this->world_id = this->world->_id;
 
-    // @warning @thread -> See all occurences of such cases where we are accessing data members/functions directly using the arrow notation, and ENSURE IT'S THREADSAFE (where they tend to be on different on different threads)
-    // dispMngr->addNode(this);	// adds this node, as well as initialise this->_display_data
-
-    this->adapter = tree->access_disp_manager()->newNodeAdapter(this);
+    this->adapter = tree->access_disp_manager()->add_node_adapter(this);
     std::thread( &World_Node::start_logging, this ).detach();
 }
 

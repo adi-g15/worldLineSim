@@ -14,7 +14,7 @@
 void Verse::big_bang(){
 	// init_tree should be ASYNCHRONOUS, and also starts, and manages the simulation itself
 		 // creation of the first world, to ever exist in the particular verse
-	this->worldTree->initTree(/*this->creation_promise*/);	// WorldTree::init() will create the first node
+	this->multiverse_forest.back().initTree(/*this->creation_promise*/);	// WorldTree::init() will create the first node
 
 	this->displayManager->startDisplay();
 }
@@ -25,7 +25,10 @@ void Verse::kaal_day(std::string_view origin){
 		this->displayManager->showExiting();	// show Exit message on the screen, till the displayManger is automatically gets destructed after its destrcutor is called, and that is when everything is removed
 	}
 
-	this->worldTree->destructTree();
+	for (auto& worldTree : multiverse_forest)
+	{
+		worldTree.destructTree();
+	}
 
 	if (origin != "Shiv") {	// if not destructor then show these messages
 		this->displayManager->stopDisplay();
@@ -54,7 +57,8 @@ void Verse::render_screen(){
 }
 
 Verse::Verse(): displayManager(new Display(this)), _ID() {
-	worldTree.reset(new World_Tree(this, this->displayManager));
+	multiverse_forest.emplace_back(this, this->displayManager);	// one tree will already be in the forest
+	//worldTree.reset(new World_Tree(this, this->displayManager));
 }
 
 Verse::~Verse(){

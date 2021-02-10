@@ -14,12 +14,13 @@ NOTE - This time, i will first complete World_Tree class from start, and then wh
 // it will actuall ystore dynamiucally allocated objects, not just there pointers
 // template<typename node_data_type = World>  // @for_now - For now only, we are giving it this default templated version
 class World_Tree{
-	// typedef Tree_Node* Tree_Node_Ptr;
+public:
 	typedef World_Node* World_Node_Ptr;
-	// typedef _tree_node<World>* World_Node_Ptr;
+	typedef Display* Display_Ptr;	// not using ref count for this now
+
 private:
-	std::shared_ptr<Display> displayManager;    // the displayManager for the verse
-	Verse const* parent_verse;
+	Display_Ptr displayManager;    // the displayManager for the verse
+	Verse* parent_verse;
 	World_Node_Ptr root;
 	int16_t num_nodes{0};
 
@@ -34,7 +35,8 @@ private:
 	} _fast_access_data;    // temporary data for fast access, to currently running world
 
 public:
-	const std::shared_ptr<Display> access_disp_manager() const;
+	const Display* access_disp_manager() const;
+	Display* access_disp_manager();
 
 	bool initTree();
 	void destructTree();
@@ -45,6 +47,6 @@ public:
 
 	friend class Display;
 
-	World_Tree(Verse*, std::shared_ptr<Display> displayManager);
+	World_Tree(Verse*, Display_Ptr displayManager);
 	~World_Tree();
 };

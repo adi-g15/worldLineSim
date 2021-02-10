@@ -14,19 +14,25 @@ struct StatePlusPlus{
 };
 
 class World_Node : public _ID{
+public:
 	typedef World* World_Ptr;
 	typedef World_Node* World_Node_Ptr;
+	typedef nanogui::ref<NodeAdapter> Adapter_Ptr;
 
-public:
 	// std::shared_ptr<Display> dispManager;    // @note - May be needed, else it will have to go this way: this->world->verse->display to get to the display class, and then use the data
-	std::shared_ptr<DisplayAdapter> adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
+	Adapter_Ptr adapter;	// the display controller, shoudl be unique_ptr, but is shared_ptr, since we need a reference in the queue in the Display class, which we do by using a weak_ptr
 	World_Tree* tree;
 
-	void update_disp();
+	void update_disp() {}
+	void stop_display() {}
+
+	/**This will pause the threads for the time being, and update the time, and states vector, then create a new node with the same World* pointer and the world_id */
+	void pauseWorld();
 
 	const World_Ptr get_world() const;
 
-	const dimen_t get_world_dimen() const;
+	const dimen_t get_world_order() const;
+	const coord& World_Node::get_exact_dimen() const;
 
 	// @note - Simulation -> The constructors themselves will AUTOMATICALLY start the simulation just before constructor finishes, by calling start_simultaion()
 	World_Node( World_Tree* tree, World_Node* parent_node, _timePoint t, bool is_continued = false);
@@ -67,13 +73,8 @@ private:
 	void start_logging();
 	void stop_WorldSimulation();
 
-	/**This will pause the threads for the time being, and update the time, and states vector, then create a new node with the same World* pointer and the world_id */
-	void pauseWorld();
-
-	void stop_display();
-
-	friend class Display;
 	friend class World_Tree;
+	friend class NodeAdapter;
 	// @change - Now, World_Tree won't be constructing the root node, rather, the Verse will create it in big_bang(), and then passes it to World_Tree to work further
 	// @reverting_change - World_Tree:init() will create the root node now
 };

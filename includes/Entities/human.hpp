@@ -23,6 +23,16 @@ public:
 	void simulateExistence() override;
 	void pauseExistence() override;
 
+	EntityState _get_current_state() const override;
+
 	explicit Human(World_Ptr const world);
 	//Human(World_Ptr const world, Human const* parter) : Entity();	// the human will be together with the partner, or at least distance
+
+	friend struct HumanState;
+};
+
+struct HumanState : public EntityState {
+	const coord location;
+
+	HumanState(const Human*);
 };

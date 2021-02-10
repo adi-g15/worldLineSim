@@ -158,6 +158,11 @@ void Snake::_add_dir_to_coord(coord& c, Direction dir) const
     }
 }
 
+EntityState Snake::_get_current_state() const
+{
+    return SnakeState(this);
+}
+
 const Entity_Point& Snake::getHead() const{
     return this->head;
 }
@@ -277,3 +282,9 @@ void SnakeBody::removeAndClearBody() {
 }
 
 SnakeBody::SnakeBody(Snake* snake_ptr) : snake_ptr(snake_ptr) {}
+
+SnakeState::SnakeState(const Snake* snake):
+    EntityState(Entity_Types::SNAKE),
+    length(snake->getLength()),
+    curr_location(snake->head.point_coord)
+{}

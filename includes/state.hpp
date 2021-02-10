@@ -1,6 +1,6 @@
 #pragma once
 
-#include "declarations.hpp"
+#include "entity.hpp"
 #include "graphMat/direction.hpp"
 #include <vector>
 
@@ -9,16 +9,13 @@ The state should only be created when asked for, for on most cases, when world p
 */
     // This is mainly for logging, hence not making it complex with Graph_Box* etc
 struct State    // @idea Can later have food location in state too... not doind it now, it's up to `future` decision
-{   
-    std::vector < coord > curr_pos; //current positions of entities
+{
+    std::vector< Entity_Types > types;
+    std::vector < EntityState > entity_states; //current positions of entities
 
-    _timePoint state_time;
+    const _timePoint state_time;
+    const statics::dimen_t universe_order;
 
-    private:
-    State(
-        _timePoint t
-    ): state_time(t){}
+    State(World*);
 
-    friend class World_Node;
-    friend struct Log;
 };

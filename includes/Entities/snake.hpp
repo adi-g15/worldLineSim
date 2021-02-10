@@ -32,6 +32,13 @@ struct SnakeBody {
     SnakeBody(Snake*);
 };
 
+struct SnakeState : public EntityState {
+    const int length;
+    const coord curr_location;
+
+    SnakeState(const Snake* snake);
+};
+
 class Snake: public Entity{
     // typedef std::shared_ptr<World> World_Ptr;
     typedef World* World_Ptr;
@@ -62,6 +69,8 @@ public:
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
     void pauseExistence();  // just `pauses` any further movement, it still will be on board
 
+    EntityState _get_current_state() const override;
+
     int getUniqProp() const;
     int getLength() const;
 
@@ -88,4 +97,5 @@ private:
     void _add_dir_to_coord(coord&, Direction) const;
 
     friend struct SnakeBody;
+    friend struct SnakeState;
 };

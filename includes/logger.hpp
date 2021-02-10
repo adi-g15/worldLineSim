@@ -1,6 +1,5 @@
 #pragma once
 
-#include "log.hpp"
 #include "declarations.hpp"
 
 // UPDATE: 3rd Feb - Will be using the console for logging

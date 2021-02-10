@@ -54,6 +54,10 @@ void WorldPlot::_rand_once_createFood()
     this->food.reset({ box_node, new_coord });
 }
 
+const util::_coord3D<int>& WorldPlot::_get_internal_dimensions() const
+{
+    return this->total_abs;
+}
 void WorldPlot::_fit_coord_in_range(coord& coordinate) const noexcept
 {
     coordinate.mX %= this->getOrder() / 2;

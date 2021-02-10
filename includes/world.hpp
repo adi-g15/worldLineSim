@@ -7,7 +7,6 @@ FOR THE WORLD TO BE DYNAMICALLY GROWING ->
 
 #pragma once
 
-#include "log.hpp"
 #include "Entities/snake.hpp"
 #include "world_plot.hpp"
 
@@ -57,11 +56,10 @@ public:
 			//auto get_world_thread_id() const{ return std::this_thread::get_id(); }
 	} _shared_concurrent_data;
 
-	//wil be required to join these threads, in stopSimulation();
-	std::vector< std::thread > entity_threads;  // not a concurrently access data, since ONLY to be used by stopSimulation and startSimulation()
 	std::vector< Entity* > entities;	// accessed by World_Plot::createFood()
 
 	udimen_t getWorldDimen() const;
+	const coord& get_dimensions() const;
 
 	Graph_Box_3D<Box>* get_box(const coord& pos) {
 		return this->world_plot.get_box(pos);

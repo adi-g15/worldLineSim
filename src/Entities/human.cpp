@@ -2,7 +2,7 @@
 #include "world.hpp"
 #include "graphMat/iterators.hpp"
 
-inline std::optional<Entity_Point> Human::getPrimaryPos() const
+std::optional<Entity_Point> Human::getPrimaryPos() const
 {
 	return this->curr_pos;
 }
@@ -53,3 +53,13 @@ Human::Human(World_Ptr const world):
 	this->curr_pos.graph_box = this->parent_world->get_box(curr_pos.point_coord);
 	assert(curr_pos.graph_box != nullptr);	// remove this assert after tests written that getRandomCoord() always returns correct one
 }
+
+EntityState Human::_get_current_state() const
+{
+	return HumanState(this);
+}
+
+HumanState::HumanState(const Human* human):
+	EntityState(Entity_Types::HUMAN),
+	location(human->curr_pos.point_coord)
+{}

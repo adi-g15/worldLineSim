@@ -26,10 +26,12 @@ private:
 
 // @future - If it lives on its own thread, put a auto expansion logic, that sleeps for 1 time unit, and then calls auto_expand()
 class WorldPlot: public Cube_Matrix<Box>{
+public:
 	typedef int32_t dimen_t;
 	typedef World* World_Ptr;
 	typedef Graph_Box graph_box_type;
 
+private:
 	_timePoint currentTime;	// ONLY updated when the world is auto expanding, since that is part of our simulation
 
 	const World_Ptr parent_world;
@@ -51,6 +53,8 @@ class WorldPlot: public Cube_Matrix<Box>{
 	directionalPath getShortestPathToFood(const Entity_Point& origin) const;
 
 	public:
+		const util::_coord3D<int>& _get_internal_dimensions() const;
+
 		const auto& get_food() const{
 			return this->food;
 		}

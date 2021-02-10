@@ -9,25 +9,11 @@
 
 #include "declarations.hpp"
 #include "id_creator.hpp"
-#include "graphMat/3d_graph_box.hpp"   // for Graph_Box
 #include "logger.hpp"
+#include "graphMat/3d_graph_box.hpp"   // for Graph_Box
+#include "entity_types.hpp"
 
 typedef void (*Action_Ptr)(void);
-
-struct Prop{    // @future - See the @future comment on the Entity::getUniqProp() function
-    std::any data;
-};
-
-struct SnakeProp: Prop{
-    // int data;   // for snake, the unique property (ie. this `data`) will be an int, ie. length
-};
-
-enum class Entity_Types {
-    SNAKE,
-    ROCK,
-    HUMAN
-    // more can be added later, it's made to be expandible, though do see the member declarations as for what ANY entity must have
-};
 
 struct Entity_Point {    // a general class, since each object will have at least 1 POINT, for example for the snake this will be its head, for a planet, this can be its center, while a square may store 4 Entity_Point
     Graph_Box_3D<Box>* graph_box;
@@ -40,6 +26,12 @@ struct Entity_Point {    // a general class, since each object will have at leas
     }
 
     Entity_Point(Graph_Box_3D<Box>* initial_box, const coord& coordinate) noexcept: graph_box(initial_box), point_coord(coordinate) {}
+};
+
+struct EntityState {
+    const Entity_Types entity_type;
+protected:
+    EntityState(Entity_Types type): entity_type(type) {};
 };
 
 class Entity: public _ID{
@@ -55,8 +47,12 @@ public:
     virtual void _Action1() = 0;    //only 2 actions supported as of now
     virtual void _Action2() = 0;
 
-    virtual void simulateExistence() = 0;   // simulate the work when on a single thread
+    // Simulation functions
+    virtual void simulateExistence() = 0;
     virtual void pauseExistence() = 0;
+
+    // Time Travel functions _ That allow the time travel feature
+    virtual EntityState _get_current_state() const = 0;   // ONLY used for saving state, by World_Node
 
     Entity(Entity_Types type):
         _ID(),

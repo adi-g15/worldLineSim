@@ -5,9 +5,12 @@
 
 #include <map>
 #include <memory>
+#include <list>
 #include <thread>
 #include <utility>
 #include <future>
+
+#include "display/display.hpp"
 
 	// The world tree will mostly work almost same as array
 class Verse: public _ID{
@@ -19,7 +22,10 @@ public:
 	void kaal_day(std::string_view origin); // mahesh, the destroyer
 	 // @don't try to destruct the origin, since that will just be kind of a deadlock like situation, both trying to stop the other
 
-	const std::shared_ptr<Display> disp_manager() const{
+	const Display* disp_manager() const{
+		return this->displayManager;
+	}
+	Display* disp_manager() {
 		return this->displayManager;
 	}
 
@@ -27,10 +33,9 @@ public:
 	~Verse();
 private:
 	// std::unordered_map< State, World* > stateMap;   //If a particular state is already on the tree, resume that world instead of creating a totally new node, which will effectively just be an array
-	std::unique_ptr<World_Tree> worldTree;    //the tree will also hold number of nodes, and other properties
-	std::shared_ptr<Display> displayManager; // this class will manage the rendering
+	std::list< World_Tree > multiverse_forest;    // there can be multiple independent trees if wanted so
+	Display* displayManager; // this class will manage the rendering
 	std::map< id_type, World_Node* > id_to_node; // to call pause on a particular world `through` the node
-
 
 	friend class Display;
 };

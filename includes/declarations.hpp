@@ -6,9 +6,9 @@
 #include <cassert>
 #include <forward_list>
 
-#include "graphMat/direction.hpp"
-#include "graphMat/../../util/coord.hpp"    // not recommended like this, @me @note - Update when Utilities become a library of themselves
-#include "util/ranges.hpp"  // for util::contains function
+#include <graphMat/direction.hpp>
+#include <graphMat/../../util/coord.hpp>    // not recommended like this, @me @note - Update when Utilities become a library of themselves
+#include <util/ranges.hpp>  // for util::contains function
 
 #include "config.hpp"
 

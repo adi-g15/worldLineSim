@@ -81,6 +81,11 @@ void VidhayakJi::simulateExistence()
     //LOGGER::log_it_verb(6, "VidhayakJi ka career khatm... ab koi aur dal me judenge :-)", this->_id);
 }
 
+EntityState VidhayakJi::_get_current_state() const
+{
+    return VidhayakState(this);
+}
+
 VidhayakJi::VidhayakJi(World* parent_world) : Entity(Entity_Types::HUMAN)
 {
     this->parent_world = parent_world;

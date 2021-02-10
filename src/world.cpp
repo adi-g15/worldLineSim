@@ -23,10 +23,9 @@
 #include "Entities/snake.hpp"
 #include "Entities/rock.hpp"
 #include "Entities/human.hpp"
-#include "Entities/rabin.hpp"
-#include "Entities/cheems_vidhayak.hpp"
+//#include "Entities/Custom/rabin.hpp"
+//#include "Entities/Custom/cheems_vidhayak.hpp"
 
-// inlining this function gives Unresolved External Symbol to call to this EXACT function in World_Node's constructor
 _timePoint World::getCurrentTime() const noexcept
 {
     return this->world_plot.currentTime;
@@ -57,6 +56,11 @@ void World::ateFood(const Snake* snake){ //which snake ate it, log it, then rand
 World::udimen_t World::getWorldDimen() const
 {
     return this->world_plot.getOrder();
+}
+
+const coord& World::get_dimensions() const
+{
+    return this->world_plot._get_internal_dimensions();
 }
 
 bool World::_RangeCheck(const coord_type& c) const{
