@@ -3,6 +3,8 @@
 #include "logger.hpp"
 #include "graphMat/iterators.hpp"
 
+std::mt19937 util::Random::generator;
+
 void WorldPlot::createFood(){
     // Resets the current food; This function should only be called after World::eatFood()
     this->food.reset({ nullptr, {0,0,0} });
@@ -26,6 +28,11 @@ void WorldPlot::createFood(){
     }
 
     this->food.reset({ box_node, new_coord });
+}
+
+void WorldPlot::createFood(const coord& food_pos)
+{
+    this->food.reset({ this->operator[](food_pos), food_pos });
 }
 
 // COME HERE
@@ -116,10 +123,22 @@ bool WorldPlot::isPathClear( const WorldPlot::graph_box_type* origin, const dire
     });
 }
 
-WorldPlot::WorldPlot(const World_Ptr world, _timePoint start_time): Cube_Matrix(statics::init_Bound), parent_world(world), path_finder(this) {
-    // @node - DONT call createFood() from this constructor, since this is multi-threaded so can't say if entities exist by now, entities are managed by world currently, let it call this too
+WorldPlot::WorldPlot(const World_Ptr world):
+    Cube_Matrix(statics::init_Bound),
+    parent_world(world),
+    path_finder(this)
+{
     this->_rand_once_createFood();
+    this->resume_auto_expansion();
+}
 
+WorldPlot::WorldPlot(const World_Ptr world, const State& start_state):
+    Cube_Matrix(start_state.universe_order),
+    parent_world(world),
+    path_finder(this)
+{
+    this->createFood(start_state.food_pos);
+    //this->_rand_once_createFood();
     this->resume_auto_expansion();
 }
 
@@ -137,20 +156,20 @@ void WorldPlot::resume_auto_expansion() {
 * @note - Call this function on a different thread, this function itself, isn't responsible for creating any new threads
 */
 void WorldPlot::auto_expansion(){
-        //"World Plots should be on a different thread than the world thread, so that they don't block the world thread itself"
-    //assert(std::this_thread::get_id() != this->parent_world->_shared_concurrent_data.get_world_thread_id());
+    this->__expansion_state.expansion_flag = true;
+    this->__expansion_state.is_actively_expanding = true;
 
     while (this->__expansion_state.expansion_flag)
     {
-        LOGGER::log_it(this->parent_world->_id, Event::World_Expanding);
+        LOGGER::log_msg("World #{} expanding from order {}", this->parent_world->_id, this->getOrder());
         this->expand_once();
 
         // sleep for 1 unit time
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
     }
 
-    this->auto_expansion_convar.notify_one();
-    LOGGER::log_it(this->parent_world->_id, Event::World_Stopped_Expanding);
+    this->__expansion_state.is_actively_expanding = false;
+    LOGGER::log_imp(this->parent_world->_id, Event::World_Stopped_Expanding);
 }
 
 void WorldPlot::pause_auto_expansion()
@@ -158,12 +177,9 @@ void WorldPlot::pause_auto_expansion()
     // return if not expanding, or "shouldn't" be auto expanding now
     if (!this->__expansion_state.expansion_flag)	return;
 
-    std::unique_lock<std::mutex> lock(this->m);
     this->__expansion_state.expansion_flag.store(false);
-    while (this->__expansion_state.expansion_flag)	// to prevent infinite blocking
-    {
-        this->auto_expansion_convar.wait_for(lock, std::chrono::milliseconds(300));
-    }
+
+    while (this->__expansion_state.is_actively_expanding) {}
 }
 
     // not actually number of nodes empty, but a utility function for WorldPlot::expand_once()
@@ -177,17 +193,23 @@ float WorldPlot::getFreeSpaceRatio() const{
 
     for (auto& entity : this->parent_world->entities)
     {
-        if (entity->type != Entity_Types::SNAKE)  continue;
-
-        min_x = std::min(entity->getPrimaryPos().value().point_coord.mX, min_x);
-        max_x = std::max(entity->getPrimaryPos().value().point_coord.mX, max_x);
-        min_y = std::min(entity->getPrimaryPos().value().point_coord.mY, min_y);
-        max_y = std::max(entity->getPrimaryPos().value().point_coord.mY, max_y);
-        min_z = std::min(entity->getPrimaryPos().value().point_coord.mZ, min_z);
-        max_z = std::max(entity->getPrimaryPos().value().point_coord.mZ, max_z);
+        if (entity->type != Entity_Types::ROCK && entity->getPrimaryPos().has_value()) {
+            min_x = std::min(entity->getPrimaryPos().value().point_coord.mX, min_x);
+            max_x = std::max(entity->getPrimaryPos().value().point_coord.mX, max_x);
+            min_y = std::min(entity->getPrimaryPos().value().point_coord.mY, min_y);
+            max_y = std::max(entity->getPrimaryPos().value().point_coord.mY, max_y);
+            min_z = std::min(entity->getPrimaryPos().value().point_coord.mZ, min_z);
+            max_z = std::max(entity->getPrimaryPos().value().point_coord.mZ, max_z);
+        }
     }
 
-    return 100.0f - (((static_cast<float>(max_x) - min_x)* (max_y - min_y)* (max_z - min_z))/(this->total_abs.mX * total_abs.mY * total_abs.mZ));
+    if (((min_x - this->min_x) > 16) && ((min_y - this->min_y) > 16) && ((min_z - this->min_z) > 16)
+        && ((this->max_x - max_x) > 16) && ((this->max_y - max_y) > 16) && ((this->max_z - max_z) > 16)) {
+        return statics::min_free_space - 1;
+    }
+    else return 100.0f - static_cast<float>(
+            (max_x - min_x) * (max_y - min_y) * (max_z - min_z)
+        ) / (this->total_abs.mX * total_abs.mY * total_abs.mZ);
 }
 
 // @note - The function decides how much to grow, and may decide to not grow at all "for this call"
@@ -205,9 +227,10 @@ void WorldPlot::expand_once(){   // `may` expands one unit on each side
     }
 
     if ( free_space_ratio > statics::max_free_space ){
-        // @log - world doesn't need to auto_expand since reached max_free_space
-        return;
 
+        // @log - world doesn't need to auto_expand since reached max_free_space
+
+        return;
     }else if ( free_space_ratio < statics::min_free_space && !this->__expansion_state.speed_doubled_recently)
     {
         this->__expansion_state.curr_expansion_speed *= 2;   // @log temporarily doubling the expansion speed

@@ -25,30 +25,27 @@ std::optional<Entity_Point> Snake::getPrimaryPos() const
 void Snake::simulateExistence() {
     // @future -> Can add more logic here, when more interaction options between entities are added
 
-    // instead of using convar, we could have used promise::set_value_at_thread_exit()
-    this->isSimulating = true;  // ysa
-    while (this->isSimulating && this->parent_world->_shared_concurrent_data.is_world_running() ){   //while the parent world continues to exist keep the entity moving
-        LOGGER::log_it(this->parent_world->_id, Event::Entity_Move/*, Moving Snake #", this->_id*/);
+    this->should_simulate = true;
+    this->is_actively_simulating = true;
+
+    while (this->should_simulate && this->parent_world->is_world_running() ){   //while the parent world continues to exist keep the entity moving
+        LOGGER::log_msg("Moving Snake #{}", this->_id);
 
         //this->moveForward();
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }
-    this->isSimulating = false;
 
-    std::this_thread::sleep_for( std::chrono::milliseconds(10) );
-    this->sim_convar.notify_one();
+    this->should_simulate = false;
+    this->is_actively_simulating = false;
 }
 
-void Snake::pauseExistence() {
-    if (!this->isSimulating) return;
+void Snake::pauseExistence()
+{
+    if (!this->should_simulate) return;
 
-    std::mutex m;   // @note @me - Correct it later (I think it shouldn't be how it works ?)
-    std::unique_lock<std::mutex> lock(m);
-
-    this->isSimulating = false;
-    this->sim_convar.wait_for(lock, std::chrono::milliseconds(80));
-        // this is to prevent infinite loop or waiting, since the next line can cause blocking if the notify_one is earlier than wait()
+    this->should_simulate = false;
+    while (this->is_actively_simulating == true) {}  // block untill simulateExistence() returns
 }
 
 bool Snake::eatFood(){  // @note - The body.grow() needs to be called in caller function
@@ -158,9 +155,9 @@ void Snake::_add_dir_to_coord(coord& c, Direction dir) const
     }
 }
 
-EntityState Snake::_get_current_state() const
+SnakeState* Snake::_get_current_state() const
 {
-    return SnakeState(this);
+    return new SnakeState(this);
 }
 
 const Entity_Point& Snake::getHead() const{
@@ -181,8 +178,6 @@ int Snake::getLength() const
     return static_cast<int>( this->body.length() + 1 );
 }
 
-Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
-
 /*
 @bug/enhancement alert - 
     As per the current code, let's consider a situation,
@@ -192,14 +187,16 @@ Snake::Snake(const World_Ptr world) : Snake(world, world->_init_SnakeLength){}
     THOUGH, isCellEmpty() will return false, but the actual problem is
     "The next move this new snake moves, will cause the new snake to `collide` with the older one, thereby ending its life in starting itself"
 */
-// @note - Entities shoud start existence from the start (constructor) itself... though be sure to handle the case when the food is still being created, since the current logic creates the Entities JUST AFTER the snakes, since the createFood logic currently needs the positions of snakes too
-Snake::Snake(const World_Ptr world, uint16_t init_len) :
+Snake::Snake(const World_Ptr world) :
     Entity(Entity_Types::SNAKE),
     parent_world(world),
     body(this),
     head(nullptr, world->world_plot.getRandomCoord()),
     tail(head)
 {
+    auto& init_len = world->_init_SnakeLength;
+    LOGGER::log_trace("Snake #{} initiated in world #{}", this->_id, world->_id);
+
     this->head.graph_box = this->parent_world->get_box(head.point_coord);
     assert(head.graph_box != nullptr);
 
@@ -212,9 +209,8 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
     this->tail.point_coord = this->head.point_coord;
     this->tail.graph_box = this->head.graph_box;
     do {
-#ifdef DEBUG
-        if (this->body.length() > 0) std::cout << "Clearing Snake: " << this->_id << '\n';
-#endif // DEBUG
+        if (this->body.length() > 0) LOGGER::log_trace("Clearing Snake: {}", this->_id);
+
         this->body.removeAndClearBody(); // we are repeating this over and over again, till we have okay body, that's why we are doing this
 
         auto* prev_box = this->head.graph_box;
@@ -231,13 +227,15 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
                 }
             }
             if (!iter) {
-                LOGGER::log_it_verb(5, "Not enough space could be traversed to allocate snake to that area");
+                LOGGER::log_trace("Snake #{} Not enough space could be traversed to allocate snake to that area", this->_id);
             }
 
             prev_box->getDataRef().addEntity(this);
             this->body.body.push_back(iter._getLastTurnedDirection().value());  // getLastTurnedDirection() MUST have a value
 
-            LOGGER::log_it_verb(6, "Added unit to snake's body: %d", this->_id);
+#ifdef HIGH_VERBOSITY
+            LOGGER::log_trace("Added unit to snake's body: {}", this->_id);
+#endif // HIGH_VERBOSITY
 
             this->tail.graph_box = prev_box;
             this->tail.point_coord += iter._getIncrementCoords();
@@ -246,24 +244,51 @@ Snake::Snake(const World_Ptr world, uint16_t init_len) :
     } while ( !isSnakeBodyOK() );
 }
 
+Snake::Snake(const World_Ptr parent_world, const SnakeState& initial_state):
+    Entity(Entity_Types::SNAKE),
+    parent_world(parent_world),
+    body(this),
+    head(nullptr, initial_state.location),
+    tail(head)
+{
+#ifdef DEBUG
+    assert(initial_state.entity_type == Entity_Types::SNAKE);
+#endif // DEBUG
+    LOGGER::log_trace("Snake #{} initiated in world #{}", this->_id, parent_world->_id);
+
+    // this->body.body.reserve(initial_state.body.size());
+    std::copy(initial_state.body.begin(), initial_state.body.end(), std::back_inserter(this->body.body));
+
+    head.graph_box = parent_world->get_box(head.point_coord);
+    tail.graph_box = parent_world->get_box(head.point_coord);
+
+    for (auto& body_dir : this->body)
+    {
+        // updating coords, for now just do add_dir_to_coord
+        tail.graph_box = tail.graph_box->get_adj_box(body_dir);
+        _add_dir_to_coord(tail.point_coord, body_dir);
+    }
+}
+
 Snake::~Snake()
 {
     this->pauseExistence();
+    LOGGER::log_trace("Snake #{} being removed", this->_id); // be sure the 2nd param is by copy, and not reference, latter case it will be dangling
 }
 
 void SnakeBody::grow(Direction move_dir)
 {
-    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     body.push_front(
         util::getOppositeDirection(move_dir)
     );
+    // @todo - Modify tail here itself
 }
 
 void SnakeBody::move(Direction move_dir)
 {
-    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     this->grow(move_dir);
     this->pop_back();
+    // @todo - Modify tail here itself
 }
 
     // doesn't remove the head
@@ -285,6 +310,6 @@ SnakeBody::SnakeBody(Snake* snake_ptr) : snake_ptr(snake_ptr) {}
 
 SnakeState::SnakeState(const Snake* snake):
     EntityState(Entity_Types::SNAKE),
-    length(snake->getLength()),
-    curr_location(snake->head.point_coord)
+    location(snake->head.point_coord),
+    body(snake->body.begin(), snake->body.end())
 {}

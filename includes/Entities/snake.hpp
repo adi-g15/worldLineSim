@@ -32,8 +32,9 @@ struct SnakeBody {
 };
 
 struct SnakeState : public EntityState {
-    const int length;
-    const coord curr_location;
+    // length - simply body.length() + 1
+    const coord location;
+    const std::vector<Direction> body;
 
     SnakeState(const Snake* snake);
 };
@@ -63,12 +64,13 @@ public:
 
     bool isSnakeBodyOK() const;
 
-    bool isSimulating{false};
+    bool should_simulate{false};
+    bool is_actively_simulating{ false };
     std::condition_variable sim_convar;
     void simulateExistence() override;  // calls moveForward, and other logic, for it to exist `independently (other than the needed interactions b/w entities)` from other entities
     void pauseExistence();  // just `pauses` any further movement, it still will be on board
 
-    EntityState _get_current_state() const override;
+    SnakeState* _get_current_state() const override;
 
     int getUniqProp() const;
     int getLength() const;
@@ -77,7 +79,7 @@ public:
     const Entity_Point& getTail() const;
 
     explicit Snake(const World_Ptr);
-    Snake(const World_Ptr, uint16_t);
+    Snake(const World_Ptr, const SnakeState& initial_state);
     ~Snake();
 private:
 

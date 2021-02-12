@@ -16,18 +16,31 @@ public:
 	typedef nanogui::ref<Display> DisplayScreen;
 	typedef World_Node* World_Node_Ptr;
 
+	DisplayScreen dispMngr;
+
 	NodeAdapter(DisplayScreen, World_Node_Ptr world_node);
-	void disable();	// once disabled, can NOT be enabled again for NOW (since we can't chose which worlds to show and which ones not to show) !
+	void resume();
+	void pause();
+		// similar to stopping it, it will remain paused forever
+	void remove();	// removes the adapter from display
 	void update();
+	void update_screen();
+
+	void diverge_without_change();
+	void diverge_with_time_travel();
 
 private:
-	nanogui::IntBox<int>* num_entity;
-	nanogui::FloatBox<_timePoint>* time;
+	nanogui::IntBox<int>* num_entity, *new_dimension;
+	nanogui::IntBox<_timePoint>* time, *time_travel_time;
 
-	nanogui::Widget* entity_group;
+	//nanogui::Widget* entity_group;
+	nanogui::Popup* time_travel_popup;
 	nanogui::Widget* dimension;
 
-	DisplayScreen dispMngr;
-	const World_Node_Ptr node;
+	nanogui::Button* time_travel_create_btn;
+	nanogui::VScrollPanel* time_travel_entity_panel;
+	nanogui::Widget* time_travel_entity_group;
+	std::vector< std::array<nanogui::ref<nanogui::Widget>, 2> > time_travel_entity_widgets;
 
+	World_Node_Ptr node;
 };
