@@ -1,5 +1,8 @@
 # World Line Simulator
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/652ba837de78439f90a144db9b6cf4ac)](https://app.codacy.com/gh/adi-g15/worldLineSim?utm_source=github.com&utm_medium=referral&utm_content=adi-g15/worldLineSim&utm_campaign=Badge_Grade)
+
+
 As of now, it simulates a simple 3D multiverse
 
 Wait... if you are thinking it's some big rendering project, sorry but it's not but it's interesting,
