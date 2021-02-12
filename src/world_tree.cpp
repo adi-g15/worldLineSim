@@ -19,9 +19,8 @@ Display* World_Tree::access_disp_manager() {
 bool World_Tree::initTree(){
     if (this->root != nullptr)   return true;   // already initialised
 
-    this->root = new World_Node(this, nullptr, statics::BIG_BANG_TIME);
+    this->root = new World_Node(this);
     this->num_nodes = 1;
-    this->_fast_access_data.__latest_world_node = this->root;
 
     return true;    // @debug
 }
@@ -29,20 +28,18 @@ bool World_Tree::initTree(){
 // @note - Blocks until the tree is destructed
 void World_Tree::destructTree()
 {
-    std::stack<World_Node_Ptr> st;
-    World_Node_Ptr temp;
+    World_Node_Ptr temp = root;
 
-    if (root) st.push(root);
+    //while (temp->diverged_child.empty())
+    //{
+    //    temp = temp->diverged_child.front();
+    //}
+    //while (temp != root)
+    //{
+    //    temp = temp->parent_node;
 
-    while (!st.empty()) {
-        temp = st.top();
-
-        if (temp->left_node)	st.push(temp->left_node);
-        if (temp->right_node)	st.push(temp->right_node);
-
-        delete st.top();
-        st.pop();
-    }
+    //    delete temp->diverged_child;
+    //}
 }
 
 World_Tree::World_Tree(Verse* parent_verse, Display_Ptr displayManager) :

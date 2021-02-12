@@ -4,6 +4,7 @@
 #include "declarations.hpp"
 #include "forward_decl.hpp"
 #include "path_finder.hpp"
+#include "state.hpp"
 #include <atomic>	// For std::atomic_bool (actually not mandatory, some extra loops are okay in auto_expand)
 
 using Graph_Box = Graph_Box_3D<Box>;
@@ -57,7 +58,10 @@ private:
 			return this->food;
 		}
 		coord getRandomCoord() const noexcept;
+
 		void createFood();
+		void createFood(const coord& food_pos);	// this overload is utilised when worlds diverge
+
 		void _rand_once_createFood();	// randomly creates food, only for the initial moments where the entities may not be in existence currently fully
 		void _fit_coord_in_range(coord&) const noexcept;
 		bool _is_in_range_coord(const coord&) const noexcept;
@@ -69,8 +73,9 @@ private:
 		// @future - For optimising purpose, use the food coords in parent_world (eg. to go search the direction which has the food, for eg, if it is in a coord on right, only iterate through those)
 		void getShortestPathToFood(const Entity_Point& origin, directionalPath&) const;
 
-	// @note - The world_plot starts AUTO EXPANSION, from constructor itself
-	WorldPlot(const World_Ptr, _timePoint start_time);
+		// By itself, worldplot only knows it's size and food position
+	WorldPlot(const World_Ptr);
+	WorldPlot(const World_Ptr, const State& start_state);
 
 	friend class World;
 	friend class Path_Finder;	// it will be a friend of world_plot too, so as to control its ability to auto expand

@@ -19,8 +19,8 @@ void Rabin::simulateExistence()
         if (rand_box == nullptr)   break;
         graphMat::LinearIterator<Box> linear_iter(rand_box, curr_dir);
 
-        if (rand_box->get_coordinate().mX % 2 == 0) LOGGER::log_it_verb(7, "Rabin marne se bach gaya");
-        else LOGGER::log_it_verb(7, "Rabin marwa raha hai...");
+        if (rand_box->get_coordinate().mX % 2 == 0) LOGGER::log_msg("Rabin marne se bach gaya");
+        else LOGGER::log_msg("Rabin marwa raha hai...");
 
         int counter = std::rand() % 5;
         for (;linear_iter && counter != 0; ++linear_iter) {
@@ -32,11 +32,11 @@ void Rabin::simulateExistence()
         std::this_thread::sleep_for( std::chrono::milliseconds( static_cast<int>(statics::UNIT_TIME * 1000) ));
     }
 
-    LOGGER::log_it_verb(6, "Rabin #%d ruk gaya", this->_id);
+    LOGGER::log_msg("Rabin #{} ruk gaya", this->_id);
 }
 
 Rabin::Rabin(World* parent_world): Entity(Entity_Types::HUMAN)
 {
     this->parent_world = parent_world;
-    std::cout << "Rabin jinda ho gaya !!" << std::endl;
+    LOGGER::log_msg("Rabin jinda ho gaya !!");
 }

@@ -53,7 +53,7 @@ public:
     virtual void pauseExistence() = 0;
 
     // Time Travel functions _ That allow the time travel feature
-    virtual EntityState _get_current_state() const = 0;   // ONLY used for saving state, by World_Node
+    virtual EntityState* _get_current_state() const = 0;   // ONLY used for saving state, by World_Node
 
     Entity(Entity_Types type):
         _ID(),

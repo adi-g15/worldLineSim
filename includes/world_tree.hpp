@@ -16,23 +16,13 @@ NOTE - This time, i will first complete World_Tree class from start, and then wh
 class World_Tree{
 public:
 	typedef World_Node* World_Node_Ptr;
-	typedef Display* Display_Ptr;	// not using ref count for this now
+	typedef Display* Display_Ptr;
 
 private:
 	Display_Ptr displayManager;    // the displayManager for the verse
 	Verse* parent_verse;
 	World_Node_Ptr root;
 	int16_t num_nodes{0};
-
- 	struct {
-	// private:
-	 	World_Node_Ptr __latest_world_node;  //pointer to the latest world currently running
-
-	// public:
-	// 	std::mutex tree_mutex;
-	// 	const World_Ptr get_latest_world();
-	// 	void update_node_time();
-	} _fast_access_data;    // temporary data for fast access, to currently running world
 
 public:
 	const Display* access_disp_manager() const;

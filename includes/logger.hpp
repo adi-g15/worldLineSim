@@ -1,29 +1,55 @@
 #pragma once
 
+#include <quill/Quill.h>
+#include <quill/Utility.h>
 #include "declarations.hpp"
 
-// UPDATE: 3rd Feb - Will be using the console for logging
+namespace LOGGER{
+    inline void init() {
+		quill::start();
+		quill::init_signal_handler();
 
-/*
-NOTE - For now, i will be making its methods static,
-though later on a logger object can be local member to each object of `Verse` class,
-since that would allow something like a `Multiverse`, in each of which only one world will be active,
-but each Verse's current World will all keep working
-*/
-class LOGGER{
-    //static inline std::ostream& log_stream = std::clog;
+		quill::get_logger()->init_backtrace(64, quill::LogLevel::Warning);
+	}
 
-    public:
-        template<typename... Args>
-        static void log_it_verb(int8_t verbosity_level, const char* msg, Args... args);  // ONLY call this for low verbosity
-        static void log_it(uint16_t world_id, Event event/*, Log& log_obj*/);
-        static void start_logger(int, char**);
+	inline void log_imp(uint16_t world_id, Event event) {
+		switch (event)
+		{
+		case Event::Entity_Created:
+		case Event::Entity_Destroyed:
+		case Event::Entity_Move:
+		case Event::Entity_Grow:
+		case Event::World_Expanding:
+			break;
+		case Event::World_Created:
+			LOG_DEBUG(quill::get_logger(), "[#{}] World Created", world_id);
+			break;
+		case Event::World_Destroyed:
+			LOG_WARNING(quill::get_logger(), "[#{}] World Destroyed", world_id);
+			break;
+		case Event::World_Paused:
+			LOG_WARNING(quill::get_logger(), "[#{}] World Paused", world_id);
+			break;
+		case Event::World_Resumed:
+			LOG_DEBUG(quill::get_logger(), "[#{}] World Resumed", world_id);
+			break;
+		case Event::DESTRUCTION_START:
+			LOG_ERROR(quill::get_logger(), "[#{}] DESTRUCTION STARTED", world_id);
+			break;
+		}
+	}
+
+    template<typename ...Args>
+	inline void log_msg(const char* msg_format, Args ...args) {
+		std::clog << msg_format << std::endl;
+		LOG_BACKTRACE(quill::get_logger(), "{} arguments: Checking", sizeof...(args), std::forward<Args>( args )... );
+		//LOG_BACKTRACE(quill::get_logger(), std::forward < const char* >( msg_format ), std::forward<Args>( args )... );
+	}
+
+	template<typename ...Args>
+	inline void log_trace(const char* msg_format, Args ...args)	// low importance logs
+	{
+		//std::clog << msg_format << std::endl;
+		//LOG_BACKTRACE(quill::get_logger(), msg_format, std::forward<Args>(args)... );
+	}
 };
-
-template<typename ...Args>
-inline void LOGGER::log_it_verb(int8_t verbosity_level, const char* msg, Args ...args)
-{
-    //loguru::log(verbosity_level, stderr, 10, msg);
-
-    return;
-}

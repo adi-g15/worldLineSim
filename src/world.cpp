@@ -26,6 +26,16 @@
 //#include "Entities/Custom/rabin.hpp"
 //#include "Entities/Custom/cheems_vidhayak.hpp"
 
+bool World::is_world_running() const
+{
+    return _world_runnning.load();
+}
+
+void World::reset_world_running()
+{
+    this->_world_runnning.store(false);
+}
+
 const coord& World::getFoodCoord()
 {
     return world_plot.get_food().coordinate;
@@ -48,7 +58,7 @@ void World::ateFood(const Snake* snake){ //which snake ate it, log it, then rand
     this->food_mutex.unlock();
 }
 
-World::udimen_t World::getWorldDimen() const
+World::udimen_t World::get_world_dimen() const
 {
     return this->world_plot.getOrder();
 }
@@ -56,6 +66,16 @@ World::udimen_t World::getWorldDimen() const
 const coord& World::get_dimensions() const
 {
     return this->world_plot._get_internal_dimensions();
+}
+
+Graph_Box_3D<Box>* World::get_box(const coord& pos)
+{
+    return this->world_plot.get_box(pos);
+}
+
+const Graph_Box_3D<Box>* World::get_box(const coord& pos) const
+{
+    return this->world_plot.get_box(pos);
 }
 
 bool World::_RangeCheck(const coord_type& c) const{
@@ -67,37 +87,93 @@ void World::capture_state() {
 
 }
 
-World::World(const World_Ptr world, _timePoint t) : world_plot(this, t), path_finder(&world_plot){
-    // @todo
+void World::resume_simulation()
+{
+    this->_world_runnning.store(true);
 
-    //const State latest_state = world->capture_state();  // since the previous world will keep running, so we `capture` it's current state to create our new world
-
-    for( auto i = 0; i < this->_MAX_NumSnakes; i++ ){
-
-
+    // stopping and freeing the entities
+    for (auto& entity : this->entities)
+    {
+        std::thread(&Entity::simulateExistence, entity).detach();
     }
 
+    // pause world from expanding
+    this->world_plot.resume_auto_expansion();
+}
 
-// @todo Log the event
-// this->logs.push_back(Log(tmpState));
+void World::pause_simulation()
+{
+    // signal world plot, and entities, that they should stop expanding
+    this->reset_world_running();
 
+    // stopping and freeing the entities
+    for (auto& entity : this->entities)
+    {
+        entity->pauseExistence();
+    }
+
+    // pause world from expanding
+    this->world_plot.pause_auto_expansion();
+}
+
+void World::end_simulation()
+{
+    this->pause_simulation();
+
+    for (auto& entity : this->entities)
+    {
+        delete entity;
+    }
+    this->entities.clear();
+}
+
+World::World(const State& start_state) :
+    simulationRunning(true),
+    world_plot(this, start_state),
+    path_finder(&world_plot)
+{
+    for (const auto& entity_state : start_state.entity_states)
+    {
+        switch (entity_state->entity_type)
+        {
+        case Entity_Types::HUMAN :
+            entities.push_back(new Human( this, *(static_cast<const HumanState*>(entity_state))) );
+            break;
+        case Entity_Types::ROCK :
+            entities.push_back(new Rock(this, *(static_cast<const RockState*>(entity_state))));
+            break;
+        case Entity_Types::SNAKE :
+            entities.push_back(new Snake(this, *(static_cast<const SnakeState*>(entity_state))));
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 // also starts the simulations for all entities
-World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TIME), path_finder(&world_plot){
-    this->entities.reserve(this->_MAX_NumSnakes);
-    for (auto i = 0; i < 0; i++)
+World::World():
+    simulationRunning(false),
+    world_plot(this),
+    path_finder(&world_plot)
+{
+    this->entities.reserve(this->_Num_Snakes);
+    int num_snakes = 1 + std::rand() % _Num_Snakes;
+    for (auto i = 0; i < num_snakes; i++)
     {
         this->entities.push_back(
-            new Snake(this, util::Random::random<uint16_t>(5, 10))
+            new Snake(this)
         );
     }
-    for (auto i = 0; i < 100; i++)
+
+    int num_rocks = 1 + std::rand() % 52;
+    for (auto i = 0; i < num_rocks; i++)
     {
         this->entities.push_back(
             new Rock(this)
         );
     }
+
     for (auto i = 0; i < 2; i++)
     {
         this->entities.push_back(
@@ -112,17 +188,13 @@ World::World() : simulationRunning(false), world_plot(this, statics::BIG_BANG_TI
 
 World::~World()
 {
-    this->_shared_concurrent_data.reset_world_running();
+    this->reset_world_running();
     for (auto& entity : entities)
     {
         delete entity;
     }
     this->entities.clear();
-    // the next loop isn't actually required, but can still be used
-    //for (auto& snake_thread : entity_threads)
-    //{
-    //    if (snake_thread.joinable()) snake_thread.join();
-    //}
+
     this->world_plot.pause_auto_expansion();
 }
 

@@ -55,7 +55,7 @@ enum Event{  //for logging puposes
     World_Stopped_Expanding,
     World_Expanding,
     World_Paused,
-    World_Resume,   //won't be used now
+    World_Resumed,   //won't be used now
 
     // verse events
     DESTRUCTION_START,

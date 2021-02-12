@@ -3,6 +3,12 @@
 #include "entity.hpp"
 
 class World;	// forward-declaration
+class Rock;	// forward-decl for RockState
+
+struct RockState : public EntityState {
+	const coord location;
+	RockState(const Rock*);
+};
 
 class Rock: public Entity {
 	typedef World* World_Ptr;
@@ -16,13 +22,9 @@ public:
 	void simulateExistence() override {}
 	void pauseExistence() override {}
 
-	EntityState _get_current_state() const override;
+	RockState* _get_current_state() const override;
 
 	Rock(World_Ptr);
 	Rock(World_Ptr, const coord&);
-};
-
-struct RockState : public EntityState {
-	const coord location;
-	RockState(const Rock*);
+	Rock(World_Ptr, const RockState&);
 };
