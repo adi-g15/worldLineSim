@@ -33,7 +33,7 @@ public:
 	static constexpr int _init_SnakeLength = 5;
 	//------        ------//
 
-	void getShortestPathToFood( const Entity_Point& origin, directionalPath& ) const;
+	void getPathToFood( const Entity_Point& origin, directionalPath& ) const;
 
 	std::vector< Entity* > entities;	// accessed by World_Plot::createFood()
 

@@ -10,8 +10,8 @@
 #include "Entities/snake.hpp"
 #include "Entities/rock.hpp"
 #include "Entities/human.hpp"
-//#include "Entities/Custom/rabin.hpp"
-//#include "Entities/Custom/cheems_vidhayak.hpp"
+#include "Entities/Custom/rabin.hpp"
+#include "Entities/Custom/cheems_vidhayak.hpp"
 
 bool World::is_world_running() const
 {
@@ -142,7 +142,7 @@ World::World():
         );
     }
 
-    int num_rocks = 1 + std::rand() % 52;
+    const int num_rocks = 1 + std::rand() % 52;
     for (auto i = 0; i < num_rocks; i++)
     {
         this->entities.push_back(
@@ -150,11 +150,29 @@ World::World():
         );
     }
 
+    const int num_rabins = 3;
+    for (auto i = 0; i < num_rabins; i++)
+    {
+        this->entities.push_back(
+            new Rabin(this)
+        );
+    }
+
+    const int num_cheems_doge = 3;
+    for (auto i = 0; i < num_cheems_doge; i++)
+    {
+        this->entities.push_back(
+            new VidhayakJi(this)
+        );
+    }
+
+    bool gender_flag = false;
     for (auto i = 0; i < 2; i++)
     {
         this->entities.push_back(
-            new Human(this)
+            new Human(this, gender_flag ? Gender::MALE : Gender::FEMALE)
         );
+        gender_flag = !gender_flag;
     }
 
     for (auto&& entity : this->entities) {
@@ -174,7 +192,7 @@ World::~World()
     this->world_plot.pause_auto_expansion();
 }
 
-void World::getShortestPathToFood(const Entity_Point& origin, directionalPath& old_path) const{
+void World::getPathToFood(const Entity_Point& origin, directionalPath& old_path) const{
     // @question -> Will std::forward with pointers work as well, (seems so, since it's just taking the value stored, which is the address in the pointer)
     return this->world_plot.getShortestPathToFood(origin, old_path);
 }

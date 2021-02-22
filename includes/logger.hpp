@@ -1,17 +1,66 @@
 #pragma once
 
-#include <quill/Quill.h>
-#include <quill/Utility.h>
+#include <spdlog/async.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h> // for printing custom types
+
 #include "declarations.hpp"
+#include "db/database.hpp"
 
 namespace LOGGER{
-    inline void init() {
-		quill::start();
-#ifdef _WIN32
-		// quill::init_signal_handler();
-#endif
+	inline std::atomic_flag lock = ATOMIC_FLAG_INIT;
+	inline std::mutex m = std::mutex();
 
-		quill::get_logger()->init_backtrace(64, quill::LogLevel::Warning);
+    inline void init() {
+		db::init();
+
+		spdlog::info("Starting spdlog");
+		auto async_file = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", "logs/async_log.txt");
+		const char* msg = "Hi there";
+		spdlog::info(msg);
+
+		lock.clear();
+	}
+
+	inline void _log_msg(const char* msg_format) {
+		std::clog << msg_format << std::endl;
+
+		//m.unlock();
+		lock.clear();
+		//lock.clear(std::memory_order_release);
+	}
+
+	template<typename FirstType, typename ...Args>
+	inline void _log_msg(const char* msg_format, FirstType arg, Args ...args) {
+		//while (lock.test_and_set())  // acquire lock
+		//	; // spin
+
+		for (; *msg_format != '\0'; msg_format++) {
+			if (*msg_format == '{' && *(msg_format + 1) == '}') {
+				std::clog << arg;
+				_log_msg(msg_format + 2, std::forward<Args>(args)...); // recursive call
+				return;
+			}
+			std::clog << *msg_format;
+		}
+
+		lock.clear();
+	}
+
+	template<typename FirstType, typename ...Args>
+	inline void log_msg(const char* msg_format, FirstType arg, Args ...args) {
+		spdlog::info(msg_format, std::forward <FirstType>(arg), std::forward<Args>(args)...);
+	}
+
+	inline void log_msg(const char* msg_format) {
+		return _log_msg(msg_format);
+	}
+
+	template<typename ...Args>
+	inline void log_trace(const char* msg_format, Args ...args)	// low importance logs
+	{
+		spdlog::trace(msg_format, std::forward<Args>(args)...);
 	}
 
 	inline void log_imp(uint16_t world_id, Event event) {
@@ -24,33 +73,21 @@ namespace LOGGER{
 		case Event::World_Expanding:
 			break;
 		case Event::World_Created:
-			LOG_DEBUG(quill::get_logger(), "[#{}] World Created", world_id);
+			spdlog::warn("[#{}] World Created", world_id);
 			break;
 		case Event::World_Destroyed:
-			LOG_WARNING(quill::get_logger(), "[#{}] World Destroyed", world_id);
+			spdlog::warn("[#{}] World Destroyed", world_id);
 			break;
 		case Event::World_Paused:
-			LOG_WARNING(quill::get_logger(), "[#{}] World Paused", world_id);
+			spdlog::warn("[#{}] World Paused", world_id);
 			break;
 		case Event::World_Resumed:
-			LOG_DEBUG(quill::get_logger(), "[#{}] World Resumed", world_id);
+			spdlog::warn("[#{}] World Resumed", world_id);
 			break;
 		case Event::DESTRUCTION_START:
-			LOG_ERROR(quill::get_logger(), "[#{}] DESTRUCTION STARTED", world_id);
+			spdlog::critical("[#{}] DESTRUCTION STARTED", world_id);
 			break;
 		}
 	}
 
-    template<typename ...Args>
-	inline void log_msg(const char* msg_format, Args ...args) {
-		std::clog << msg_format << std::endl;
-		//LOG_BACKTRACE(quill::get_logger(), std::forward < const char* >( msg_format ), std::forward<Args>( args )... );
-	}
-
-	template<typename ...Args>
-	inline void log_trace(const char* msg_format, Args ...args)	// low importance logs
-	{
-		//std::clog << msg_format << std::endl;
-		//LOG_BACKTRACE(quill::get_logger(), msg_format, std::forward<Args>(args)... );
-	}
 };

@@ -1,4 +1,4 @@
-#include "Entities/rabin.hpp"
+#include "Entities/Custom/rabin.hpp"
 
 #include "world.hpp"
 #include <iostream>
@@ -19,8 +19,10 @@ void Rabin::simulateExistence()
         if (rand_box == nullptr)   break;
         graphMat::LinearIterator<Box> linear_iter(rand_box, curr_dir);
 
+#ifndef GRAPH_MAT_NO_COORD
         if (rand_box->get_coordinate().mX % 2 == 0) LOGGER::log_msg("Rabin marne se bach gaya");
-        else LOGGER::log_msg("Rabin marwa raha hai...");
+        else LOGGER::log_msg("Rabin #{} bhaaga... from #{}", this->_id, linear_iter.curr_box->get_coordinate());
+#endif
 
         int counter = std::rand() % 5;
         for (;linear_iter && counter != 0; ++linear_iter) {
@@ -35,8 +37,18 @@ void Rabin::simulateExistence()
     LOGGER::log_msg("Rabin #{} ruk gaya", this->_id);
 }
 
+void Rabin::pauseExistence()
+{
+    is_jinda = false;
+}
+
 Rabin::Rabin(World* parent_world): Entity(Entity_Types::HUMAN)
 {
     this->parent_world = parent_world;
     LOGGER::log_msg("Rabin jinda ho gaya !!");
+}
+
+EntityState* Rabin::_get_current_state() const
+{
+    return new EntityState(Entity_Types::CUSTOM);
 }

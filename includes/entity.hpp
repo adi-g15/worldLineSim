@@ -31,7 +31,6 @@ struct Entity_Point {    // a general class, since each object will have at leas
 
 struct EntityState {
     const Entity_Types entity_type;
-protected:
     EntityState(Entity_Types type): entity_type(type) {};
 };
 

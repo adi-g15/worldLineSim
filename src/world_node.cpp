@@ -4,7 +4,7 @@
 #include "adapter.hpp"
 
 void World_Node::capture_state(){
-    this->states.emplace_back(this);
+    this->states.emplace_back(this);  // for some reason the 1st element is always being tried to be removed
 }
 
 // this is to be provided to the user to edit how the `current` state should be, this option creates a new worldLine for future

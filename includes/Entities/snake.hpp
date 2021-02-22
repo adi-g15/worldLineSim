@@ -13,7 +13,43 @@
 
 class Snake;    // forward-declaration for use in SnakeBody
 
-// @note - `directionalPath` is alias for a `std::vector`, while `SnakeBody` is an alias for a `std::list`
+/**
+ * 
+ * Earlier -
+ * After moving we used to add the `opposite of direction moved` to SnakeBody,
+ * so, SnakeBody USED TO be FROM head to TAIL, and it seemed more logical to me
+ * 
+ *                      ^
+ *                      |
+ *                    ->
+ *                   ^
+ *                   |
+ *                   ^
+ *                   |
+ *                 head
+ *                   |
+ *                   v
+ *          tail <- <-
+ *
+ * Now -
+ * But, now i changed it to be same direction pushed in body, so the snakebody is now FROM tail TO head
+ *
+ *                      ^
+ *                      |
+ *                    ->
+ *                   ^
+ *                   |
+ *                   ^
+ *                   |
+ *                 head
+ *                   ^
+ *                   |
+ *          tail -> ->
+ * 
+ * Notice the end part, now it is FROM tail to head
+ *
+ */
+
 struct SnakeBody {
    // @order -> body.front() is the first direction from the body_head
     std::list<Direction> body; //list because, popping at back and pushing in front both required quite regulRLY, SO CANT use vector, shift is O(N)
@@ -49,14 +85,12 @@ class Snake: public Entity{
             // size 10 since 10 directions
         std::array<int, 10> bucket;  // a temporary bucket for use in Snake::hasRoundTrips
         Direction last_dir; // used in move_Forward()
-    }__temp;
+    }_temp;
 
 public:
     const World_Ptr parent_world;
 
-    // std::vector< coord_type > curr_path;
     directionalPath curr_Path;
-    //udimen_t length;   //starts with _world.init_length
 
     void _Action1() override;   //calls moveForward()
     void _Action2() override;   //calls eatFood()

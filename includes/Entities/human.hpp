@@ -1,14 +1,16 @@
 #pragma once
-// @future - For a small improvement, have a static member (like 3D bitset representing the areas found by humanity)
-
-// As of now, human justs keeps moving randomly
+// @future - For an interesting improvement, have a static member (like 3D bitset representing the areas found by humanity)
+// As of now, human just keep moving randomly
 
 #include "entity.hpp"
+#include "db/database.hpp"
 
 class Human;
 
 struct HumanState : public EntityState {
-	const coord location;
+	Gender gender;
+	coord location;
+	id_type old_id;
 
 	HumanState(const Human*);
 };
@@ -24,6 +26,8 @@ class Human : public Entity {
 	void _Action2() override {}
 public:
 	typedef World* World_Ptr;
+	Gender gender;
+	const std::string& mName;
 
 	//static std::vector<std::vector<std::bitset>> > humanities_exploration;
 	//static GraphMatrix3D<bool> humanities_exploration;
@@ -34,7 +38,7 @@ public:
 
 	HumanState* _get_current_state() const override;
 
-	explicit Human(World_Ptr const world);
+	Human(World_Ptr const world, Gender);
 	Human(World_Ptr const world, const HumanState& prev_state);
 	~Human();
 	//Human(World_Ptr const world, Human const* parter) : Entity();	// the human will be together with the partner, or at least distance

@@ -31,7 +31,7 @@ void Snake::simulateExistence() {
     while (this->should_simulate && this->parent_world->is_world_running() ){   //while the parent world continues to exist keep the entity moving
         LOGGER::log_msg("Moving Snake #{}", this->_id);
 
-        //this->moveForward();
+        this->moveForward();
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }
@@ -57,7 +57,7 @@ bool Snake::eatFood(){  // @note - The body.grow() needs to be called in caller 
 
 bool Snake::hasRoundTrips() const{
         // since array calls the initializer for its object type, so it is `value initialised IN THIS CASE`, ie 0
-    auto& temp_bucket = this->__temp.bucket;
+    auto& temp_bucket = this->_temp.bucket;
     std::fill(temp_bucket.begin(), temp_bucket.end(), 0); // ensuring all of the array are zero
 
     for (auto& dir : this->body)
@@ -95,27 +95,23 @@ bool Snake::isSnakeBodyOK() const{
  * If path is empty, that means the snake has already mved using the path, and is now JUST on the food, so eat it now
  *
  **/
-void Snake::moveForward(){  // this will also be on the snake's thread, and not the world_thread
+void Snake::moveForward(){
 
-    // @todo - Change for tail (Can also move head and tail to snake body, but let moveForward like methods outside)
     if (this->parent_world->world_plot.get_food().box == nullptr)    return;
 
-    this->parent_world->getShortestPathToFood(this->head, this->curr_Path);
+    this->parent_world->getPathToFood(this->head, this->curr_Path);
 
-    if (this->curr_Path.empty()) {   // if path was empty, ie. we are at the food position
-        if(this->eatFood()) body.grow(__temp.last_dir);
-
-        return;
+    if (this->curr_Path.empty()) {  // reached food's location
+        if (this->eatFood())
+        {
+            body.grow(_temp.last_dir);
+            return;
+        }
     }
 
-    this->__temp.last_dir = curr_Path.next_dir();
+    _temp.last_dir = curr_Path.next_dir();
+    body.move(_temp.last_dir);
     curr_Path.pop();
-
-    this->head.graph_box = this->head.graph_box->get_adj_box(__temp.last_dir);
-    this->_add_dir_to_coord( this->head.point_coord, __temp.last_dir);
-
-    body.move(__temp.last_dir);
-
 }
 
 void Snake::_add_dir_to_coord(coord& c, Direction dir) const
@@ -278,17 +274,25 @@ Snake::~Snake()
 
 void SnakeBody::grow(Direction move_dir)
 {
+    snake_ptr->head.graph_box = snake_ptr->head.graph_box->get_adj_box(move_dir);
+    snake_ptr->_add_dir_to_coord(snake_ptr->head.point_coord, move_dir);
+
     body.push_front(
-        util::getOppositeDirection(move_dir)
+        move_dir    // Edit: No more using util::oppositeDirection
     );
-    // @todo - Modify tail here itself
+
+    // tail doesn't change in case of growth
 }
 
 void SnakeBody::move(Direction move_dir)
 {
     this->grow(move_dir);
-    this->pop_back();
-    // @todo - Modify tail here itself
+
+    const auto& tail_dir = this->body.back();
+    snake_ptr->tail.graph_box = snake_ptr->tail.graph_box->get_adj_box(tail_dir);
+    snake_ptr->_add_dir_to_coord(snake_ptr->tail.point_coord, tail_dir);
+
+    this->body.pop_back();
 }
 
     // doesn't remove the head

@@ -1,4 +1,4 @@
-#include "Entities/cheems_vidhayak.hpp"
+#include "Entities/Custom/cheems_vidhayak.hpp"
 
 #include "world.hpp"
 #include <thread>
@@ -17,7 +17,7 @@ void VidhayakJi::simulateExistence()
         const Direction curr_dir = statics::directions[i % statics::directions.size()];
 
         if (rand_box == nullptr)   break;
-        LOGGER::log_msg("Vidhayak Ji #${} moving Rabin ko dhundh rahe hai... [{}]", this->_id, quill::utility::to_string(this->curr_pos) );
+        LOGGER::log_msg("Vidhayak Ji #${} rabin ko dhundh rahe hai... [{}]", this->_id, this->curr_pos );
 
         graphMat::LinearIterator<Box> linear_iter(rand_box, curr_dir);
 
@@ -39,7 +39,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} moving", this->_id );
+                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id );
                     flag = true;
                 }
                 ++neighbour_iter;
@@ -50,7 +50,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} moving", this->_id );
+                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id);
                     flag = true;
                 }
                 ++neighbour_iter;
@@ -61,7 +61,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} moving", this->_id );
+                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id);
                     flag = true;
                 }
                 ++neighbour_iter;
@@ -77,13 +77,13 @@ void VidhayakJi::simulateExistence()
     LOGGER::log_msg("VidhayakJi #{} ka career khatm... ab koi aur dal me judenge :-)", this->_id );
 }
 
-EntityState VidhayakJi::_get_current_state() const
-{
-    return VidhayakState(this);
-}
-
 VidhayakJi::VidhayakJi(World* parent_world) : Entity(Entity_Types::HUMAN)
 {
     this->parent_world = parent_world;
     LOGGER::log_msg("VidhayakJi #{} jinda ho chuke hai !!", this->_id );
+}
+
+EntityState* VidhayakJi::_get_current_state() const
+{
+    return new EntityState(Entity_Types::CUSTOM);
 }

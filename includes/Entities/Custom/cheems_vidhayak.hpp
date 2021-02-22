@@ -2,12 +2,6 @@
 
 #include "entity.hpp"
 
-struct VidhayakState : public EntityState {
-    const bool is_jinda;
-
-    VidhayakState(const VidhayakJi* entity) : EntityState(Entity_Types), is_jinda(entity->is_jinda) {}
-};
-
 class VidhayakJi : public Entity {
     coord curr_pos;
     World* parent_world;
@@ -24,7 +18,7 @@ public:
         this->is_jinda = false;
     }
 
-    EntityState _get_current_state() const override;   // ONLY used for saving state, by World_Node
+    EntityState* _get_current_state() const override;   // ONLY used for saving state, by World_Node
 
     VidhayakJi(World*);
 };

@@ -23,7 +23,6 @@ struct Box{    //Just as extension, to add more variables to the graph_box
 
 public:
     bool hasEntities() const noexcept { return  this->entity != nullptr; }
-    //inline void addEntity(const Entity* entity) {
     inline void addEntity(const Entity* entity) {
         if(this->entity == nullptr) this->entity = entity;
         //entities.emplace_front(entity);
@@ -39,7 +38,6 @@ public:
     }
 
     Box() noexcept {}
-    // bool isEmpty() const noexcept {return entities.empty();}    //maybe removed
 };
 
 enum Event{  //for logging puposes

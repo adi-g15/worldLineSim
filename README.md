@@ -1,16 +1,17 @@
 # World Line Simulator
 
-As of now, it simulates a simple 3D multiverse
+As of now, it `can` be said that it simulates a simple 3D multiverse
 
-Wait... if you are thinking it's some big rendering project, sorry but it's not but it's interesting,
+And... it currently doesn't have 3D rendering, since that wasn't of importance earlier, the theoretical implementation was the goal, but it's interesting,
 think of the very basic idea as this ->
 
-_Think about a world, in which 4 snakes keep moving automatically to get food_
+_Think about a world, in which 4 snakes keep moving automatically to get food, any \`time*\` the universe has some state; You go back in time, change anything, that then changes the state then, and hence the present and the future_
 
+ie. Time Travel following the WorldLine theory, stated in the Anime `Steins Gate`
+It has a 3D auto expanding space, like a simple form of our universe
 Now the project offers much more, since you can now have as many entities as memory allows, and can CREATE your own entities too.
 
 This project generalises the idea to entities and actions, in different worlds and worldlines, all independently on different threads, as well theoretically different verses too, other than this ->
-_And... you can go to a particular time in **past**, and change the position of one of the entities... Baammm, a new world line is created in which *this event* happened, and the older world had *this event* had not taken place... so there is a high chance, current state(lengths of the snakes, positions of entities, etc. combined) of the world will be different than what had been in the previous world line_
 
 It also features a constantly growing matrix (the world_plot), using another project [GraphMat3D](https://github.com/adi-g15/graphMat) that was actually a part of this one itself
 
@@ -22,13 +23,11 @@ cmake ..
 cmake --build .
 ```
 
-> It WILL build using MSVC compiler
->
-> the github action is failing, since it's not building on GCC due to SFINAE errors, which work on MSVC though GCC maybe more strict, i am not focusing on that for now
+> You may set CMAKE_Build_Type as Release
 
 ## Creating your own Custom ENTITIES (for example, horses)
 
-* Inherit from the Entity class (Interface actually), override/implement the `startSimulation` and `pauseSimulation` virtual member functions, and others that are pure virtuals, and need to be overloaded in Entity class
+* Inherit from the Entity class, override/implement the `startSimulation` and `pauseSimulation` virtual member functions, and others that are pure virtuals, and need to be overloaded in Entity class
 
 * In `World` constructors, make sure your push your new entities to the entities vector with `entities.push_back(new Horse(this));`
 
@@ -49,20 +48,19 @@ cmake --build .
 
 ## Future Ideas
 
-> There have been lots of ideas, all just in code, from now on, adding here, what i feel...
+> There have been lots of ideas, all just in code, from now on, adding here, what i think...
 
-* UI libraries ->
-  Consider using libraries that have been made for multi threaded applications, or better handle those cases. Some considerables are ->
-  1. https://github.com/wjakob/nanogui
-  2. https://github.com/dankamongmen/notcurses
+* 3D Rendering ->
+  Currently, EVERYTHING happens, and is correctly simulating, devs working on this maybe satisfied, though actually being able see them moving will absolutely be a great thing
 
-* I/O ->
-  Likely not required with the UI libraries, but likely for logging another stream maybe required. Some considerations are ->
+* Logging ->
+  For logging purposes, another open source logging library maybe utilised. Some considerations are ->
   1. https://github.com/expnkx/fast_io
 
-* Multi-Threading ->
-  Since this project HEAVILY depends on asynchronous and multithreading approach, so better use a thread pool too in later time, for removing some of the overhead of creating and destroying threads again and again
-  There are likely multiple thread pool implementations, use one of them.
+* Sparse Matrix for space ->
+  Currently it uses the graphMat library for the 3D matrix, ie, the space here, in current scenario a sparse data structure will be more beneficial
+
+> 3D Rendering wasn't the aim at beginning; Developed graphMat as dense matrix as per the eariler needs, they have slightly changed with the current ways entities exist
 
 ## Source of Idea
 

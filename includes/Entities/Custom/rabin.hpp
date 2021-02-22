@@ -12,9 +12,9 @@ class Rabin : public Entity {
 
 public:
     void simulateExistence() override;
-    void pauseExistence() override {
-        this->is_jinda = false;
-    }
+    void pauseExistence() override;
 
     Rabin(World*);
+
+    EntityState* _get_current_state() const override;
 };

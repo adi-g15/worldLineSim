@@ -7,6 +7,6 @@
 [submodule "ext/utilpp"]
 	path = ext/utilpp
 	url = https://github.com/adi-g15/utilpp
-[submodule "ext/quill"]
-	path = ext/quill
-	url = https://github.com/odygrd/quill
+[submodule "ext/spdlog"]
+	path = ext/spdlog
+	url = https://github.com/gabime/spdlog

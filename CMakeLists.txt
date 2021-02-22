@@ -17,16 +17,19 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/include")
         )
 endif()
 
-add_compile_definitions(GRAPH_MAT_NO_COORD)
-add_compile_definitions(DEBUG)
+if(CMAKE_BUILD_TYPE EQUAL "Release")
+    add_compile_definitions(GRAPH_MAT_NO_COORD)
+else()
+    add_compile_definitions(DEBUG)
+endif()
 
 set(NANOGUI_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
 set(NANOGUI_BUILD_SHARED    OFF CACHE BOOL "" FORCE)
 set(NANOGUI_BUILD_PYTHON    OFF CACHE BOOL "" FORCE)
 set(NANOGUI_INSTALL         OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(ext/quill)
 add_subdirectory(ext/nanogui)
+add_subdirectory(ext/spdlog)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -35,15 +38,16 @@ include_directories(includes)   # should also be available to display
 include_directories(.)
 include_directories(ext/graphMat/includes/)
 include_directories(ext/utilpp/includes/)
+include_directories(ext/csv_parser/)
 
 file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
+file(GLOB CUSTOM_ENTITIES_SRC "src/Entities/Custom/*.cpp")
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 
-add_executable(simulator main.cpp ${SOURCES} ${DISP_SOURCES})
+add_executable(simulator main.cpp ${SOURCES} ${DISP_SOURCES} ${CUSTOM_ENTITIES_SRC})
 
 target_link_libraries(simulator PRIVATE Threads::Threads)
-target_link_libraries(simulator PRIVATE quill::quill )
-target_link_libraries(simulator PRIVATE nanogui)
+target_link_libraries(simulator PRIVATE nanogui spdlog::spdlog)
 
 # set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
 # file(GLOB DISP_SOURCES "display/src/*.cpp")
