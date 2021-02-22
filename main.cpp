@@ -5,11 +5,15 @@
 
 int main(int argc, char *argv[])
 {
-    LOGGER::init(); // for logging to console
-    nanogui::init();    // for display
+    try{
+        LOGGER::init(); // for logging to console
+        nanogui::init();    // for display
 
-    Verse verse;
-    verse.big_bang();
+        Verse verse;
+        verse.big_bang();
+    } catch(...) {  // catch all handler
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }

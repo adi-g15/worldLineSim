@@ -9,9 +9,6 @@
 #include "db/database.hpp"
 
 namespace LOGGER{
-	inline std::atomic_flag lock = ATOMIC_FLAG_INIT;
-	inline std::mutex m = std::mutex();
-
     inline void init() {
 		db::init();
 
@@ -19,33 +16,6 @@ namespace LOGGER{
 		auto async_file = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", "logs/async_log.txt");
 		const char* msg = "Hi there";
 		spdlog::info(msg);
-
-		lock.clear();
-	}
-
-	inline void _log_msg(const char* msg_format) {
-		std::clog << msg_format << std::endl;
-
-		//m.unlock();
-		lock.clear();
-		//lock.clear(std::memory_order_release);
-	}
-
-	template<typename FirstType, typename ...Args>
-	inline void _log_msg(const char* msg_format, FirstType arg, Args ...args) {
-		//while (lock.test_and_set())  // acquire lock
-		//	; // spin
-
-		for (; *msg_format != '\0'; msg_format++) {
-			if (*msg_format == '{' && *(msg_format + 1) == '}') {
-				std::clog << arg;
-				_log_msg(msg_format + 2, std::forward<Args>(args)...); // recursive call
-				return;
-			}
-			std::clog << *msg_format;
-		}
-
-		lock.clear();
 	}
 
 	template<typename FirstType, typename ...Args>
@@ -54,7 +24,7 @@ namespace LOGGER{
 	}
 
 	inline void log_msg(const char* msg_format) {
-		return _log_msg(msg_format);
+		spdlog::info(msg_format);
 	}
 
 	template<typename ...Args>

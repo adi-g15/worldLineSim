@@ -1,4 +1,4 @@
-#include "..\..\includes\Entities\solar_system.hpp"
+#include "Entities/solar_system.hpp"
 
 void Solar_System::simulateExistence()
 {

@@ -1,4 +1,4 @@
-#include "Entities\planet.hpp"
+#include "Entities/planet.hpp"
 
 std::optional<Entity_Point> Planet::getPrimaryPos() const
 {
