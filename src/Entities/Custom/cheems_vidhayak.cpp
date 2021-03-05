@@ -67,10 +67,11 @@ void VidhayakJi::simulateExistence()
                 ++neighbour_iter;
             }
         }
-        
-        rand_box = linear_iter.curr_box;
-        this->curr_pos = rand_box != nullptr ? rand_box->get_coordinate() : coord{0, 0, 0};
 
+        rand_box = linear_iter.curr_box;
+#ifndef GRAPH_MAT_NO_COORD
+        this->curr_pos = rand_box != nullptr ? rand_box->get_coordinate() : coord{0, 0, 0};
+#endif
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
     }
 
