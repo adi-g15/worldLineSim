@@ -24,6 +24,8 @@ It also features a constantly growing matrix (the world_plot), using another pro
 
 ## Building
 
+First do a recursive clone, then
+
 ```sh
 cd build   # if doesn't exist, then create
 cmake ..
@@ -59,10 +61,6 @@ cmake --build .
 
 * 3D Rendering ->
   Currently, EVERYTHING happens, and is correctly simulating, devs working on this maybe satisfied, though actually being able see them moving will absolutely be a great thing
-
-* Logging ->
-  For logging purposes, another open source logging library maybe utilised. Some considerations are ->
-  1. https://github.com/expnkx/fast_io
 
 * Sparse Matrix for space ->
   Currently it uses the graphMat library for the 3D matrix, ie, the space here, in current scenario a sparse data structure will be more beneficial
