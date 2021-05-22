@@ -12,11 +12,12 @@ As of now, it `can` be said that it simulates a simple 3D multiverse
 And... it currently doesn't have 3D rendering, since that wasn't of importance earlier, the theoretical implementation was the goal, but it's interesting,
 think of the very basic idea as this ->
 
-_Think about a world, in which 4 snakes keep moving automatically to get food, any \`time*\` the universe has some state; You go back in time, change anything, that then changes the state then, and hence the present and the future_
+_Think about a world, in which some snakes keep moving automatically to get food, any \`time*\` the universe has some state; You go back in time, change anything, that then changes the state then, and hence the present and the future_
 
 ie. Time Travel following the WorldLine theory, stated in the Anime `Steins Gate`
+
 It has a 3D auto expanding space, like a simple form of our universe
-Now the project offers much more, since you can now have as many entities as memory allows, and can CREATE your own entities too.
+**Now the project offers much more**, since you can now have as many entities as memory allows, and can CREATE your own entities too.
 
 This project generalises the idea to entities and actions, in different worlds and worldlines, all independently on different threads, as well theoretically different verses too, other than this ->
 
@@ -43,17 +44,19 @@ cmake --build .
 > Constructor - An entities constructor takes in the World*, so that it has access to the worldplot (consider it the space fabric here, just a matrix), for eg, calling world->getRandomCoord() to get a position in the world
 > See the constructor of other entity, for eg. Human, Rock, Snake for reference
 
-## Current State (Logs)
+## Current State
 
 > Note: Currently the focus is that _internally_ the simulation happens, but maybe the display won't be very great now, so it just logs on console (Since, I don't have a ground in rendering things currently, if you have ideas, or suggestions do put in that pinned issue)
 
-![Current State](https://raw.githubusercontent.com/adi-g15/Sources/main/worldLineSim_state.png?token=AI4LBINZKQFMNVC5BRCO7S3AFU3KO "This is a part of the logging")
+> **NOTE: The time is integral now**
 
-## Class Chart
+![Current State](ss.png "This is a part of the logging")
+
+## Class Diagram
 
 > Made with draw.io
 
-![Class Chart](https://raw.githubusercontent.com/adi-g15/Sources/main/worldLineSim.png?token=AI4LBIN5MOCOAM4ODLI3NCLAFU3TS "WorldLine Sim")
+![Class Diagram](class_diagram.png "WorldLine Sim")
 
 ## Future Ideas
 
