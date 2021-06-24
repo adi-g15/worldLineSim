@@ -11,7 +11,7 @@
 #include "declarations.hpp"
 #include "id_creator.hpp"
 #include "logger.hpp"
-#include "graphMat/3d_graph_box.hpp"   // for Graph_Box
+#include "graphMat/graph_box.hpp"   // for Graph_Box
 #include "entity_types.hpp"
 
 typedef void (*Action_Ptr)(void);
