@@ -55,16 +55,11 @@ file(GLOB SOURCES "src/Entities/*.cpp" "src/*.cpp")
 file(GLOB CUSTOM_ENTITIES_SRC "src/Entities/Custom/*.cpp")
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 
-add_executable(simulator main.cpp ${SOURCES} ${DISP_SOURCES} ${CUSTOM_ENTITIES_SRC})
+add_executable(worldlinesim main.cpp ${SOURCES} ${DISP_SOURCES} ${CUSTOM_ENTITIES_SRC})
 
-target_link_libraries(simulator PRIVATE Threads::Threads)
-target_link_libraries(simulator PRIVATE nanogui spdlog::spdlog)
+target_link_libraries(worldlinesim PRIVATE Threads::Threads)
+target_link_libraries(worldlinesim PRIVATE nanogui spdlog::spdlog)
 
-# set(CMAKE_TOOLCHAIN_FILE "C:/Users/adity/libs/vcpkg/scripts/buildsystems/vcpkg.cmake")
-# file(GLOB DISP_SOURCES "display/src/*.cpp")
-# set(CURSES_INCLUDE_PATH "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/include")
-# set(CURSES_LIBRARY "C:/Users/adity/libs/vcpkg/packages/pdcurses_x64-windows/lib")
-#target_include_directories(simulator PRIVATE curses/includes)
-# include_directories(${CURSES_INCLUDE_PATH})
-# find_package(Curses REQUIRED)
-# target_link_libraries(display PUBLIC ${CURSES_LIBRARY}/pdcurses.lib)
+# If you want, you can install 'worldlinesim' executable :D
+install(TARGETS worldlinesim DESTINATION bin COMPONENT binaries)
+
