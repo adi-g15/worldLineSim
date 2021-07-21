@@ -31,7 +31,7 @@ void Snake::simulateExistence() {
     while (this->should_simulate && this->parent_world->is_world_running() ){   //while the parent world continues to exist keep the entity moving
         LOGGER::log_msg("Moving Snake #{}", this->_id);
 
-        this->moveForward();
+        // this->moveForward(); // BUG: See issue #5 - https://github.com/adi-g15/worldLineSim/issues/5
 
         std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
     }

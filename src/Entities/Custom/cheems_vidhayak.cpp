@@ -39,7 +39,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id );
+                    LOGGER::log_msg("Mil gaya rabin... Vidhayak #{} action time", this->_id );
                     flag = true;
                 }
                 ++neighbour_iter;

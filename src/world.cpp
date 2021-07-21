@@ -12,6 +12,8 @@
 #include "Entities/human.hpp"
 #include "Entities/Custom/rabin.hpp"
 #include "Entities/Custom/cheems_vidhayak.hpp"
+#include "Entities/Custom/aliens.hpp"
+#include "Entities/Custom/mathematicians.hpp"
 
 bool World::is_world_running() const
 {
@@ -134,7 +136,8 @@ World::World():
     path_finder(&world_plot)
 {
     this->entities.reserve(this->_Num_Snakes);
-    int num_snakes = 1 + std::rand() % _Num_Snakes;
+    //int num_snakes = 1 + std::rand() % _Num_Snakes;
+    int num_snakes = 3;
     for (auto i = 0; i < num_snakes; i++)
     {
         this->entities.push_back(
@@ -150,7 +153,7 @@ World::World():
         );
     }
 
-    const int num_rabins = 3;
+    const int num_rabins = 1;
     for (auto i = 0; i < num_rabins; i++)
     {
         this->entities.push_back(
@@ -158,7 +161,7 @@ World::World():
         );
     }
 
-    const int num_cheems_doge = 3;
+    const int num_cheems_doge = 1;
     for (auto i = 0; i < num_cheems_doge; i++)
     {
         this->entities.push_back(
@@ -167,12 +170,29 @@ World::World():
     }
 
     bool gender_flag = false;
-    for (auto i = 0; i < 2; i++)
+    const uint32_t num_humans = std::rand() % 5;
+    for (auto i = 0; i < num_humans; i++)
     {
         this->entities.push_back(
             new Human(this, gender_flag ? Gender::MALE : Gender::FEMALE)
         );
         gender_flag = !gender_flag;
+    }
+
+    const uint32_t num_aliens = std::rand() % 3;
+    for (auto i = 0; i < num_aliens; i++)
+    {
+        this->entities.push_back(
+            new Aliens(this)
+        );
+    }
+
+    const uint32_t num_mathematicians = 1;
+    for( auto i=0; i < num_mathematicians; ++i )
+    {
+        this->entities.push_back(
+            new Mathematician(this)
+        );
     }
 
     for (auto&& entity : this->entities) {
