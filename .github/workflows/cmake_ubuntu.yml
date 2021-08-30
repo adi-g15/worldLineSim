@@ -12,14 +12,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: recursive
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
 
     - name: Install linux specific DISPLAY dependencies
-      run: sudo apt-get install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libglu1-mesa libglu1-mesa-dev
+      run: sudo apt-get update && sudo apt-get install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libglu1-mesa libglu1-mesa-dev
 
     - name: Configure CMake
       # Use a bash shell so we can use the same syntax for environment variable
