@@ -165,7 +165,7 @@ void WorldPlot::auto_expansion(){
         this->expand_once();
 
         // sleep for 1 unit time
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
+        std::this_thread::sleep_for(statics::UNIT_TIME);
     }
 
     this->__expansion_state.is_actively_expanding = false;

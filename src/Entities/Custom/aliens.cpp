@@ -51,8 +51,8 @@ long Equation::eval(int x) const {
             current_coord.mY = std::get<1>(position_equations).eval(this->current_var);
             current_coord.mZ = std::get<2>(position_equations).eval(this->current_var);            
 
-            // 800 millisecond sleep
-            std::this_thread::sleep_for( std::chrono::milliseconds( static_cast<int>(statics::UNIT_TIME * 800) ));
+            // 0.8 unit time
+            std::this_thread::sleep_for( statics::UNIT_TIME * 0.8 );
         }
     }
 

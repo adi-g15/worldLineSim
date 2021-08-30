@@ -17,7 +17,7 @@ void VidhayakJi::simulateExistence()
         const Direction curr_dir = statics::directions[i % statics::directions.size()];
 
         if (rand_box == nullptr)   break;
-        LOGGER::log_msg("Vidhayak Ji #${} rabin ko dhundh rahe hai... [{}]", this->_id, this->curr_pos );
+        LOGGER::log_msg("Chacha Vidhayak Ji #${} 🤝🤝 rabin ko dhundh rahe hai... [{}]", this->_id, this->curr_pos );
 
         graphMat::LinearIterator<Box> linear_iter(rand_box, curr_dir);
 
@@ -50,7 +50,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id);
+                    LOGGER::log_msg("Rabin 🥲🥲... Vidhayak ${} action time", this->_id);
                     flag = true;
                 }
                 ++neighbour_iter;
@@ -61,7 +61,7 @@ void VidhayakJi::simulateExistence()
             while (neighbour_iter)
             {
                 if (neighbour_iter->getData().hasEntities()) {
-                    LOGGER::log_msg("Bakra mil gaya hai... Vidhayak ${} action time", this->_id);
+                    LOGGER::log_msg("Mai bole to Cheems Vidhayak ${} 😎", this->_id);
                     flag = true;
                 }
                 ++neighbour_iter;
@@ -72,7 +72,7 @@ void VidhayakJi::simulateExistence()
 #ifndef GRAPH_MAT_NO_COORD
         this->curr_pos = rand_box != nullptr ? rand_box->get_coordinate() : coord{0, 0, 0};
 #endif
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
+        std::this_thread::sleep_for(statics::UNIT_TIME);
     }
 
     LOGGER::log_msg("VidhayakJi #{} ka career khatm... ab koi aur dal me judenge :-)", this->_id );

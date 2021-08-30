@@ -5,3 +5,4 @@
 * Snake::grow and move don't modify tail
 
 *Many entities, the new ones, may unknowingly not call addentity() on the box they are present,
+* Use a consistent display 'API', which allows many options for display to be chosen from

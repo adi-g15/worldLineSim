@@ -46,7 +46,7 @@ void Human::simulateExistence()
 			}
 		}
 
-		std::this_thread::sleep_for(std::chrono::seconds( static_cast<int>( statics::UNIT_TIME * TIME_DIFF_PER_MOVE )));
+		std::this_thread::sleep_for(statics::UNIT_TIME * TIME_DIFF_PER_MOVE );
 	}
 
 	this->has_been_paused = true;
@@ -60,14 +60,15 @@ void Human::pauseExistence()
 	while (!this->has_been_paused)	{}	// we keep checking until it's stopped
 }
 
-Human::Human(World_Ptr const world, Gender gender):
+Human::Human(World_Ptr const world, Gender gender): Human(world, db::getRandomName(gender, _id), gender) {}
+Human::Human(World_Ptr const world, const std::string& name, Gender gender):
 	Entity(Entity_Types::HUMAN),
 	parent_world(world),
 	curr_pos(nullptr, world->world_plot.getRandomCoord()),
 	gender(gender),
-	mName(db::getRandomName(gender, _id))
+	mName(name)
 {
-	LOGGER::log_msg("#{} born :D ... Location: {}", mName, this->_id, this->curr_pos.point_coord);
+	LOGGER::log_msg("{} [#{}] is here... Location: {}", mName, this->_id, this->curr_pos.point_coord);
 
 	this->curr_pos.graph_box = this->parent_world->get_box(curr_pos.point_coord);
 	assert(curr_pos.graph_box != nullptr);	// remove this assert after tests written that getRandomCoord() always returns correct one
@@ -80,7 +81,7 @@ Human::Human(World_Ptr const world, const HumanState& prev_state):
 	gender(prev_state.gender),
 	mName(db::getNameFromId(prev_state.old_id))
 {
-	LOGGER::log_msg("#{} born :D ... Location: {}", mName, this->_id, this->curr_pos.point_coord);
+	LOGGER::log_msg("#{} born ... Location: {}", mName, this->_id, this->curr_pos.point_coord);
 
 	this->curr_pos.graph_box = this->parent_world->get_box(curr_pos.point_coord);
 	assert(curr_pos.graph_box != nullptr);

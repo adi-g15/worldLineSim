@@ -20,7 +20,7 @@ void Mathematician::simulateExistence() {
         }
 
         // 2 second sleep
-        std::this_thread::sleep_for( std::chrono::milliseconds( static_cast<int>(statics::UNIT_TIME * 2000) ));
+        std::this_thread::sleep_for( statics::UNIT_TIME * 2 );
     }
 }
 
