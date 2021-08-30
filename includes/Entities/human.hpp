@@ -16,6 +16,7 @@ struct HumanState : public EntityState {
 };
 
 class Human : public Entity {
+protected:
 	Entity_Point curr_pos;
 	World* parent_world;
 	bool should_wander{ false };
@@ -27,7 +28,7 @@ class Human : public Entity {
 public:
 	typedef World* World_Ptr;
 	Gender gender;
-	const std::string& mName;
+	std::string mName;
 
 	//static std::vector<std::vector<std::bitset>> > humanities_exploration;
 	//static GraphMatrix3D<bool> humanities_exploration;
@@ -38,6 +39,7 @@ public:
 
 	HumanState* _get_current_state() const override;
 
+	Human(World_Ptr const world, const std::string& name, Gender);
 	Human(World_Ptr const world, Gender);
 	Human(World_Ptr const world, const HumanState& prev_state);
 	~Human();

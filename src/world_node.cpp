@@ -45,7 +45,7 @@ void World_Node::start_state_management(){
         this->capture_state();   // can PAUSE then capture, for i am preferring some wrong coords in state, rather than stopping and starting threads again and again
         this->adapter->update();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(statics::UNIT_TIME * 1000)));
+        std::this_thread::sleep_for(statics::UNIT_TIME);
     }
 }
 

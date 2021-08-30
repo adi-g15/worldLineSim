@@ -1,4 +1,5 @@
 #include "world.hpp"
+#include "db/database.hpp"
 #include "util/random.hpp"
 #include "exceptions.hpp"
 #include "util/math.hpp"
@@ -14,6 +15,9 @@
 #include "Entities/Custom/cheems_vidhayak.hpp"
 #include "Entities/Custom/aliens.hpp"
 #include "Entities/Custom/mathematicians.hpp"
+
+// Meta Entities
+#include "Entities/Meta/Custom/GDSC/gdsc.hpp"
 
 bool World::is_world_running() const
 {
@@ -136,8 +140,7 @@ World::World():
     path_finder(&world_plot)
 {
     this->entities.reserve(this->_Num_Snakes);
-    //int num_snakes = 1 + std::rand() % _Num_Snakes;
-    int num_snakes = 3;
+    int num_snakes = 1 + std::rand() % _Num_Snakes;
     for (auto i = 0; i < num_snakes; i++)
     {
         this->entities.push_back(
@@ -170,7 +173,7 @@ World::World():
     }
 
     bool gender_flag = false;
-    const uint32_t num_humans = std::rand() % 5;
+    const uint32_t num_humans = std::rand() % 5 + 2;
     for (auto i = 0; i < num_humans; i++)
     {
         this->entities.push_back(
@@ -179,7 +182,7 @@ World::World():
         gender_flag = !gender_flag;
     }
 
-    const uint32_t num_aliens = std::rand() % 3;
+    const uint32_t num_aliens = 1/*std::rand() % 3*/;
     for (auto i = 0; i < num_aliens; i++)
     {
         this->entities.push_back(
@@ -187,6 +190,7 @@ World::World():
         );
     }
 
+    auto /*const*/ *this_verse = this;
     const uint32_t num_mathematicians = 1;
     for( auto i=0; i < num_mathematicians; ++i )
     {
@@ -194,6 +198,36 @@ World::World():
             new Mathematician(this)
         );
     }
+
+    // @adi TODO Abhi ke liye members idhar pass karna adi, dynamically change bhi kr skte lekin file wala achha dikhega
+    // auto member_details_yaml = util::read_yaml( std::string(statics::DATABASE_DIRNAME) + "/gdsc_nitp_members.yaml" );
+    auto *gdsc_nit_patna = new GDSC(this, "NIT Patna - GDSC", std::map<std::string, Member>({
+            {"Divya Prakash", 	Member(this_verse,"Divya Prakash",Gender::MALE, "Lead", 0.8)},
+			{"Ashwini", 		Member(this_verse, "Ashwini", Gender::MALE, "Topper", 0.4, 0.7)},
+			{"Asmit", 		Member(this_verse, "Asmit", Gender::MALE, "Comder")},
+			{"Neeraj", 		Member(this_verse, "Neeraj", Gender::MALE, "Big Fan", 0.8, 0.8)},
+			{"Palak", 		Member(this_verse, "Palak", Gender::FEMALE, "TagLearner", 0.8, 0.7)},
+			{"Suraj", 		Member(this_verse, "Suraj", Gender::MALE, "Suraj")},
+			{"Srijan", 		Member(this_verse, "Srijan", Gender::MALE, "Sri")},
+			{"Pragati.", 		Member(this_verse, "Pragati##", Gender::FEMALE, "Core")},
+			{"Pragati..", 		Member(this_verse, "Pragati@@", Gender::FEMALE, "Core")},
+			{"Amrit",		Member(this_verse, "Amrit", Gender::MALE, "Core")},
+			{"Shagufta", 		Member(this_verse, "Shagufta", Gender::FEMALE, "Core")},
+			{"Uddeshya", 		Member(this_verse, "Uddeshya", Gender::MALE, "Designer", 0.6, 0.7)},
+			{"Priyanshu", 		Member(this_verse, "Priyanshu", Gender::MALE, "Core")},
+			{"Paritosh", 		Member(this_verse, "Paritosh", Gender::MALE, "...")},
+			{"Rachit", 		Member(this_verse, "Rachit", Gender::MALE, "Core")},
+			{"Shubhangi", 		Member(this_verse, "Shubhangi", Gender::FEMALE, "Core")},
+			{"Shivam Jha", 		Member(this_verse, "Shivam", Gender::MALE, "Core")},
+			{"Rishabh Sir Big Fan", Member(this_verse, "Rishabh", Gender::MALE, "Fan holder")},
+			{"Animesh", 		Member(this_verse, "Animesh", Gender::MALE, "Maru")},
+			{"Raj", 		Member(this_verse, "Raj", Gender::MALE, "Core")},
+			{"Pratik", 		Member(this_verse, "Pratik", Gender::MALE, "Core")},
+			{"Digvijay", 		Member(this_verse, "Digvijay", Gender::MALE, "Core")},
+			{"Samridhhi", 		Member(this_verse, "Samridhhi", Gender::FEMALE, "Core")},
+			{"Tess", 		Member(this_verse, "Tejas", Gender::FEMALE, "Manhas")},
+		    }));
+    this->entities.push_back(gdsc_nit_patna);
 
     for (auto&& entity : this->entities) {
         std::thread(&Entity::simulateExistence, entity).detach();

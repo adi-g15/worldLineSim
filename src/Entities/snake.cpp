@@ -33,7 +33,7 @@ void Snake::simulateExistence() {
 
         // this->moveForward(); // BUG: See issue #5 - https://github.com/adi-g15/worldLineSim/issues/5
 
-        std::this_thread::sleep_for( std::chrono::milliseconds( (int)statics::UNIT_TIME * 1000 ) );
+        std::this_thread::sleep_for( statics::UNIT_TIME );
     }
 
     this->should_simulate = false;

@@ -31,7 +31,7 @@ void Rabin::simulateExistence()
 
         rand_box = linear_iter.curr_box;
 
-        std::this_thread::sleep_for( std::chrono::milliseconds( static_cast<int>(statics::UNIT_TIME * 1000) ));
+        std::this_thread::sleep_for( statics::UNIT_TIME );
     }
 
     LOGGER::log_msg("Rabin #{} ruk gaya", this->_id);

@@ -56,7 +56,7 @@ Verse::~Verse(){
 
 //     while( true ){
 //         this->currWorld->runNextUnitTime();
-//         std::this_thread::sleep_for(std::chrono::microseconds((int) statics::UNIT_TIME * 1000));   //wait for 1 second before executing the nextUnitTime of world
+//         std::this_thread::sleep_for(statics::UNIT_TIME));   //wait before executing the nextUnitTime of world
 //     }
 // }
 
