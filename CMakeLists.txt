@@ -12,6 +12,8 @@ include(CTest)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
 # add CPM
 include(cmake/CPM.cmake)
 
@@ -20,6 +22,7 @@ file(GLOB CUSTOM_ENTITIES_SRC "src/Entities/Custom/*.cpp" "src/Entities/Meta/Cus
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 
 add_executable(worldlinesim main.cpp ${SOURCES} ${DISP_SOURCES} ${CUSTOM_ENTITIES_SRC})
+add_executable(_test _test.cpp)
 
 add_custom_command(TARGET worldlinesim POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -32,15 +35,13 @@ else()
     add_compile_definitions(DEBUG)
 endif()
 
-include_directories(includes)   # should also be available to display
-include_directories(.)
-
+include_directories("include" "modules" ".")
 
 # graphMat & utilpp
-CPMAddPackage("gh:adi-g15/graphMat@1.0.1")
-CPMAddPackage("gh:adi-g15/utilpp@1.0.3")
-target_link_libraries(worldlinesim PRIVATE graphMat)
-target_link_libraries(worldlinesim PRIVATE utilpp)
+CPMAddPackage("gh:adi-g15/graphMat@1.0.3")
+CPMAddPackage("gh:adi-g15/utilpp@1.0.4")
+target_link_libraries(worldlinesim PRIVATE "graphMat" "utilpp")
+target_link_libraries(_test PRIVATE "graphMat" "utilpp")
 
 # spdlog
 CPMAddPackage("gh:gabime/spdlog@1.8.5")
