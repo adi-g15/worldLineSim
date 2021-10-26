@@ -3,28 +3,23 @@
 #include <optional>
 #include <thread>
 
-#include "communication/communicator.hpp"
 #include <boost/lockfree/queue.hpp>
 #include <vector>
 
 // Communication channels
 namespace interthread {
-using communicator::Communicator;
-
 /**
  * MessageQueue
  * A queue which is to be used as a communication channel between TWO entities
  *
- * \note Thread-safe, DOES NOT store messages, passes on the message to
+ * \note Thread-safe, actually a 'wrapper' over boost::lockfree::queue
+ * internally
  * */
 template <typename MessageType = std::vector<bool>> class MessageQueue {
-    Communicator &ea, &eb; // entity a, entity b
     boost::lockfree::queue<MessageType /*, typename Options*/> _queue;
 
   public:
-    MessageQueue(Communicator &entity_a, Communicator &entity_b,
-                 size_t QUEUE_MAX_SIZE = 0)
-        : ea(entity_a), eb(entity_b) {}
+    MessageQueue(size_t QUEUE_MAX_SIZE = 0) {}
 
     /**
      * Pushes message to internal queue

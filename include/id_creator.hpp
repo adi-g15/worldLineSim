@@ -14,5 +14,5 @@ class _ID { // no reuse of IDs, since it's enough
     id_type getId() const noexcept { return this->_id; }
 
   private:
-    static inline std::atomic<id_type> _curr_ID{111110};
+    static inline std::atomic<id_type> _curr_ID{0};
 };

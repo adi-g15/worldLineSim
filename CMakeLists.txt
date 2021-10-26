@@ -46,13 +46,26 @@ target_link_libraries(_test PRIVATE "graphMat" "utilpp")
 # spdlog
 CPMAddPackage("gh:gabime/spdlog@1.8.5")
 
+# On linux can pass this flag to use already installed glfw
+# -D
 # nanogui
+find_package(glfw3)
+if(glfw3_FOUND)
+    CPMAddPackage(
+	    NAME "nanogui"
+	    GITHUB_REPOSITORY "mitsuba-renderer/nanogui"
+	    GIT_TAG "abd03f651b2e8fd168c30a5301d5348712198776"
+	    OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_GLFW OFF" "NANOGUI_BUILD_SHARED OFF" "NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
+	    )
+    target_link_libraries(worldlinesim PRIVATE glfw)
+else()
 CPMAddPackage(
 	NAME "nanogui"
 	GITHUB_REPOSITORY "mitsuba-renderer/nanogui"
-	GIT_TAG "9371d845cbdeb548ac8677656669044fd3a3f2a2"
-	OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_SHARED OFF"	"NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
+	GIT_TAG "abd03f651b2e8fd168c30a5301d5348712198776"
+	OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_SHARED OFF" "NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
 	)
+endif()
 
 # yaml-cpp
 CPMAddPackage(
@@ -66,7 +79,10 @@ target_link_libraries(worldlinesim PRIVATE nanogui spdlog::spdlog yaml-cpp)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+find_package(Boost REQUIRED)
+include_directories(Boost_INCLUDE_DIRS)
 
+target_link_libraries(worldlinesim PRIVATE Boost::headers)
 add_library(arraydisksaver "modules/internal/ArrayDiskSaver/src/impl.cpp")
 target_include_directories(arraydisksaver PRIVATE "modules/internal/ArrayDiskSaver/include")
 
