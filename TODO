@@ -1,0 +1,2 @@
+fmt has breaking changes, due to which can't use latest spdlog. Says string passed not constexpr
+gcc internal seg fault when compiling gdsc.cpp with -fmodules-ts, use commit 70828d0c5d73e837a9866f2da2cfc5d5d6b9ea0d version to file the bug report

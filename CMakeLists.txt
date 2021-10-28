@@ -21,7 +21,18 @@ file(GLOB CUSTOM_ENTITIES_SRC "src/Entities/Custom/*.cpp" "src/Entities/Meta/Cus
 file(GLOB DISP_SOURCES "display/src/*.cpp")
 
 add_executable(worldlinesim main.cpp ${SOURCES} ${DISP_SOURCES} ${CUSTOM_ENTITIES_SRC})
-add_executable(_test _test.cpp)
+#add_executable(_test _test.cpp)
+#target_link_libraries(_test PRIVATE "graphMat" "utilpp")
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # -xc++-system-header iostream
+    target_compile_options(worldlinesim PRIVATE -fmodules-ts)
+else(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # TODO: libc++ mandatory with clang
+    target_compile_options(worldlinesim PRIVATE -fmodules -stdlib=libc++
+            -fbuiltin-module-map)
+endif()
+
 
 add_custom_command(TARGET worldlinesim POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -45,7 +56,6 @@ include_directories("include" "modules" ".")
 CPMAddPackage("gh:adi-g15/graphMat@1.0.3")
 CPMAddPackage("gh:adi-g15/utilpp@1.0.4")
 target_link_libraries(worldlinesim PRIVATE "graphMat" "utilpp")
-target_link_libraries(_test PRIVATE "graphMat" "utilpp")
 
 # spdlog
 CPMAddPackage("gh:gabime/spdlog@1.8.5")
@@ -53,23 +63,23 @@ CPMAddPackage("gh:gabime/spdlog@1.8.5")
 # On linux can pass this flag to use already installed glfw
 # -D
 # nanogui
-find_package(glfw3)
-if(glfw3_FOUND)
-    CPMAddPackage(
-	    NAME "nanogui"
-	    GITHUB_REPOSITORY "mitsuba-renderer/nanogui"
-	    GIT_TAG "abd03f651b2e8fd168c30a5301d5348712198776"
-	    OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_GLFW OFF" "NANOGUI_BUILD_SHARED OFF" "NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
-	    )
-    target_link_libraries(worldlinesim PRIVATE glfw)
-else()
+#find_package(glfw3)
+#if(glfw3_FOUND)
+#    CPMAddPackage(
+#	    NAME "nanogui"
+#	    GITHUB_REPOSITORY "mitsuba-renderer/nanogui"
+#	    GIT_TAG "abd03f651b2e8fd168c30a5301d5348712198776"
+#	    OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_GLFW OFF" "NANOGUI_BUILD_SHARED OFF" "NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
+#	    )
+#    target_link_libraries(worldlinesim PRIVATE glfw)
+#else()
 CPMAddPackage(
 	NAME "nanogui"
 	GITHUB_REPOSITORY "mitsuba-renderer/nanogui"
 	GIT_TAG "abd03f651b2e8fd168c30a5301d5348712198776"
 	OPTIONS "NANOGUI_BUILD_EXAMPLES OFF" "NANOGUI_BUILD_SHARED OFF" "NANOGUI_BUILD_PYTHON OFF" "NANOGUI_INSTALL OFF"
 	)
-endif()
+#endif()
 
 # yaml-cpp
 CPMAddPackage(

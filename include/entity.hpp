@@ -1,11 +1,11 @@
 #pragma once
 
-#include <any>
-#include <functional> // for std::reference_wrapper
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
+import <any>;
+import <functional>; // for std::reference_wrapper
+import <optional>;
+import <string>;
+import <string_view>;
+import <vector>;
 
 #include "declarations.hpp"
 #include "entity_types.hpp"

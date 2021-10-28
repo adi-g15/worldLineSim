@@ -1,0 +1,12 @@
+❯ cmake --build build
+[6/40] Building C object _deps/nanogui-build/CMakeFiles/nanogui.dir/ext/nanovg/src/nanovg.c.o
+cc1: warning: command-line option ‘-fmodules-ts’ is valid for C++/ObjC++ but not for C
+[10/40] Building CXX object CMakeFiles/worldlinesim.dir/src/Entities/Meta/Custom/GDSC/gsdc.cpp.o
+FAILED: CMakeFiles/worldlinesim.dir/src/Entities/Meta/Custom/GDSC/gsdc.cpp.o 
+/usr/bin/g++ -DBOOST_ALL_NO_LIB -DDEBUG -DNANOGUI_USE_OPENGL -DSPDLOG_COMPILED_LIB -I/home/adityag/projects/worldLineSim/include -I/home/adityag/projects/worldLineSim/modules -I/home/adityag/projects/worldLineSim/. -I/home/adityag/.cache/CPM/graphmat/e7d696b9d504cc95fc9596a07f6841d46c12b19d/include -I/home/adityag/.cache/CPM/utilpp/edf247c67180573e04a9ca4f482835d7c2833679/include -I/home/adityag/.cache/CPM/nanogui/7390ecf7bbba0515702bda0effeb62fcecc89841/include -I/home/adityag/.cache/CPM/nanogui/7390ecf7bbba0515702bda0effeb62fcecc89841/ext/nanovg/src -I/home/adityag/.cache/CPM/spdlog/be9796fe42cf4cd102be04c44dd3c83ff2a4d1c0/include -fdiagnostics-color=always -g -fmodules-ts -pthread -std=gnu++20 -MD -MT CMakeFiles/worldlinesim.dir/src/Entities/Meta/Custom/GDSC/gsdc.cpp.o -MF CMakeFiles/worldlinesim.dir/src/Entities/Meta/Custom/GDSC/gsdc.cpp.o.d -o CMakeFiles/worldlinesim.dir/src/Entities/Meta/Custom/GDSC/gsdc.cpp.o -c /home/adityag/projects/worldLineSim/src/Entities/Meta/Custom/GDSC/gsdc.cpp
+g++: internal compiler error: Segmentation fault signal terminated program cc1plus
+Please submit a full bug report,
+with preprocessed source if appropriate.
+See <https://bugs.archlinux.org/> for instructions.
+[19/40] Building CXX object _deps/spdlog-build/CMakeFiles/spdlog.dir/src/fmt.cpp.o
+ninja: build stopped: subcommand failed.

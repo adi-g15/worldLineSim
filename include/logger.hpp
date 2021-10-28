@@ -28,7 +28,7 @@ inline void log_msg(const char *msg_format, FirstType arg, Args... args) {
 inline void log_msg(const char *msg_format) { spdlog::info(msg_format); }
 
 template <typename... Args>
-inline void log_trace(const char *msg_format,
+constexpr void log_trace(const char *msg_format,
                       Args... args) // low importance logs
 {
     spdlog::trace(msg_format, std::forward<Args>(args)...);
