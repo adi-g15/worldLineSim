@@ -1,10 +1,10 @@
 #pragma once
 
-#include <fstream>
-#include <map>
-#include <string>
-#include <string_view>
-#include <vector>
+import <fstream>;
+import <map>;
+import <string>;
+import <string_view>;
+import <vector>;
 
 enum class Gender { MALE, FEMALE };
 

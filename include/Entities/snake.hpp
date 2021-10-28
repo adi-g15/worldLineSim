@@ -6,10 +6,10 @@
 #include "graphMat/graph_box.hpp"
 
 #include <condition_variable>
-#include <cstdint>
-#include <list>
-#include <memory>
-#include <vector>
+import <cstdint>;
+import <list>;
+import <memory>;
+import <vector>;
 
 class Snake; // forward-declaration for use in SnakeBody
 

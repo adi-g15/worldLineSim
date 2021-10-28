@@ -3,12 +3,12 @@
 #include "forward_decl.hpp" // for World_Tree
 #include "id_creator.hpp"
 
-#include <future>
-#include <list>
-#include <map>
-#include <memory>
-#include <thread>
-#include <utility>
+import <future>;
+import <list>;
+import <map>;
+import <memory>;
+import <thread>;
+import <utility>;
 
 #include "display/display.hpp"
 

@@ -33,6 +33,9 @@ else(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
             -fbuiltin-module-map)
 endif()
 
+add_custom_command(TARGET worldlinesim PRE_BUILD
+        COMMAND ${CMAKE_CXX_COMPILER} -fmodules-ts -std=c++20 -x c++-system-header any
+	)
 
 add_custom_command(TARGET worldlinesim POST_BUILD
 		   COMMAND ${CMAKE_COMMAND} -E copy_directory

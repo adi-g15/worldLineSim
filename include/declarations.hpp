@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cassert>
-#include <cstdint>
+import <cstdint>;
 #include <forward_list>
 #include <ostream>
-#include <utility>
+import <utility>;
 
 #include <graphMat/direction.hpp>
 #include <util/ranges.hpp> // for util::contains function

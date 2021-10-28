@@ -1,6 +1,6 @@
 #pragma once
 
-#include <list>
+import <list>;
 
 #include "adapter.hpp"
 #include "id_creator.hpp"

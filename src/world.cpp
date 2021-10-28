@@ -5,7 +5,7 @@
 #include "util/random.hpp"
 
 #include <algorithm>
-#include <chrono>
+import <chrono>;
 
 // Entities
 #include "Entities/Custom/aliens.hpp"

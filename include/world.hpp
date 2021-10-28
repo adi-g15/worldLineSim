@@ -5,10 +5,10 @@
 #include "world_plot.hpp"
 
 #include <mutex>
-#include <thread>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+import <thread>;
+import <unordered_map>;
+import <utility>;
+import <vector>;
 
 typedef World *World_Ptr;
 class World : public _ID {

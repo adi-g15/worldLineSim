@@ -3,11 +3,11 @@
 #include "graphMat/cube_mat.hpp"
 #include "world_tree.hpp"
 
-#include <future>
-#include <iostream> // @debug
-#include <memory>
-#include <stdexcept>
-#include <thread>
+import <future>;
+import <iostream>; // @debug
+import <memory>;
+import <stdexcept>;
+import <thread>;
 
 // Update: Feb 4 -> It no longer returns a promise or a future, display takes
 // over the main thread, and BLOCKS

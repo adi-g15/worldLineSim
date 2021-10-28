@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chrono>
+import <chrono>;
 
 using namespace std::chrono_literals;
 

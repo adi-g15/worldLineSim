@@ -1,9 +1,9 @@
 #include <graphMat/iterators.hpp>
 #include <util/random.hpp>
 
-#include <chrono>
-#include <map>
-#include <thread>
+import <chrono>;
+import <map>;
+import <thread>;
 
 #include "Entities/snake.hpp"
 #include "declarations.hpp"

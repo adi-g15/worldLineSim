@@ -4,10 +4,10 @@
 #include "verse.hpp"
 #include "world_tree.hpp"
 
-#include <chrono>
-#include <future>
-#include <iostream>
-#include <thread>
+import <chrono>;
+import <future>;
+import <iostream>;
+import <thread>;
 
 using namespace nanogui;
 

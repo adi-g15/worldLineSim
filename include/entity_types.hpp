@@ -1,7 +1,7 @@
 #pragma once
 
-#include <array>
-#include <string>
+import <array>;
+import <string>;
 
 // moved here, since there will be many entities, generated, many of them being
 // unique

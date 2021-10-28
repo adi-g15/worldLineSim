@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
-// #include <queue>
-#include <future>
-#include <stack>
-#include <thread>
+import <vector>;
+// import <queue>;
+import <future>;
+import <stack>;
+import <thread>;
 
 #include "forward_decl.hpp"
 

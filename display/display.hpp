@@ -1,10 +1,10 @@
 #pragma once
 
 #include "adapter.hpp"
-#include <chrono>
+import <chrono>;
 
-#include <map>
-#include <string>
+import <map>;
+import <string>;
 
 #include <nanogui/nanogui.h>
 
