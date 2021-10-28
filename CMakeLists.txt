@@ -8,8 +8,7 @@ include(CTest)
 
 #cmake_policy(SET CMP0097 NEW)
 
-# Later utilise features in C++20
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -29,10 +28,15 @@ add_custom_command(TARGET worldlinesim POST_BUILD
 		   	${CMAKE_SOURCE_DIR}/db $<TARGET_FILE_DIR:worldlinesim>/db
 	)
 
-if(CMAKE_BUILD_TYPE EQUAL "Release")
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_definitions(GRAPH_MAT_NO_COORD)
 else()
     add_compile_definitions(DEBUG)
+endif()
+
+if(CMAKE_GENERATOR STREQUAL "Ninja")
+    message("Enabling color in Ninja color")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
 endif()
 
 include_directories("include" "modules" ".")
@@ -80,14 +84,14 @@ target_link_libraries(worldlinesim PRIVATE nanogui spdlog::spdlog yaml-cpp)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 find_package(Boost REQUIRED)
-include_directories(Boost_INCLUDE_DIRS)
+include_directories(${Boost_INCLUDE_DIRS})
 
 target_link_libraries(worldlinesim PRIVATE Boost::headers)
-add_library(arraydisksaver "modules/internal/ArrayDiskSaver/src/impl.cpp")
-target_include_directories(arraydisksaver PRIVATE "modules/internal/ArrayDiskSaver/include")
+add_library(arraydisksaver "modules/internal/storage/ArrayDiskSaver/src/impl.cpp")
+target_include_directories(arraydisksaver PRIVATE "modules/internal/storage/ArrayDiskSaver/include")
 
-add_executable(test_target "modules/internal/ArrayDiskSaver/tests/array_file.cpp")
-target_include_directories(test_target PRIVATE "modules/internal/ArrayDiskSaver/include")
+add_executable(test_target "modules/internal/storage/ArrayDiskSaver/tests/array_file.cpp")
+target_include_directories(test_target PRIVATE "modules/internal/storage/ArrayDiskSaver/include")
 target_link_libraries(test_target PRIVATE arraydisksaver)
 
 target_link_libraries(worldlinesim PRIVATE Threads::Threads)
