@@ -27,6 +27,11 @@ add_custom_command(TARGET worldlinesim POST_BUILD
 	)
 
 if(CMAKE_BUILD_TYPE EQUAL "Release")
+    # Enable LTO when supported by the compiler: https://cmake.org/cmake/help/latest/module/CheckIPOSupported.html
+    check_ipo_supported(RESULT lto_supported)
+    if( lto_supported )
+	set_property(TARGET worldlinesim PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
     add_compile_definitions(GRAPH_MAT_NO_COORD)
 else()
     add_compile_definitions(DEBUG)
@@ -77,3 +82,5 @@ target_link_libraries(worldlinesim PRIVATE Threads::Threads)
 
 # If you want, you can install 'worldlinesim' executable :D
 install(TARGETS worldlinesim DESTINATION bin COMPONENT binaries)
+
+# vim: shiftwidth=4
