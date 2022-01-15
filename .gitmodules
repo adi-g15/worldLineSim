@@ -1,0 +1,3 @@
+[submodule "references/sawtooth-core"]
+	path = references/sawtooth-core
+	url = https://github.com/adi-g15/sawtooth-core.git
