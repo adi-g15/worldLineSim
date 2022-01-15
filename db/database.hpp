@@ -9,7 +9,7 @@
 enum class Gender { MALE, FEMALE };
 
 class db {
-    using id_type = unsigned int;
+    using id_type = u32;
 
     static inline std::vector<std::string> male_names, female_names;
     static constexpr int num_names = 200; // will store 200 names only, at max

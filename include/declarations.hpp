@@ -11,6 +11,16 @@
 
 #include "config.hpp"
 
+// Type aliases
+// 'char' is simply 'char'
+using i32 = int32_t;
+using u32 = uint32_t;
+using f32 = float;
+using f64 = double;
+using i64 = int64_t;
+using u64 = uint64_t;
+// Type aliases END
+
 typedef util::_coord3D<int32_t> coord;
 class Entity; // forward decl
 

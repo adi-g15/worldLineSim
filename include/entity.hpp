@@ -70,6 +70,7 @@ class Entity : public _ID {
         // //doesn't work supported_Operations = {&Entity::_Action1,
         // &Entity::_Action2};
     }
+    virtual ~Entity() {}
 
     friend class World;
 };

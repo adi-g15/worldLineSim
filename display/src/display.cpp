@@ -1,6 +1,7 @@
 #include "../display.hpp"
 
 #include "adapter.hpp"
+#include "nanogui/widget.h"
 #include "verse.hpp"
 #include "world_tree.hpp"
 
@@ -68,7 +69,7 @@ void Display::startDisplay() {
         new Label(legend_window, "");
     }
 
-    auto command_area = new Widget(legend_window);
+    auto command_area = ref<Widget>(new Widget(legend_window));
     command_area->set_layout(new GroupLayout());
 
     new Label(legend_window, "Namaste/New WorldTree");
